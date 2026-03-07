@@ -44,6 +44,11 @@ const TicketList = lazy(() => import('./views/admin/TicketList'));
 const TicketDetail = lazy(() => import('./views/admin/TicketDetail'));
 const StaffRatings = lazy(() => import('./views/admin/StaffRatings'));
 
+// Meter & Utilities Views
+const MeterList = lazy(() => import('./views/admin/MeterList'));
+const BulkMeterEntry = lazy(() => import('./views/admin/BulkMeterEntry'));
+const MeterReadingHistory = lazy(() => import('./views/admin/MeterReadingHistory'));
+
 // Portal Views
 const PortalHome = lazy(() => import('@/views/portal/PortalHome'));
 
@@ -133,6 +138,11 @@ const App = () => {
                    <Route path="/tickets" element={<TicketList />} />
                    <Route path="/tickets/:id" element={<TicketDetail />} />
                    <Route path="/staff/:id/ratings" element={<StaffRatings />} />
+                   
+                   {/* Meter & Utility Routes */}
+                   <Route path="/meters" element={<MeterList />} />
+                   <Route path="/meters/bulk-entry" element={<BulkMeterEntry />} />
+                   <Route path="/meters/:id/readings" element={<MeterReadingHistory />} />
                    
                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
                  </Route>

@@ -84,15 +84,31 @@
 
 @layer components {
   .card-container {
-    @apply bg-white rounded-lg shadow-sm border border-border overflow-hidden;
+    @apply bg-white/70 backdrop-blur-xl rounded-[32px] shadow-2xl shadow-slate-200/50 border border-white/20 transition-all duration-300;
   }
   
   .btn-primary {
-    @apply bg-primary text-white px-space-4 py-space-2 rounded-md hover:opacity-90 transition-all font-medium;
+    @apply bg-primary text-white px-8 py-3 rounded-[20px] hover:opacity-90 active:scale-95 transition-all font-black uppercase tracking-[2px] text-[13px] shadow-xl shadow-blue-900/40;
+  }
+
+  .input-base {
+    @apply w-full px-5 rounded-[20px] bg-white border border-slate-200 text-slate-900 text-[14px] font-bold outline-none ring-blue-900/5 transition-all focus:border-blue-700/40 focus:ring-4 focus:shadow-xl focus:shadow-blue-900/5 placeholder:text-slate-300;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
   }
 
   /* Responsive Utilities */
   .layout-grid {
-    @apply grid gap-space-4;
+    @apply grid gap-6;
   }
 }
