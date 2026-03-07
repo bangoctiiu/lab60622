@@ -12,7 +12,8 @@ export type StatusType =
   | 'Confirmed' | 'Submitted' | 'Published' 
   | 'Vacant' | 'Occupied' | 'Maintenance' | 'Reserved'
   | 'Apartment' | 'Office' | 'Mixed' | 'Shophouse'
-  | 'FullOwner' | 'CoOwner' | 'Investor';
+  | 'FullOwner' | 'CoOwner' | 'Investor'
+  | 'CheckedOut' | 'Blacklisted';
 
 interface StatusBadgeProps {
   status: StatusType | string;
@@ -60,6 +61,8 @@ const statusConfig: Record<string, { bg: string; text: string }> = {
   FullOwner: { bg: '#DBEAFE', text: '#1E40AF' },
   CoOwner: { bg: '#EDE9FE', text: '#5B21B6' },
   Investor: { bg: '#D1FAE5', text: '#065F46' },
+  CheckedOut: { bg: '#F3F4F6', text: '#6B7280' },
+  Blacklisted: { bg: '#FEE2E2', text: '#991B1B' },
 };
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className, size = 'md' }) => {

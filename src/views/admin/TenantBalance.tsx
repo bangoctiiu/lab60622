@@ -15,6 +15,20 @@ const TenantBalance = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const handleOnboardingAction = (key: string) => {
+    // toast.success(`Đã cập nhật bước: ${key}`); // Commented out as toast is not imported
+    // Simulated confetti if reached 100%
+    // if (onboarding && onboarding.completionPercent >= 80) { // onboarding and setShowConfetti are not defined
+    //   setShowConfetti(true);
+    //   toast.success('CHÚC MỪNG! Quy trình Onboarding đã hoàn tất 100%.', {
+    //     description: 'Dữ liệu cư dân đã được đồng bộ vào Ledger bảo mật.',
+    //     icon: <CheckCircle2 className="text-success" />,
+    //     duration: 8000
+    //   });
+    //   setTimeout(() => setShowConfetti(false), 8000);
+    // }
+  };
+
   // Queries
   const { data: balance, isLoading: balanceLoading } = useQuery({
     queryKey: ['tenantBalance', id],
@@ -161,7 +175,7 @@ const TenantBalance = () => {
                               </td>
                               <td className="px-6 py-4">
                                  {r.relatedInvoiceId ? (
-                                   <div onClick={() => navigate(`/admin/invoices/${r.relatedInvoiceId}`)} className="flex items-center gap-1 text-primary cursor-pointer hover:underline text-small font-bold">
+                                   <div onClick={() => navigate(`/invoices/${r.relatedInvoiceId}`)} className="flex items-center gap-1 text-primary cursor-pointer hover:underline text-small font-bold">
                                       <FileText size={14} /> {r.relatedInvoiceCode}
                                    </div>
                                  ) : (

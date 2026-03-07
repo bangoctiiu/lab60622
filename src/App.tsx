@@ -24,6 +24,8 @@ const CreateContractWizard = lazy(() => import('@/views/admin/CreateContractWiza
 // Payment Views
 const PaymentList = lazy(() => import('@/views/admin/PaymentList'));
 const WebhookLogs = lazy(() => import('@/views/admin/WebhookLogs'));
+const TenantList = lazy(() => import('@/views/admin/TenantList'));
+const TenantDetail = lazy(() => import('@/views/admin/TenantDetail'));
 const TenantBalance = lazy(() => import('@/views/admin/TenantBalance'));
 
 // Room & Asset Views
@@ -106,6 +108,9 @@ const App = () => {
                   {/* Payment Routes */}
                   <Route path="/payments" element={<PaymentList />} />
                   <Route path="/payments/webhooks" element={<WebhookLogs />} />
+                  {/* Tenant Routes */}
+                  <Route path="/tenants" element={<TenantList />} />
+                  <Route path="/tenants/:id" element={<TenantDetail />} />
                   <Route path="/tenants/:id/balance" element={<TenantBalance />} />
                   
                   {/* Room & Asset Routes */}

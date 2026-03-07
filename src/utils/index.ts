@@ -25,11 +25,29 @@ export const formatDate = (date: Date | string | number, formatStr: string = 'dd
 };
 
 /**
- * Mask CCCD/ID Card number for security
+ * Mask CCCD/ID Card number for security (Requirement: Mask first 8 chars)
  */
 export const maskCCCD = (id: string): string => {
-  if (!id || id.length < 6) return id;
-  return id.substring(0, 3) + 'xxx' + id.substring(id.length - 3);
+  if (!id || id.length < 12) return id;
+  return '********' + id.substring(8);
+};
+
+/**
+ * Mask Phone number (Hide middle numbers)
+ */
+export const maskPhone = (phone: string): string => {
+  if (!phone || phone.length < 9) return phone;
+  return phone.substring(0, 3) + '****' + phone.substring(phone.length - 3);
+};
+
+/**
+ * Format age from date of birth
+ */
+import { differenceInYears } from 'date-fns';
+export const calculateAge = (dob: string | Date): string => {
+  if (!dob) return '--';
+  const age = differenceInYears(new Date(), new Date(dob));
+  return `${age} tuổi`;
 };
 
 /**
