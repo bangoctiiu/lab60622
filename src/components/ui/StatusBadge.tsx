@@ -8,7 +8,7 @@ export type StatusType =
   | 'Active' | 'Paid' | 'Completed' 
   | 'Pending' | 'Draft' 
   | 'Overdue' | 'Expired' | 'Terminated' | 'Cancelled'
-  | 'Open' | 'InProgress' | 'Resolved' 
+  | 'Open' | 'InProgress' | 'Resolved' | 'Closed'
   | 'Confirmed' | 'Submitted' | 'Published' 
   | 'Vacant' | 'Occupied' | 'Maintenance' | 'Reserved'
   | 'Apartment' | 'Office' | 'Mixed' | 'Shophouse'
@@ -45,6 +45,7 @@ const statusConfig: Record<string, { bg: string; text: string }> = {
   
   InProgress: { bg: '#E0F2FE', text: '#0369A1' },
   Resolved: { bg: '#DCFCE7', text: '#166534' },
+  Closed: { bg: '#F1F5F9', text: '#475569' },
   Published: { bg: '#CCFBF1', text: '#0F766E' },
   
   Critical: { bg: '#FEE2E2', text: '#991B1B' }, 

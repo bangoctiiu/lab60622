@@ -1,0 +1,339 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { 
+  Plus, Search, LayoutGrid, List, Building, AlertCircle, 
+  MapPin, User, Clock, ChevronRight, MoreVertical, 
+  Download, Filter, ArrowRight 
+} from 'lucide-react';
+import { ticketService } from '@/services/ticketService';
+import { TicketSummary, TicketStatus, TicketPriority, TicketType } from '@/models/Ticket';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { SelectAsync } from '@/components/ui/SelectAsync';
+import { cn } from '@/utils';
+import { formatDistanceToNow, isAfter, parseISO, differenceInSeconds } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import { TicketKanban } from '@/components/tickets/TicketKanban';
+import { TicketFormModal } from '@/components/forms/TicketFormModal';
+import useUIStore from '@/stores/uiStore';
+import { toast } from 'sonner';
+
+const Spinner = () => (
+  <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+);
+
+// 4.1.3 Priority Color Dots
+const PRIORITY_COLORS: Record<TicketPriority, string> = {
+  Critical: 'bg-[#DC2626]',
+  High: 'bg-[#F97316]',
+  Medium: 'bg-[#EAB308]',
+  Low: 'bg-[#22C55E]'
+};
+
+const TYPE_ICONS: Record<TicketType, any> = {
+  Maintenance: AlertCircle,
+  Complaint: AlertCircle,
+  ServiceRequest: AlertCircle,
+  Inquiry: AlertCircle,
+  Emergency: AlertCircle
+};
+
+// 4.1.1 SLA Countdown Component
+const SLACountdown = ({ deadline, status }: { deadline: string, status: TicketStatus }) => {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    if (status === 'Resolved' || status === 'Closed' || status === 'Cancelled') return;
+    const interval = setInterval(() => setNow(new Date()), 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [status]);
+
+  const targetDate = parseISO(deadline);
+  const diff = differenceInSeconds(targetDate, now);
+  const isBreached = diff <= 0;
+
+  if (status === 'Resolved' || status === 'Closed' || status === 'Cancelled') {
+    return <span className="text-muted opacity-50 text-[10px] font-bold">DONE</span>;
+  }
+
+  const hours = Math.floor(Math.abs(diff) / 3600);
+  const minutes = Math.floor((Math.abs(diff) % 3600) / 60);
+
+  return (
+    <div className={cn(
+      "flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black tracking-tighter shadow-sm border",
+      isBreached
+        ? "bg-danger/10 text-danger border-danger/20 animate-pulse"
+        : "bg-warning/10 text-warning border-warning/20"
+    )}>
+      <Clock size={10} />
+      <span>{isBreached ? '-' : ''}{hours}h {minutes}m</span>
+    </div>
+  );
+};
+
+const TicketList = () => {
+  const navigate = useNavigate();
+  const { activeBuildingId, setBuilding } = useUIStore();
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>(() =>
+    (localStorage.getItem('ticket-view-mode') as any) || 'list'
+  );
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<TicketStatus[]>(['Open', 'InProgress']);
+  const [priorityFilter, setPriorityFilter] = useState<TicketPriority[]>([]);
+  const [typeFilter, setTypeFilter] = useState<TicketType[]>([]);
+  const [slaBreached, setSlaBreached] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('ticket-view-mode', viewMode);
+  }, [viewMode]);
+
+  const { data: tickets, isLoading, refetch } = useQuery<TicketSummary[]>({
+    queryKey: ['tickets', search, activeBuildingId, statusFilter, priorityFilter, typeFilter, slaBreached],
+    queryFn: () => ticketService.getTickets({ 
+      search, 
+      buildingId: activeBuildingId, 
+      status: statusFilter,
+      priority: priorityFilter,
+      type: typeFilter,
+      slaBreached
+    })
+  });
+
+  const handleStatusChange = async (id: string, newStatus: TicketStatus) => {
+    try {
+      await ticketService.updateStatus(id, newStatus);
+      toast.success(`Ticket ${id} chuyển thành ${newStatus}!`);
+      refetch();
+    } catch (e) {
+      toast.error('Lỗi khi chuyển trạng thái!');
+    }
+  };
+
+  const toggleStatus = (s: TicketStatus) => {
+    setStatusFilter(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  };
+
+  const togglePriority = (p: TicketPriority) => {
+    setPriorityFilter(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  };
+
+  const handleCreateTicket = async (data: any) => {
+    try {
+      console.log('Creating ticket:', data);
+      // await ticketService.createTicket(data); // Uncomment and implement actual service call
+      toast.success('Đã tạo ticket thành công!');
+      setIsModalOpen(false);
+      refetch();
+    } catch (e) {
+      toast.error('Lỗi khi tạo ticket!');
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-3 bg-primary/10 text-primary rounded-2xl shadow-inner">
+              <AlertCircle size={28} />
+            </div>
+            <h1 className="text-display text-primary leading-tight">Yêu cầu & Sự cố</h1>
+          </div>
+          <p className="text-body text-muted font-medium">Trung tâm điều hành hỗ trợ cư dân, quản lý kỹ thuật và xử lý khiếu nại.</p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <div className="flex bg-bg/50 p-1.5 rounded-2xl border border-border/10">
+             <button 
+               onClick={() => setViewMode('list')}
+               className={cn("p-2 rounded-xl transition-all", viewMode === 'list' ? "bg-white text-primary shadow-sm" : "text-muted hover:text-primary")}
+             >
+                <List size={20} />
+             </button>
+             <button 
+               onClick={() => setViewMode('kanban')}
+               className={cn("p-2 rounded-xl transition-all", viewMode === 'kanban' ? "bg-white text-primary shadow-sm" : "text-muted hover:text-primary")}
+             >
+                <LayoutGrid size={20} />
+             </button>
+          </div>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="btn-primary flex items-center gap-2 px-8 h-12 shadow-xl shadow-primary/20 hover:-translate-y-0.5"
+          >
+            <Plus size={18} /> Tạo ticket
+          </button>
+        </div>
+      </div>
+
+      {/* 4.1.2 Filter Panel */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 items-center bg-bg/20 p-6 rounded-[32px] border border-border/10">
+        <div className="lg:col-span-3">
+           <SelectAsync 
+             placeholder="Tòa nhà"
+             icon={Building}
+             value={activeBuildingId}
+             onChange={setBuilding}
+             loadOptions={async () => [
+               { label: 'The Manor Central Park', value: 'B1' },
+               { label: 'Vinhomes Central Park', value: 'B2' }
+             ]}
+           />
+        </div>
+
+        <div className="lg:col-span-3 relative group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" size={18} />
+          <input 
+            type="text" 
+            placeholder="Tìm mã ticket, tiêu đề..." 
+            className="input-base w-full pl-12 pr-4 h-12 shadow-sm focus:shadow-lg transition-all"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="lg:col-span-6 flex items-center gap-5 overflow-x-auto no-scrollbar py-1">
+           <div className="flex items-center gap-2 pr-4 border-r border-border/20">
+              {(['Open', 'InProgress', 'Resolved', 'Closed'] as TicketStatus[]).map(s => (
+                <button
+                  key={s}
+                  onClick={() => toggleStatus(s)}
+                  className={cn(
+                    "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    statusFilter.includes(s) 
+                      ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                      : "bg-white text-muted hover:text-primary border border-border/50"
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+           </div>
+
+           <div className="flex items-center gap-2 pr-4 border-r border-border/20">
+              {(['Critical', 'High', 'Medium', 'Low'] as TicketPriority[]).map(p => (
+                <button
+                  key={p}
+                  onClick={() => togglePriority(p)}
+                  className={cn(
+                    "w-3 h-3 rounded-full transition-all hover:scale-125",
+                    PRIORITY_COLORS[p],
+                    priorityFilter.includes(p) ? "ring-4 ring-offset-2 ring-slate-200" : "opacity-40 hover:opacity-100"
+                  )}
+                  title={p}
+                />
+              ))}
+           </div>
+
+           <label className="flex items-center gap-3 cursor-pointer group whitespace-nowrap">
+              <div 
+                onClick={() => setSlaBreached(!slaBreached)}
+                className={cn(
+                  "w-10 h-5 rounded-full transition-all relative border",
+                  slaBreached ? "bg-danger border-danger" : "bg-white border-border"
+                )}
+              >
+                 <div className={cn(
+                   "absolute top-1 w-3 h-3 rounded-full bg-white transition-all shadow-sm",
+                   slaBreached ? "right-1" : "left-1"
+                 )} />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-muted group-hover:text-danger">SLA Breached</span>
+           </label>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="py-40 flex flex-col items-center justify-center gap-4">
+           <Spinner />
+           <p className="text-[11px] text-muted font-bold uppercase tracking-[4px]">Fetching Command Center Data...</p>
+        </div>
+      ) : viewMode === 'list' ? (
+        /* List View */
+        <div className="card-container p-0 overflow-hidden border-none shadow-2xl shadow-primary/5 bg-white/40 backdrop-blur-md">
+           <div className="overflow-x-auto">
+             <table className="w-full text-left border-collapse">
+               <thead className="bg-bg/50 border-b border-border/20">
+                 <tr>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted whitespace-nowrap">Ticket ID</th>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted">Vấn đề</th>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted">Loại / Ưu tiên</th>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted text-center">Trạng thái</th>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted">Phụ trách</th>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted">Cảnh báo SLA</th>
+                    <th className="px-6 py-5 text-[9px] font-black uppercase tracking-widest text-muted text-right">Age</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-border/10">
+                 {tickets?.map(t => (
+                   <tr 
+                     key={t.id} 
+                     className="group hover:bg-white transition-all cursor-pointer"
+                     onClick={() => navigate(`/tickets/${t.id}`)}
+                   >
+                     <td className="px-6 py-5">
+                       <div className="flex items-center gap-3">
+                          <div className={cn("w-2 h-2 rounded-full", PRIORITY_COLORS[t.priority])} />
+                          <span className="font-mono text-small font-black text-primary group-hover:underline">{t.ticketCode}</span>
+                       </div>
+                     </td>
+                     <td className="px-6 py-5">
+                        <p className="text-small font-bold text-primary line-clamp-1">{t.title}</p>
+                     </td>
+                     <td className="px-6 py-5">
+                        <div className="flex items-center gap-2">
+                           <div className="p-1.5 bg-bg/50 rounded-lg text-muted">
+                              <AlertCircle size={14} />
+                           </div>
+                           <span className="text-[10px] font-bold text-muted uppercase tracking-tighter">{t.type}</span>
+                        </div>
+                     </td>
+                     <td className="px-6 py-5 text-center">
+                        <StatusBadge status={t.status} size="sm" />
+                     </td>
+                     <td className="px-6 py-5">
+                        {t.assignedToName ? (
+                          <div className="flex items-center gap-2">
+                             <img src={t.assignedToAvatar} className="w-6 h-6 rounded-lg object-cover border border-border/20" alt="" />
+                             <span className="text-[11px] font-bold text-primary">{t.assignedToName}</span>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-black uppercase text-muted italic opacity-50">Chưa gán</span>
+                        )}
+                     </td>
+                     <td className="px-6 py-5">
+                        <SLACountdown deadline={t.slaDeadline} status={t.status} />
+                     </td>
+                     <td className="px-6 py-5 text-right">
+                        <span className="text-[11px] font-bold text-muted">
+                           {formatDistanceToNow(parseISO(t.createdAt), { locale: vi })}
+                        </span>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+           </div>
+        </div>
+      ) : (
+        <TicketKanban
+          tickets={tickets || []}
+          onStatusChange={handleStatusChange}
+          onTicketClick={(id) => navigate(`/tickets/${id}`)}
+        />
+      )}
+
+      <TicketFormModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleCreateTicket}
+      />
+    </div>
+  );
+};
+
+export default TicketList;

@@ -14,30 +14,35 @@ const ChangePasswordPage = lazy(() => import('@/views/auth/ChangePasswordPage'))
 const OTPVerifyPage = lazy(() => import('@/views/auth/OTPVerifyPage'));
 
 // Admin Views
-const Dashboard = lazy(() => import('@/views/admin/Dashboard'));
-const InvoiceList = lazy(() => import('@/views/admin/InvoiceList'));
-const InvoiceDetail = lazy(() => import('@/views/admin/InvoiceDetail'));
-const ContractList = lazy(() => import('@/views/admin/ContractList'));
-const ContractDetail = lazy(() => import('@/views/admin/ContractDetail'));
-const CreateContractWizard = lazy(() => import('@/views/admin/CreateContractWizard'));
+const Dashboard = lazy(() => import('./views/admin/Dashboard'));
+const InvoiceList = lazy(() => import('./views/admin/InvoiceList'));
+const InvoiceDetail = lazy(() => import('./views/admin/InvoiceDetail'));
+const ContractList = lazy(() => import('./views/admin/ContractList'));
+const ContractDetail = lazy(() => import('./views/admin/ContractDetail'));
+const CreateContractWizard = lazy(() => import('./views/admin/CreateContractWizard'));
 
 // Payment Views
-const PaymentList = lazy(() => import('@/views/admin/PaymentList'));
-const WebhookLogs = lazy(() => import('@/views/admin/WebhookLogs'));
-const TenantList = lazy(() => import('@/views/admin/TenantList'));
-const TenantDetail = lazy(() => import('@/views/admin/TenantDetail'));
-const TenantBalance = lazy(() => import('@/views/admin/TenantBalance'));
+const PaymentList = lazy(() => import('./views/admin/PaymentList'));
+const WebhookLogs = lazy(() => import('./views/admin/WebhookLogs'));
+const TenantList = lazy(() => import('./views/admin/TenantList'));
+const TenantDetail = lazy(() => import('./views/admin/TenantDetail'));
+const TenantBalance = lazy(() => import('./views/admin/TenantBalance'));
 
 // Room & Asset Views
-const RoomList = lazy(() => import('@/views/admin/RoomList'));
-const RoomDetail = lazy(() => import('@/views/admin/RoomDetail'));
-const HandoverChecklist = lazy(() => import('@/views/admin/HandoverChecklist'));
-const AssetCatalog = lazy(() => import('@/views/admin/AssetCatalog'));
+const RoomList = lazy(() => import('./views/admin/RoomList'));
+const RoomDetail = lazy(() => import('./views/admin/RoomDetail'));
+const HandoverChecklist = lazy(() => import('./views/admin/HandoverChecklist'));
+const AssetCatalog = lazy(() => import('./views/admin/AssetCatalog'));
 
 // Building & Owner Views
 const BuildingList = lazy(() => import('./views/admin/BuildingList'));
 const BuildingDetail = lazy(() => import('./views/admin/BuildingDetail'));
 const OwnerList = lazy(() => import('./views/admin/OwnerList'));
+
+// Ticket & Support Views
+const TicketList = lazy(() => import('./views/admin/TicketList'));
+const TicketDetail = lazy(() => import('./views/admin/TicketDetail'));
+const StaffRatings = lazy(() => import('./views/admin/StaffRatings'));
 
 // Portal Views
 const PortalHome = lazy(() => import('@/views/portal/PortalHome'));
@@ -119,14 +124,19 @@ const App = () => {
                   <Route path="/rooms/:id/handover" element={<HandoverChecklist />} />
                   <Route path="/assets" element={<AssetCatalog />} />
                   
-                  {/* Building & Owner Routes */}
-                  <Route path="/buildings" element={<BuildingList />} />
-                  <Route path="/buildings/:id" element={<BuildingDetail />} />
-                  <Route path="/owners" element={<OwnerList />} />
-                  
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                </Route>
-              </Route>
+                   {/* Building & Owner Routes */}
+                   <Route path="/buildings" element={<BuildingList />} />
+                   <Route path="/buildings/:id" element={<BuildingDetail />} />
+                   <Route path="/owners" element={<OwnerList />} />
+ 
+                   {/* Ticket & Support Routes */}
+                   <Route path="/tickets" element={<TicketList />} />
+                   <Route path="/tickets/:id" element={<TicketDetail />} />
+                   <Route path="/staff/:id/ratings" element={<StaffRatings />} />
+                   
+                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                 </Route>
+               </Route>
 
               {/* 2. Tenant Portal Namespace (Protected, Mobile-first) */}
               <Route path="/portal" element={<ProtectedRoute requiredRole="Tenant" />}>
