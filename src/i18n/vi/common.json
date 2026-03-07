@@ -1,0 +1,14 @@
+{
+  "app_title": "SmartStay BMS — Quản lý tòa nhà thông minh v5.0",
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất"
+  },
+  "nav": {
+    "dashboard": "Bảng điều khiển",
+    "management": "Quản lý tòa nhà",
+    "contracts": "Hợp đồng & Phí",
+    "operations": "Vận hành",
+    "reports": "Báo cáo"
+  }
+}

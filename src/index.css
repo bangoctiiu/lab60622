@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 2.1 Color Tokens */
+    --color-primary: #1B3A6B;
+    --color-secondary: #0D8A8A;
+    --color-accent: #F26419;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
+    --color-bg: #F4F6FA;
+    --color-card: #FFFFFF;
+    --color-text: #1A1A2E;
+    --color-muted: #6B7280;
+    --color-border: #E2E8F0;
+
+    /* 2.3 Spacing Tokens */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+    --space-8: 48px;
+
+    /* 2.3 Border Radius Tokens */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+    --radius-2xl: 16px;
+    --radius-full: 9999px;
+
+    /* Semantic Mappings */
+    --background: var(--color-bg);
+    --foreground: var(--color-text);
+    --primary: var(--color-primary);
+    --secondary: var(--color-secondary);
+    --accent: var(--color-accent);
+    --border: var(--color-border);
+    --input: var(--color-border);
+    --ring: var(--color-primary);
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "DM Sans", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 2.2 Typography Scale - Semantic Classes */
+  .text-display { 
+    font-family: "Syne", sans-serif;
+    @apply text-[32px] font-bold leading-tight; 
+  }
+  .text-h1 { 
+    @apply text-[24px] font-bold leading-snug; 
+  }
+  .text-h2 { 
+    @apply text-[20px] font-semibold; 
+  }
+  .text-h3 { 
+    @apply text-[18px] font-semibold; 
+  }
+  .text-body { 
+    @apply text-[14px] font-normal leading-relaxed; 
+  }
+  .text-small { 
+    @apply text-[12px] font-normal; 
+  }
+  .text-label { 
+    @apply text-[11px] font-medium uppercase tracking-wider; 
+  }
+  .text-mono { 
+    font-family: "IBM Plex Mono", monospace;
+    @apply text-[13px] font-normal; 
+  }
+}
+
+@layer components {
+  .card-container {
+    @apply bg-white rounded-lg shadow-sm border border-border overflow-hidden;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white px-space-4 py-space-2 rounded-md hover:opacity-90 transition-all font-medium;
+  }
+
+  /* Responsive Utilities */
+  .layout-grid {
+    @apply grid gap-space-4;
+  }
+}

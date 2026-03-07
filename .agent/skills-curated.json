@@ -1,0 +1,16 @@
+{
+  "project": "SmartStay_Frontend",
+  "description": "Curated skills for property/rental management frontend — React, Vue, TypeScript, Tailwind (verified existing)",
+  "skills": [
+    {"id": "react-best-practices", "useWhen": ["Component React", "data fetching", "performance", "re-render"]},
+    {"id": "react-patterns", "useWhen": ["Hooks", "state", "composition", "patterns React"]},
+    {"id": "react-ui-patterns", "useWhen": ["Loading", "error", "empty state", "data display"]},
+    {"id": "tailwind-patterns", "useWhen": ["Tailwind CSS", "styling", "responsive"]},
+    {"id": "tailwind-design-system", "useWhen": ["Design tokens", "theme", "components"]},
+    {"id": "web-design-guidelines", "useWhen": ["UI guidelines", "aesthetics"]},
+    {"id": "typescript-expert", "useWhen": ["TypeScript", "types", "strict mode"]},
+    {"id": "web-performance-optimization", "useWhen": ["Performance frontend"]},
+    {"id": "web-security-testing", "useWhen": ["XSS", "client-side security"]},
+    {"id": "planning-with-files", "useWhen": ["Lập kế hoạch trước khi code"]}
+  ]
+}

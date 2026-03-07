@@ -1,0 +1,14 @@
+{
+  "app_title": "SmartStay BMS — Smart Building Management v5.0",
+  "auth": {
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "management": "Property Mgmt",
+    "contracts": "Contracts & Fees",
+    "operations": "Operations",
+    "reports": "Reports"
+  }
+}
