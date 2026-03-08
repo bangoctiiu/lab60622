@@ -9,3 +9,5 @@ export * from './SignaturePad';
 export * from './QRCode';
 export * from './MonthYearPicker';
 export * from './Modal';
+export * from './TierTableInput';
+export * from './PolicyPreview';

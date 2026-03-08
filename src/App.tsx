@@ -49,6 +49,10 @@ const MeterList = lazy(() => import('./views/admin/MeterList'));
 const BulkMeterEntry = lazy(() => import('./views/admin/BulkMeterEntry'));
 const MeterReadingHistory = lazy(() => import('./views/admin/MeterReadingHistory'));
 
+// Settings Views
+const ElectricityPolicyPage = lazy(() => import('@/views/admin/settings/ElectricityPolicyPage'));
+const WaterPolicyPage = lazy(() => import('@/views/admin/settings/WaterPolicyPage'));
+
 // Portal Views
 const PortalHome = lazy(() => import('@/views/portal/PortalHome'));
 
@@ -175,6 +179,12 @@ const App = () => {
                        <Route path="nps" element={<Suspense fallback={<PageSkeleton />}><NPSReport /></Suspense>} />
                        <Route path="staff" element={<Suspense fallback={<PageSkeleton />}><StaffReport /></Suspense>} />
                        <Route path="alerts" element={<Suspense fallback={<PageSkeleton />}><AlertsReport /></Suspense>} />
+                     </Route>
+                     
+                     {/* Settings Routes (Admin Only) */}
+                     <Route path="/settings">
+                       <Route path="electricity-policy" element={<Suspense fallback={<PageSkeleton />}><ElectricityPolicyPage /></Suspense>} />
+                       <Route path="water-policy" element={<Suspense fallback={<PageSkeleton />}><WaterPolicyPage /></Suspense>} />
                      </Route>
                    </Route>
 
