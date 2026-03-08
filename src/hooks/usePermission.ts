@@ -14,5 +14,9 @@ export const usePermissionStore = create<PermissionState>((set, get) => ({
 
 export const usePermission = () => {
   const { permissions, hasPermission } = usePermissionStore();
-  return { permissions, hasPermission };
+  return { 
+    permissions, 
+    hasPermission,
+    can: hasPermission 
+  };
 };

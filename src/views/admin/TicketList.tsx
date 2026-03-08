@@ -12,11 +12,14 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { SelectAsync } from '@/components/ui/SelectAsync';
 import { cn } from '@/utils';
 import { formatDistanceToNow, isAfter, parseISO, differenceInSeconds } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { vi } from 'date-fns/locale/vi';
 import { TicketKanban } from '@/components/tickets/TicketKanban';
 import { TicketFormModal } from '@/components/forms/TicketFormModal';
 import useUIStore from '@/stores/uiStore';
+import useAuthStore from '@/stores/authStore';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
+import StaffMyTickets from '@/views/admin/StaffMyTickets';
 
 const Spinner = () => (
   <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -131,6 +134,13 @@ const TicketList = () => {
       toast.error('Lỗi khi tạo ticket!');
     }
   };
+
+  const { user } = useAuthStore();
+  const [searchParams] = useSearchParams();
+
+  if (user?.role === 'Staff' && searchParams.get('assignedTo') === 'me') {
+    return <StaffMyTickets />;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">

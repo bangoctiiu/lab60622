@@ -112,3 +112,31 @@
     @apply grid gap-6;
   }
 }
+
+@media print {
+  .sidebar, .topbar, .filter-panel, .btn-primary, button {
+    display: none !important;
+  }
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .card-container, .bg-white {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .recharts-responsive-container {
+    width: 100% !important;
+    page-break-inside: avoid;
+  }
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+}

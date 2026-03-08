@@ -25,6 +25,7 @@ const navItems: { group: string; items: NavItem[] }[] = [
     group: "CORE SYSTEM",
     items: [
       { label: "Tổng quan", route: "/dashboard", icon: LayoutDashboard },
+      { label: "Vé của tôi", route: "/tickets?assignedTo=me", icon: AlertCircle, permission: "ticket.view" },
       { label: "Hợp đồng", route: "/contracts", icon: FileText, permission: "contract.view" },
       { label: "Hóa đơn", route: "/invoices", icon: Receipt, permission: "invoice.view" },
       { label: "Thanh toán", route: "/payments", icon: CreditCard, permission: "payment.view" },
@@ -36,9 +37,11 @@ const navItems: { group: string; items: NavItem[] }[] = [
   {
     group: "OPERATIONS",
     items: [
-      { label: "Đồng hồ điện/nước", route: "/meters", icon: Gauge, permission: "meter.view" },
+      { label: "Nhập số điện/nước", route: "/meters/bulk-entry", icon: Gauge, permission: "meter.entry" },
+      { label: "Kiểm tra Khách", route: "/staff/visitor-checkin", icon: Users, permission: "visitor.checkin" },
+      { label: "Kiểm tra Tiện ích", route: "/staff/amenity-checkin", icon: Zap, permission: "amenity.checkin" },
       { label: "Tài sản", route: "/assets", icon: Package, permission: "asset.view" },
-      { label: "Yêu cầu & Sự cố", route: "/tickets", icon: AlertCircle, permission: "ticket.view", badge: 3 },
+      { label: "Tất cả Vé yêu cầu", route: "/tickets", icon: AlertCircle, permission: "ticket.view.all", badge: 3 },
       { label: "Báo cáo", route: "/reports", icon: BarChart2, permission: "report.view" },
       { label: "Thông báo", route: "/announcements", icon: Megaphone, permission: "announcement.manage" },
       { label: "Chủ sở hữu", route: "/owners", icon: Briefcase, adminOnly: true },

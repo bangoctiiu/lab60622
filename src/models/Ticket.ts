@@ -86,6 +86,7 @@ export interface TicketSummary {
   priority: TicketPriority;
   type: TicketType;
   status: TicketStatus;
+  roomName?: string;
   assignedToName?: string;
   assignedToAvatar?: string;
   slaDeadline: string;

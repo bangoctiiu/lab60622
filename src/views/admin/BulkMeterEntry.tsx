@@ -31,14 +31,15 @@ const BulkMeterEntry = () => {
 
   const [monthYear, setMonthYear] = useState(new Date().toISOString().substring(0, 7));
   const [readingDate, setReadingDate] = useState(new Date().toISOString().substring(0, 10));
+  const [missingOnly, setMissingOnly] = useState(false);
 
   // Step 2 Data
   const [readings, setReadings] = useState<Record<string, { current: string; note: string; prev: number }>>({});
   
   // Queries
   const { data: meters, isLoading: isLoadingMeters } = useQuery({
-    queryKey: ['meters-bulk', buildingId, meterType],
-    queryFn: () => meterService.getMeters({ buildingId, type: meterType, status: 'Active' }),
+    queryKey: ['meters-bulk', buildingId, meterType, missingOnly],
+    queryFn: () => meterService.getMeters({ buildingId, type: meterType, status: 'Active', missingOnly }),
     enabled: step >= 2
   });
 
@@ -185,6 +186,17 @@ const BulkMeterEntry = () => {
                          <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Ngày ghi</label>
                          <input type="date" value={readingDate} onChange={(e) => setReadingDate(e.target.value)} className="input-base h-14 bg-white font-black" />
                       </div>
+                   </div>
+
+                   <div className="flex items-center gap-4 bg-primary/5 p-4 rounded-2xl border border-primary/10">
+                      <input 
+                        type="checkbox" 
+                        id="missingOnly"
+                        checked={missingOnly}
+                        onChange={(e) => setMissingOnly(e.target.checked)}
+                        className="w-5 h-5 accent-primary cursor-pointer" 
+                      />
+                      <label htmlFor="missingOnly" className="text-small font-black text-primary cursor-pointer">Chỉ hiển thị phòng chưa có chỉ số tháng này</label>
                    </div>
 
                   <button 

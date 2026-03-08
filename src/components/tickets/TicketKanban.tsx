@@ -32,11 +32,8 @@ const PRIORITY_COLORS: Record<TicketPriority, string> = {
   Low: 'bg-[#22C55E]'
 };
 
-interface TicketKanbanProps {
-  tickets: TicketSummary[];
-  onStatusChange: (id: string, newStatus: TicketStatus) => void;
-  onTicketClick: (id: string) => void;
-}
+
+// TicketKanbanProps is defined below near the main component
 
 const KanbanCard = ({ ticket, isOverlay = false }: { ticket: TicketSummary, isOverlay?: boolean }) => {
   const {
@@ -150,14 +147,24 @@ const KanbanColumn = ({ status, tickets, id }: { status: TicketStatus, tickets: 
   );
 };
 
-export const TicketKanban = ({ tickets, onStatusChange, onTicketClick }: TicketKanbanProps) => {
+interface TicketKanbanProps {
+  tickets: TicketSummary[];
+  onStatusChange: (id: string, newStatus: TicketStatus) => void;
+  onTicketClick: (id: string) => void;
+  columns?: TicketStatus[];
+}
+
+export const TicketKanban = ({ 
+  tickets, 
+  onStatusChange, 
+  onTicketClick,
+  columns = ['Open', 'InProgress', 'Resolved', 'Closed']
+}: TicketKanbanProps) => {
   const [activeTicket, setActiveTicket] = React.useState<TicketSummary | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
-
-  const columns: TicketStatus[] = ['Open', 'InProgress', 'Resolved', 'Closed'];
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;

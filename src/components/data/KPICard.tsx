@@ -11,7 +11,8 @@ interface KPICardProps {
   color?: 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'danger';
   loading?: boolean;
   onClick?: () => void;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
+  reverseDeltaColor?: boolean;
 }
 
 export const KPICard = ({ 
@@ -23,7 +24,8 @@ export const KPICard = ({
   color = 'primary', 
   loading,
   onClick,
-  subtitle
+  subtitle,
+  reverseDeltaColor
 }: KPICardProps) => {
   if (loading) {
     return (
@@ -39,6 +41,7 @@ export const KPICard = ({
   }
 
   const isPositive = delta && delta > 0;
+  const isGood = reverseDeltaColor ? !isPositive : isPositive;
   
   const colorMap = {
     primary: 'bg-primary/10 text-primary',
@@ -64,7 +67,7 @@ export const KPICard = ({
         {delta !== undefined && (
           <div className={cn(
             "flex items-center gap-1 text-small font-bold px-2 py-1 rounded-full",
-            isPositive ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
+            isGood ? "bg-success/10 text-success" : "bg-danger/10 text-danger"
           )}>
             {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
             {Math.abs(delta)}%
@@ -75,7 +78,7 @@ export const KPICard = ({
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <p className="text-small font-medium text-muted uppercase tracking-wider">{title}</p>
-          {subtitle && <span className="text-[10px] font-mono font-bold text-muted/40 uppercase">{subtitle}</span>}
+          {subtitle && <div className="text-[10px] font-mono font-bold text-muted/40 uppercase">{subtitle}</div>}
         </div>
         <h3 className="text-h1 font-bold text-primary">
           {isCurrency ? formatVND(Number(value)) : value.toLocaleString()}

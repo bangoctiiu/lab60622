@@ -148,8 +148,8 @@ export const ticketService = {
     return MOCK_COMMENTS.filter(c => c.ticketId === id);
   },
 
-  updateStatus: async (id: string, status: TicketStatus, note?: string): Promise<void> => {
-    console.log(`Updating ticket ${id} to ${status} with note: ${note}`);
+  updateStatus: async (id: string, status: TicketStatus, resolution?: { resolutionNote?: string, rootCause?: string }): Promise<void> => {
+    console.log(`Updating ticket ${id} to ${status}`, resolution);
     await new Promise(r => setTimeout(r, 800));
   },
 

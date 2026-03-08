@@ -23,7 +23,7 @@ const MOCK_LATEST: Record<string, LatestMeterReading> = {
 };
 
 export const meterService = {
-  getMeters: async (params: { buildingId?: string; roomId?: string; type?: string; status?: string } = {}) => {
+  getMeters: async (params: { buildingId?: string; roomId?: string; type?: string; status?: string; missingOnly?: boolean } = {}) => {
     await new Promise(r => setTimeout(r, 600));
     let filtered = [...MOCK_METERS];
     
@@ -32,11 +32,17 @@ export const meterService = {
     if (params.type) filtered = filtered.filter(m => m.meterType === params.type);
     if (params.status) filtered = filtered.filter(m => m.meterStatus === params.status);
 
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    if (params.missingOnly) {
+       filtered = filtered.filter(m => MOCK_LATEST[m.id]?.monthYear !== currentMonth);
+    }
+
     // RULE-01: Correctly join with latest reading view (vw_LatestMeterReading)
     const joinedData = filtered.map(m => ({
       ...m,
       latestReadingIndex: MOCK_LATEST[m.id]?.currentIndex || 0,
-      latestMonthYear: MOCK_LATEST[m.id]?.monthYear || '--'
+      latestMonthYear: MOCK_LATEST[m.id]?.monthYear || '--',
+      hasReadingThisMonth: MOCK_LATEST[m.id]?.monthYear === currentMonth
     }));
 
     return { data: joinedData, total: joinedData.length };

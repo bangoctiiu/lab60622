@@ -40,7 +40,7 @@ const BuildingDetail = lazy(() => import('./views/admin/BuildingDetail'));
 const OwnerList = lazy(() => import('./views/admin/OwnerList'));
 
 // Ticket & Support Views
-const TicketList = lazy(() => import('./views/admin/TicketList'));
+const TicketList = lazy(() => import('@/views/admin/TicketList'));
 const TicketDetail = lazy(() => import('./views/admin/TicketDetail'));
 const StaffRatings = lazy(() => import('./views/admin/StaffRatings'));
 
@@ -51,6 +51,21 @@ const MeterReadingHistory = lazy(() => import('./views/admin/MeterReadingHistory
 
 // Portal Views
 const PortalHome = lazy(() => import('@/views/portal/PortalHome'));
+
+// Staff Specific Views
+const VisitorCheckin = lazy(() => import('@/views/admin/VisitorCheckin'));
+const AmenityCheckin = lazy(() => import('@/views/admin/AmenityCheckin'));
+
+// Reports Views
+const ReportsHub = lazy(() => import('@/views/admin/reports/ReportsHub'))
+const OccupancyReport = lazy(() => import('@/views/admin/reports/OccupancyReport'))
+const FinancialReport = lazy(() => import('@/views/admin/reports/FinancialReport'))
+const DebtReport = lazy(() => import('@/views/admin/reports/DebtReport'))
+const ConsumptionReport = lazy(() => import('@/views/admin/reports/ConsumptionReport'))
+const RoomLifecycleReport = lazy(() => import('@/views/admin/reports/RoomLifecycleReport'))
+const NPSReport = lazy(() => import('@/views/admin/reports/NPSReport'))
+const StaffReport = lazy(() => import('@/views/admin/reports/StaffReport'))
+const AlertsReport = lazy(() => import('./views/admin/reports/AlertsReport'));
 
 
 import useAuthStore from './stores/authStore';
@@ -69,7 +84,7 @@ const AuthRedirect = ({ children }: { children: React.ReactNode }) => {
 // Error Pages
 import { Error404, Error403, Error500, MaintenancePage } from './views/error/ErrorPages';
 import ErrorBoundary from './components/ErrorBoundary';
-import { OfflineBanner } from './components/ui/StatusStates';
+import { OfflineBanner, PageSkeleton } from './components/ui/StatusStates';
 
 const App = () => {
   return (
@@ -139,11 +154,30 @@ const App = () => {
                    <Route path="/tickets/:id" element={<TicketDetail />} />
                    <Route path="/staff/:id/ratings" element={<StaffRatings />} />
                    
+                   {/* Staff Specific Workflows */}
+                   <Route path="/staff/visitor-checkin" element={<VisitorCheckin />} />
+                   <Route path="/staff/amenity-checkin" element={<AmenityCheckin />} />
+                   
                    {/* Meter & Utility Routes */}
                    <Route path="/meters" element={<MeterList />} />
                    <Route path="/meters/bulk-entry" element={<BulkMeterEntry />} />
                    <Route path="/meters/:id/readings" element={<MeterReadingHistory />} />
                    
+                   {/* Reports Routes (Admin Only) */}
+                   <Route element={<ProtectedRoute requiredRole="Admin" />}>
+                     <Route path="/reports">
+                       <Route index element={<Suspense fallback={<PageSkeleton />}><ReportsHub /></Suspense>} />
+                       <Route path="occupancy" element={<Suspense fallback={<PageSkeleton />}><OccupancyReport /></Suspense>} />
+                       <Route path="financial" element={<Suspense fallback={<PageSkeleton />}><FinancialReport /></Suspense>} />
+                       <Route path="debt" element={<Suspense fallback={<PageSkeleton />}><DebtReport /></Suspense>} />
+                       <Route path="consumption" element={<Suspense fallback={<PageSkeleton />}><ConsumptionReport /></Suspense>} />
+                       <Route path="room-lifecycle" element={<Suspense fallback={<PageSkeleton />}><RoomLifecycleReport /></Suspense>} />
+                       <Route path="nps" element={<Suspense fallback={<PageSkeleton />}><NPSReport /></Suspense>} />
+                       <Route path="staff" element={<Suspense fallback={<PageSkeleton />}><StaffReport /></Suspense>} />
+                       <Route path="alerts" element={<Suspense fallback={<PageSkeleton />}><AlertsReport /></Suspense>} />
+                     </Route>
+                   </Route>
+
                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
                  </Route>
                </Route>
