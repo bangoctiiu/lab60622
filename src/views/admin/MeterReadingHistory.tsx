@@ -17,7 +17,7 @@ import { meterService } from '@/services/meterService';
 import { MeterReading, Meter } from '@/models/Meter';
 import { cn } from '@/utils';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { Spinner } from '@/components/ui/Feedback';
+import { Spinner, Skeleton } from '@/components/ui/Feedback';
 import { differenceInMinutes } from 'date-fns';
 import { usePermission } from '@/hooks/usePermission';
 
@@ -66,7 +66,7 @@ const MeterReadingHistory = () => {
       {/* 5.4.1 Meter Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
          <div className="flex items-center gap-6">
-            <button onClick={() => navigate('/meters')} className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-muted hover:text-primary transition-all">
+            <button onClick={() => navigate('/meters')} className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-muted hover:text-primary transition-all active:scale-90">
                <ArrowLeft size={28} />
             </button>
             <div className="space-y-1">
@@ -89,14 +89,13 @@ const MeterReadingHistory = () => {
             <div className="relative z-10 shrink-0">
                <p className="text-[10px] font-black uppercase tracking-[3px] text-slate-400 mb-1">Chỉ số mới nhất (RULE-01)</p>
                <h2 className="text-[44px] font-black font-mono leading-none tracking-tighter">
-                  {isLoadingLatest ? <Spinner className="w-8 h-8" /> : (latestReading?.currentIndex || 0).toLocaleString()}
+                  {isLoadingLatest ? <Skeleton className="h-10 w-24 bg-white/10" /> : (latestReading?.currentIndex || 0).toLocaleString()}
                </h2>
                <p className="text-[11px] font-bold text-success-text mt-2 uppercase tracking-widest flex items-center gap-2">
                   <TrendingUp size={14} /> +12.4% vs tháng trước
                </p>
             </div>
             <div className="w-24 h-full relative z-10 opacity-60 group-hover:opacity-100 transition-all">
-               {/* Sparkline simulation */}
                <ResponsiveContainer width="100%" height={60}>
                   <BarChart data={chartData.slice(-6)}>
                      <Bar dataKey="consumption" fill="#3b82f6" radius={[2, 2, 0, 0]} />
@@ -154,7 +153,6 @@ const MeterReadingHistory = () => {
                           <Cell 
                            key={`cell-${index}`} 
                            fill={index === chartData.length - 1 ? '#2563eb' : '#3b82f6'} 
-                           // Click -> scroll logic simulation could be here
                           />
                         ))}
                      </Bar>
@@ -182,7 +180,7 @@ const MeterReadingHistory = () => {
                </div>
             </div>
 
-            <button className="relative z-10 btn-primary w-full h-14 rounded-2xl bg-white text-slate-900 border-none hover:bg-slate-100 flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[12px] group">
+            <button className="relative z-10 btn-primary w-full h-14 rounded-2xl bg-white text-slate-900 border-none hover:bg-slate-100 flex items-center justify-center gap-3 font-black uppercase tracking-widest text-[12px] group active:scale-95 transition-all">
                Xuất hóa đơn sớm
                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </button>
@@ -199,7 +197,7 @@ const MeterReadingHistory = () => {
                </div>
                <h2 className="text-[20px] font-black text-slate-900 tracking-tight uppercase tracking-widest">Lịch sử ghi chỉ số</h2>
             </div>
-            <button className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[2px] text-primary bg-primary/5 px-5 h-10 rounded-full hover:bg-primary hover:text-white transition-all">
+            <button className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[2px] text-primary bg-primary/5 px-5 h-11 rounded-full hover:bg-primary hover:text-white transition-all active:scale-95">
                <TrendingUp size={16} /> So sánh kỳ trước
             </button>
          </div>
@@ -219,11 +217,14 @@ const MeterReadingHistory = () => {
                </thead>
                <tbody>
                   {isLoadingReadings ? (
-                     <tr><td colSpan={8} className="py-10 text-center"><Spinner className="w-8 h-8" /></td></tr>
+                     Array.from({ length: 5 }).map((_, i) => (
+                        <tr key={i} className="border-b border-border/5">
+                           <td colSpan={8} className="px-8 py-6"><Skeleton className="h-6 w-full" /></td>
+                        </tr>
+                     ))
                   ) : readings?.data?.length === 0 ? (
                      <tr><td colSpan={8} className="py-20 text-center text-muted font-black uppercase tracking-[4px]">Chưa có dữ liệu lịch sử</td></tr>
                   ) : readings?.data?.map((reading: MeterReading, idx: number) => {
-                     // 5.4.3 Edit window (10 mins)
                      const canEdit = hasPermission("meter.edit") && differenceInMinutes(new Date(), new Date(reading.createdAt)) <= 10;
                      
                      return (
@@ -248,14 +249,14 @@ const MeterReadingHistory = () => {
                               </div>
                            </td>
                            <td className="px-6 py-6">
-                              <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-muted cursor-pointer hover:border-primary hover:text-primary transition-all overflow-hidden group/image">
+                              <div className="w-11 h-11 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-muted cursor-pointer hover:border-primary hover:text-primary transition-all overflow-hidden group/image active:scale-95">
                                  <Eye size={18} className="relative z-10" />
                                  <div className="absolute inset-x-0 bottom-0 top-0 bg-slate-800/20 group-hover/image:opacity-100 opacity-0 transition-opacity" />
                               </div>
                            </td>
                            <td className="px-8 py-6 text-right">
                               {canEdit ? (
-                                 <button className="p-2 text-primary hover:bg-primary/10 rounded-xl transition-all shadow-sm">
+                                 <button className="h-11 w-11 flex items-center justify-center text-primary hover:bg-primary/10 rounded-xl transition-all shadow-sm active:scale-90 ml-auto border border-primary/10">
                                     <Edit3 size={18} />
                                  </button>
                               ) : (
@@ -269,7 +270,7 @@ const MeterReadingHistory = () => {
             </table>
          </div>
          <div className="p-6 bg-bg flex justify-center">
-            <button className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[3px] text-muted hover:text-primary transition-all">
+            <button className="flex h-11 px-8 items-center gap-2 text-[11px] font-black uppercase tracking-[3px] text-muted hover:text-primary transition-all active:scale-95">
                Xem toàn bộ lịch sử <ChevronRight size={14} />
             </button>
          </div>

@@ -6,12 +6,12 @@ import {
 import { subMonths, format } from 'date-fns';
 
 const MOCK_METERS: Meter[] = [
-  { id: 'M1', meterCode: 'E-MN-101', meterType: 'Electricity', meterStatus: 'Active', buildingId: 'B1', roomId: 'R1', roomCode: 'A-101', lastReadingValue: 12450 },
-  { id: 'M2', meterCode: 'W-MN-101', meterType: 'Water', meterStatus: 'Active', buildingId: 'B1', roomId: 'R1', roomCode: 'A-101', lastReadingValue: 342 },
-  { id: 'M3', meterCode: 'E-MN-205', meterType: 'Electricity', meterStatus: 'Active', buildingId: 'B1', roomId: 'R2', roomCode: 'B-205', lastReadingValue: 8900 },
-  { id: 'M4', meterCode: 'W-MN-205', meterType: 'Water', meterStatus: 'Active', buildingId: 'B1', roomId: 'R2', roomCode: 'B-205', lastReadingValue: 156 },
-  { id: 'M5', meterCode: 'E-VH-401', meterType: 'Electricity', meterStatus: 'Inactive', buildingId: 'B2', roomId: 'R3', roomCode: 'V-401', lastReadingValue: 5670 },
-  { id: 'M6', meterCode: 'W-VH-401', meterType: 'Water', meterStatus: 'Active', buildingId: 'B2', roomId: 'R3', roomCode: 'V-401', lastReadingValue: 98 }
+  { id: 'M1', meterCode: 'E-MN-101', meterType: 'Electricity', meterStatus: 'Active', buildingId: 'B1', roomId: 'R1', roomCode: 'A-101' },
+  { id: 'M2', meterCode: 'W-MN-101', meterType: 'Water', meterStatus: 'Active', buildingId: 'B1', roomId: 'R1', roomCode: 'A-101' },
+  { id: 'M3', meterCode: 'E-MN-205', meterType: 'Electricity', meterStatus: 'Active', buildingId: 'B1', roomId: 'R2', roomCode: 'B-205' },
+  { id: 'M4', meterCode: 'W-MN-205', meterType: 'Water', meterStatus: 'Active', buildingId: 'B1', roomId: 'R2', roomCode: 'B-205' },
+  { id: 'M5', meterCode: 'E-VH-401', meterType: 'Electricity', meterStatus: 'Inactive', buildingId: 'B2', roomId: 'R3', roomCode: 'V-401' },
+  { id: 'M6', meterCode: 'W-VH-401', meterType: 'Water', meterStatus: 'Active', buildingId: 'B2', roomId: 'R3', roomCode: 'V-401' }
 ];
 
 const MOCK_LATEST: Record<string, LatestMeterReading> = {
@@ -32,11 +32,19 @@ export const meterService = {
     if (params.type) filtered = filtered.filter(m => m.meterType === params.type);
     if (params.status) filtered = filtered.filter(m => m.meterStatus === params.status);
 
-    return { data: filtered, total: filtered.length };
+    // RULE-01: Correctly join with latest reading view (vw_LatestMeterReading)
+    const joinedData = filtered.map(m => ({
+      ...m,
+      latestReadingIndex: MOCK_LATEST[m.id]?.currentIndex || 0,
+      latestMonthYear: MOCK_LATEST[m.id]?.monthYear || '--'
+    }));
+
+    return { data: joinedData, total: joinedData.length };
   },
 
   getLatestReading: async (meterId: string): Promise<LatestMeterReading> => {
     await new Promise(r => setTimeout(r, 400));
+    // RULE-01: Explicitly fetch from the latest reading source
     return MOCK_LATEST[meterId] || { meterId, currentIndex: 0, monthYear: '', readingDate: '', consumption: 0 };
   },
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Building, Zap, Droplets, Calendar, 
   ArrowRight, CheckCircle, ChevronLeft, 
@@ -6,13 +6,13 @@ import {
   Search, Clipboard, Keyboard, Upload
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { meterService } from '@/services/meterService';
 import { Meter, MeterType } from '@/models/Meter';
 import { cn } from '@/utils';
 import { SelectAsync } from '@/components/ui/SelectAsync';
 import { Select } from '@/components/ui/Select';
-import { Spinner } from '@/components/ui/Feedback';
+import { Skeleton } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
 
 const BulkMeterEntry = () => {
@@ -248,7 +248,16 @@ const BulkMeterEntry = () => {
                       </thead>
                      <tbody>
                         {isLoadingMeters || isFetchingPrev ? (
-                           <tr><td colSpan={6} className="py-20 text-center"><Spinner className="w-10 h-10" /></td></tr>
+                           Array.from({ length: 10 }).map((_, i) => (
+                             <tr key={i} className="border-b border-border/5">
+                                <td className="px-8 py-6"><Skeleton className="h-4 w-32 mb-2" /><Skeleton className="h-3 w-20" /></td>
+                                <td className="px-6 py-6 border-l border-border/5"><Skeleton className="h-6 w-16" /></td>
+                                <td className="px-6 py-6 border-l border-border/5 bg-slate-50"><Skeleton className="h-8 w-full" /></td>
+                                <td className="px-6 py-6 border-l border-border/5"><Skeleton className="h-6 w-16" /></td>
+                                <td className="px-6 py-6 border-l border-border/5"><Skeleton className="h-6 w-12 rounded-full" /></td>
+                                <td className="px-8 py-6 border-l border-border/5"><Skeleton className="h-4 w-full" /></td>
+                             </tr>
+                           ))
                         ) : paginatedMeters.map((m: Meter) => {
                            // RULE-01: Ensuring readings are correctly initialized from the view
                            const r = readings[m.id];
@@ -328,7 +337,7 @@ const BulkMeterEntry = () => {
                      <button 
                         disabled={currentPage === 1}
                         onClick={() => setCurrentPage(prev => prev - 1)}
-                        className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-sm disabled:opacity-30 disabled:cursor-not-allowed border border-border/10"
                      >
                         <ChevronLeft size={20} />
                      </button>
@@ -336,7 +345,7 @@ const BulkMeterEntry = () => {
                      <button 
                         disabled={currentPage === totalPages}
                         onClick={() => setCurrentPage(prev => prev + 1)}
-                        className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-sm disabled:opacity-30 disabled:cursor-not-allowed border border-border/10"
                      >
                         <ChevronLeft size={20} className="rotate-180" />
                      </button>
@@ -345,15 +354,15 @@ const BulkMeterEntry = () => {
             </div>
 
             <div className="flex items-center justify-between">
-               <button onClick={handleBack} className="flex items-center gap-3 text-[13px] font-black uppercase tracking-[3px] text-muted hover:text-slate-900 transition-all">
+               <button onClick={handleBack} className="flex h-12 px-6 items-center gap-3 text-[13px] font-black uppercase tracking-[3px] text-muted hover:text-slate-900 transition-all">
                   <ChevronLeft size={20} /> Quay lại
                </button>
                <button 
                  onClick={handleNext}
                  disabled={stats.error > 0 || stats.valid === 0}
                  className={cn(
-                  "px-12 h-16 rounded-[28px] bg-primary text-white text-[16px] font-black uppercase tracking-[4px] shadow-2xl transition-all",
-                  (stats.error > 0 || stats.valid === 0) ? "opacity-30 grayscale cursor-not-allowed" : "hover:scale-[1.05] active:scale-95 shadow-primary/30"
+                   "px-12 h-16 rounded-[28px] bg-primary text-white text-[16px] font-black uppercase tracking-[4px] shadow-2xl transition-all",
+                   (stats.error > 0 || stats.valid === 0) ? "opacity-30 grayscale cursor-not-allowed" : "hover:scale-[1.05] active:scale-95 shadow-primary/30"
                  )}
                >
                   Xác nhận ({stats.valid}) <ArrowRight size={20} className="inline ml-2" />
@@ -394,9 +403,9 @@ const BulkMeterEntry = () => {
                <button 
                  onClick={() => {
                    toast.promise(new Promise(res => setTimeout(res, 2000)), {
-                      loading: 'Đang xử lý dữ liệu hàng loạt...',
-                      success: 'Ghi nhận thành công tất cả chỉ số!',
-                      error: 'Lỗi khi gửi dữ liệu.'
+                       loading: 'Đang xử lý dữ liệu hàng loạt...',
+                       success: 'Ghi nhận thành công tất cả chỉ số!',
+                       error: 'Lỗi khi gửi dữ liệu.'
                    });
                    setTimeout(() => navigate('/meters'), 2200);
                  }}

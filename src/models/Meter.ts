@@ -10,7 +10,8 @@ export interface Meter {
   buildingName?: string;
   roomId: string;
   roomCode?: string;
-  lastReadingValue?: number; // RULE-01: SHOULD NOT USE THIS FOR CALC
+  latestReadingIndex?: number; // RULE-01: Derived from vw_LatestMeterReading
+  latestMonthYear?: string;
   description?: string;
 }
 

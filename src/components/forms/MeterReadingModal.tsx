@@ -84,7 +84,7 @@ export const MeterReadingModal = ({ isOpen, onClose, meter, onSuccess }: Reading
        toast.warning("Bạn đang ghi chồng chỉ số đã tồn tại.");
     }
     if (isError) {
-       toast.error(`Số hiện tại (${currentIndex}) không được nhỏ hơn số trước (${previousIndex})`);
+       toast.error(`Chỉ số hiện tại (${currentIndex}) không được nhỏ hơn chỉ số trước (${previousIndex})`);
        return;
     }
 

@@ -1,44 +1,41 @@
 import React, { useState } from 'react';
-import { 
-  Zap, Droplets, Search, Building, Home, 
-  History, TrendingUp, AlertCircle, Activity,
-  CheckCircle, ChevronRight, ClipboardCheck
-} from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
-import { meterService } from '@/services/meterService';
-import { Meter, MeterType, MeterStatus } from '@/models/Meter';
-import { StatusBadge } from '@/components/ui/StatusBadge';
+import { 
+  Building, Home, Zap, Droplets, AlertCircle, 
+  Activity, Search, Download, 
+  History, TrendingUp, ChevronRight, Inbox
+} from 'lucide-react';
 import { cn } from '@/utils';
-import useUIStore from '@/stores/uiStore';
-import { SelectAsync } from '@/components/ui/SelectAsync';
 import { Select } from '@/components/ui/Select';
-import { Spinner } from '@/components/ui/Feedback';
+import { SelectAsync } from '@/components/ui/SelectAsync';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { Spinner, Skeleton } from '@/components/ui/Feedback';
+import { useQuery } from '@tanstack/react-query';
+import { meterService } from '@/services/meterService';
+import { Meter } from '@/models/Meter';
 import { MeterReadingModal } from '@/components/forms/MeterReadingModal';
+import useUIStore from '@/stores/uiStore';
 
 const MeterList = () => {
   const navigate = useNavigate();
   const { activeBuildingId, setBuilding } = useUIStore();
-  
-  // States for filters
-  const [meterType, setMeterType] = useState<MeterType | ''>('');
-  const [meterStatus, setMeterStatus] = useState<MeterStatus | 'Active'>('Active');
+  const [roomId, setRoomId] = useState('');
+  const [meterType, setMeterType] = useState<'Electricity' | 'Water' | ''>('');
+  const [meterStatus, setMeterStatus] = useState<'Active' | 'Inactive' | 'Replaced'>('Active');
   const [search, setSearch] = useState('');
   const [isMissingOnly, setIsMissingOnly] = useState(false);
-  const [roomId, setRoomId] = useState<string | null>(null);
-
+  
   // Modal State
-  const [selectedMeter, setSelectedMeter] = useState<Meter | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedMeter, setSelectedMeter] = useState<Meter | null>(null);
 
-  // 1.1.2 Queries
   const { data: meters, isLoading, refetch } = useQuery({
-    queryKey: ['meters', activeBuildingId, roomId, meterType, meterStatus, search, isMissingOnly],
+    queryKey: ['meters', activeBuildingId, roomId, meterType, meterStatus, search],
     queryFn: () => meterService.getMeters({ 
       buildingId: activeBuildingId ? String(activeBuildingId) : undefined, 
-      roomId: roomId || undefined,
-      type: meterType || undefined, 
-      status: meterStatus || undefined 
+      roomId, 
+      type: meterType,
+      status: meterStatus 
     })
   });
 
@@ -47,36 +44,42 @@ const MeterList = () => {
     setIsModalOpen(true);
   };
 
-  const currentMonthYear = new Date().toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
-
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* 5.1.1 Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-5 duration-700">
+      {/* 5.1.1 Header & Actions */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-[44px] font-black leading-tight tracking-tighter text-primary">Đồng hồ & Chỉ số</h1>
-          <p className="text-body text-muted max-w-2xl font-medium">Quản lý điện nước, ghi nhận chỉ số tiêu thụ và tự động tính toán hóa đơn hàng tháng.</p>
+          <h1 className="text-[44px] font-black leading-tight tracking-tighter text-slate-900">
+            Đồng hồ <span className="text-primary italic">& Chỉ số</span>
+          </h1>
+          <p className="text-small text-muted font-bold uppercase tracking-[2px] mt-2">
+            Quản lý chỉ số điện nước & Lịch sử ghi nhận
+          </p>
         </div>
-        <div className="flex items-center gap-4">
-           <button 
-             onClick={() => navigate('/meters/bulk-entry')}
-             className="btn-primary pl-8 pr-8 h-14 rounded-[32px] flex items-center gap-3 shadow-2xl shadow-primary/20 active:scale-95 transition-all"
-           >
-              <ClipboardCheck size={20} />
-              <span className="text-[13px] font-black uppercase tracking-[3px]">Ghi chỉ số hàng loạt</span>
-           </button>
+
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => navigate('/meters/bulk')}
+            className="btn-primary h-14"
+          >
+            <History size={18} />
+            <span>Ghi hàng loạt</span>
+          </button>
+          <button className="h-14 w-14 flex items-center justify-center rounded-[20px] bg-white text-muted hover:text-primary transition-all shadow-xl shadow-slate-200/50 active:scale-95 border border-white">
+            <Download size={22} />
+          </button>
         </div>
       </div>
 
       {/* 5.1.1 Filter Panel */}
-      <div className="card-container p-8 animate-in slide-in-from-top-4 duration-500 relative z-20 overflow-visible">
+      <div className="card-container p-8 animate-in slide-in-from-top-4 duration-500 relative z-20 overflow-visible border-none bg-white/60 backdrop-blur-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 items-start">
-          <div className="relative z-[50]">
+          <div>
             <SelectAsync 
               label="Tòa nhà"
               placeholder="Tất cả tòa nhà"
               icon={Building}
-              value={activeBuildingId}
+              value={activeBuildingId ? String(activeBuildingId) : ''}
               loadOptions={async () => [
                 { label: 'The Manor Central Park', value: 'B1' },
                 { label: 'Vinhomes Central Park', value: 'B2' }
@@ -85,7 +88,7 @@ const MeterList = () => {
             />
           </div>
 
-          <div className="relative z-[49]">
+          <div>
             <SelectAsync 
               label="Phòng"
               placeholder="Tất cả phòng"
@@ -103,7 +106,7 @@ const MeterList = () => {
             />
           </div>
 
-          <div className="relative z-[48]">
+          <div>
             <Select 
               label="Loại đồng hồ"
               placeholder="Tất cả"
@@ -118,7 +121,7 @@ const MeterList = () => {
             />
           </div>
 
-          <div className="relative z-[47]">
+          <div>
             <Select 
               label="Trạng thái"
               placeholder="Đang hoạt động"
@@ -133,7 +136,7 @@ const MeterList = () => {
             />
           </div>
 
-          <div className="relative z-[46]">
+          <div>
             <div className="space-y-2">
                <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Tìm kiếm</label>
                <div className="relative group">
@@ -141,7 +144,7 @@ const MeterList = () => {
                   <input 
                     type="text" 
                     placeholder="Mã/Số phòng..."
-                    className="input-base pl-12 h-14"
+                    className="input-base pl-12 h-14 w-full"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
@@ -149,22 +152,24 @@ const MeterList = () => {
             </div>
           </div>
 
-          <div className="relative z-[45]">
-            <div className="pt-6">
-               <div 
+          <div>
+            <div className="space-y-2">
+               <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Bộ lọc nhanh</label>
+               <button 
                  onClick={() => setIsMissingOnly(!isMissingOnly)}
                  className={cn(
-                   "flex h-14 items-center justify-center gap-3 rounded-[20px] cursor-pointer transition-all border-2 font-black uppercase tracking-widest text-[11px]",
-                   isMissingOnly ? "bg-danger/10 border-danger/20 text-danger shadow-lg shadow-danger/10" : "bg-bg border-transparent text-muted hover:bg-slate-100"
+                   "flex h-14 w-full items-center justify-center gap-3 rounded-[20px] cursor-pointer transition-all border-2 font-black uppercase tracking-widest text-[11px]",
+                   isMissingOnly ? "bg-danger text-white border-danger shadow-lg shadow-danger/20" : "bg-bg border-transparent text-muted hover:bg-slate-100"
                  )}
                >
                   <AlertCircle size={18} className={isMissingOnly ? "animate-pulse" : ""} />
                   Chưa nhập
-               </div>
+               </button>
             </div>
           </div>
         </div>
       </div>
+
       {/* 5.1.2 DataTable */}
       <div className="card-container overflow-hidden bg-white/40 border-border/5">
         <div className="overflow-x-auto">
@@ -173,25 +178,34 @@ const MeterList = () => {
                  <tr>
                     <th className="px-8 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Mã đồng hồ</th>
                     <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Phòng</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Loại</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Chỉ số mới nhất (RULE-01)</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Tháng kỳ</th>
+                    <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Loại thiết bị</th>
+                    <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Chỉ số mới nhất</th>
+                    <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Kỳ chốt</th>
                     <th className="px-6 py-6 text-[10px] font-black text-muted uppercase tracking-[3px]">Trạng thái</th>
                     <th className="px-8 py-6 text-right text-[10px] font-black text-muted uppercase tracking-[3px]">Thao tác</th>
                  </tr>
               </thead>
               <tbody>
                  {isLoading ? (
-                    <tr>
-                       <td colSpan={7} className="py-20 text-center">
-                          <Spinner className="w-10 h-10" />
-                       </td>
-                    </tr>
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i} className="border-b border-border/5">
+                        <td className="px-8 py-6"><Skeleton className="h-6 w-32" /></td>
+                        <td className="px-6 py-6"><Skeleton className="h-6 w-24" /></td>
+                        <td className="px-6 py-6"><Skeleton className="h-8 w-20 rounded-full" /></td>
+                        <td className="px-6 py-6"><Skeleton className="h-8 w-24" /></td>
+                        <td className="px-6 py-6"><Skeleton className="h-6 w-16" /></td>
+                        <td className="px-6 py-6"><Skeleton className="h-8 w-24 rounded-full" /></td>
+                        <td className="px-8 py-6 text-right"><Skeleton className="h-10 w-24 ml-auto rounded-xl" /></td>
+                      </tr>
+                    ))
                  ) : meters?.data?.length === 0 ? (
                     <tr>
-                       <td colSpan={7} className="py-20 text-center opacity-40">
-                          <AlertCircle size={48} className="mx-auto mb-4" />
-                          <p className="text-[13px] font-black uppercase tracking-widest">Không tìm thấy đồng hồ nào</p>
+                       <td colSpan={7} className="py-24 text-center">
+                          <div className="flex flex-col items-center justify-center opacity-30">
+                            <Inbox size={64} className="mb-4 text-primary" strokeWidth={1} />
+                            <p className="text-[14px] font-black uppercase tracking-[4px] text-slate-800">Không tìm thấy dữ liệu</p>
+                            <p className="text-small font-bold mt-2">Vui lòng điều chỉnh bộ lọc hoặc tìm kiếm khác</p>
+                          </div>
                        </td>
                     </tr>
                  ) : (
@@ -219,32 +233,30 @@ const MeterList = () => {
                                 </span>
                              </div>
                           </td>
-                          <td className="px-6 py-6">
-                             <span className="text-[16px] font-black font-mono text-slate-800">
-                                {Number(meter.lastReadingValue || 0).toLocaleString()}
+                          <td className="px-6 py-6 font-mono">
+                             <span className="text-[16px] font-black text-slate-800">
+                                {Number(meter.latestReadingIndex || 0).toLocaleString()}
                              </span>
+                             <p className="text-[9px] text-muted font-bold uppercase tracking-tighter mt-1 italic opacity-60">RULE-01 Source</p>
                           </td>
-                          <td className="px-6 py-6">
-                             <div className="flex flex-col">
-                                <span className="text-[11px] font-bold text-slate-600">{currentMonthYear}</span>
-                                <span className="text-[9px] text-muted font-medium uppercase tracking-tighter">Cập nhật 2 ngày trước</span>
-                             </div>
+                          <td className="px-6 py-6 font-mono font-bold text-slate-600">
+                             {meter.latestMonthYear || '--'}
                           </td>
                           <td className="px-6 py-6">
                              <StatusBadge status={meter.meterStatus} />
                           </td>
                           <td className="px-8 py-6 text-right">
-                             <div className="flex justify-end gap-2">
+                             <div className="flex justify-end gap-3">
                                 <button 
                                   onClick={() => handleOpenReadingModal(meter)}
-                                  className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5 active:scale-90"
+                                  className="h-11 w-11 flex items-center justify-center rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5 active:scale-90"
                                   title="Nhập chỉ số"
                                 >
                                    <History size={18} />
                                 </button>
                                 <button 
                                   onClick={() => navigate(`/meters/${meter.id}/readings`)}
-                                  className="h-10 w-10 flex items-center justify-center rounded-xl bg-bg border border-border/50 text-muted hover:text-primary transition-all active:scale-90"
+                                  className="h-11 w-11 flex items-center justify-center rounded-xl bg-bg border border-border/50 text-muted hover:text-primary transition-all active:scale-90"
                                   title="Lịch sử tiêu thụ"
                                 >
                                    <TrendingUp size={18} />
@@ -257,46 +269,18 @@ const MeterList = () => {
               </tbody>
            </table>
         </div>
-      </div>
-
-      {/* Metric Grid Mini */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-         <div className="card-container p-6 bg-gradient-to-br from-white to-blue-50/30 border-blue-100/20">
-            <div className="flex items-center gap-4 mb-4">
-               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
-                  <Droplets size={20} />
-               </div>
-               <span className="text-[11px] font-black uppercase tracking-[2px] text-muted">Tổng tiêu thụ nước</span>
-            </div>
-            <p className="text-[28px] font-black text-slate-900 tracking-tighter">1,245 <span className="text-[14px] text-muted">m3</span></p>
-            <div className="mt-4 h-1 bg-blue-100 rounded-full overflow-hidden">
-               <div className="h-full bg-blue-500 w-[65%]" />
-            </div>
-         </div>
-
-         <div className="card-container p-6 bg-gradient-to-br from-white to-amber-50/30 border-amber-100/20">
-            <div className="flex items-center gap-4 mb-4">
-               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600">
-                  <Zap size={20} fill="currentColor" />
-               </div>
-               <span className="text-[11px] font-black uppercase tracking-[2px] text-muted">Tổng tiêu thụ điện</span>
-            </div>
-            <p className="text-[28px] font-black text-slate-900 tracking-tighter">45,890 <span className="text-[14px] text-muted">kWh</span></p>
-            <div className="mt-4 h-1 bg-amber-100 rounded-full overflow-hidden">
-               <div className="h-full bg-amber-500 w-[82%]" />
-            </div>
-         </div>
-
-         <div className="card-container p-6 bg-gradient-to-br from-white to-danger-bg/20 border-danger/5">
-            <div className="flex items-center gap-4 mb-4">
-               <div className="w-10 h-10 rounded-xl bg-danger/10 flex items-center justify-center text-danger">
-                  <AlertCircle size={20} />
-               </div>
-               <span className="text-[11px] font-black uppercase tracking-[2px] text-muted">Đồng hồ chưa nhập</span>
-            </div>
-            <p className="text-[28px] font-black text-danger tracking-tighter">12 <span className="text-[14px] opacity-60">phòng</span></p>
-            <p className="text-[10px] text-danger/60 font-medium mt-1 uppercase tracking-widest">Hạn chót: 3 ngày tới</p>
-         </div>
+        
+        {/* Pagination Info */}
+        <div className="p-8 border-t border-border/5 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-6">
+           <p className="text-small text-muted font-bold uppercase tracking-wider">
+              Hiển thị {meters?.data?.length || 0} trong {meters?.total || 0} đồng hồ
+           </p>
+           <div className="flex items-center gap-2">
+              <button className="h-11 px-6 rounded-xl border border-border text-muted opacity-50 cursor-not-allowed text-[11px] font-black uppercase">Trước</button>
+              <button className="h-11 w-11 rounded-xl bg-white border border-border text-primary text-[11px] font-black uppercase shadow-inner border-primary/20">1</button>
+              <button className="h-11 px-6 rounded-xl border border-border text-muted opacity-50 cursor-not-allowed text-[11px] font-black uppercase">Sau</button>
+           </div>
+        </div>
       </div>
       
       {/* 5.2 Meter Reading Modal */}
