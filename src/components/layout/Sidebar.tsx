@@ -10,6 +10,7 @@ import {
 import { cn } from '@/utils';
 import useUIStore from '@/stores/uiStore';
 import useAuthStore from '@/stores/authStore';
+import { usePermission } from '@/hooks/usePermission';
 
 interface NavItem {
   label: string;
@@ -63,8 +64,12 @@ const navItems: { group: string; items: NavItem[] }[] = [
 export const Sidebar = () => {
   const { sidebarOpen, toggleSidebar, activeBuildingId, setBuilding } = useUIStore();
   const { user, logout } = useAuthStore();
+  const { can } = usePermission();
   
   const isAdmin = user?.role === 'Admin';
+  
+  // LOG for debugging as requested
+  console.log("Permission check (service.manage):", can("service.manage"));
   
   return (
     <aside className={cn(
@@ -104,7 +109,16 @@ export const Sidebar = () => {
       {/* 4.1.1 Navigation Items */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6 custom-scrollbar">
         {navItems.map((group) => {
-          const visibleItems = group.items.filter(item => !item.adminOnly || isAdmin);
+          const visibleItems = group.items.filter(item => {
+            // 1. Check adminOnly
+            if (item.adminOnly && !isAdmin) return false;
+            
+            // 2. Check specific permission
+            // If item has permission AND user doesn't have it AND user is NOT admin (admin has all powers)
+            if (item.permission && !can(item.permission) && !isAdmin) return false;
+            
+            return true;
+          });
           if (visibleItems.length === 0) return null;
 
           return (

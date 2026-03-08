@@ -17,11 +17,12 @@ import {
   Inbox
 } from 'lucide-react';
 
-interface RowAction<T> {
-  label: string;
-  onClick: (row: T) => void;
+export interface RowAction<T> {
+  label?: string;
+  onClick?: (row: T) => void;
   icon?: React.ReactNode;
   variant?: 'default' | 'danger';
+  type?: 'action' | 'divider';
 }
 
 const ActionDropdown = <T,>({ actions, row }: { actions: RowAction<T>[]; row: T }) => {
@@ -41,24 +42,30 @@ const ActionDropdown = <T,>({ actions, row }: { actions: RowAction<T>[]; row: T 
           <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
           <div className="absolute right-0 mt-2 w-48 bg-white border rounded-xl shadow-xl z-30 animate-in fade-in zoom-in-95 duration-150 origin-top-right overflow-hidden">
             <div className="py-1">
-              {actions.map((action, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    action.onClick(row);
-                    setIsOpen(false);
-                  }}
-                  className={cn(
-                    "w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors",
-                    action.variant === 'danger' 
-                      ? "text-red-600 hover:bg-red-50" 
-                      : "text-gray-700 hover:bg-gray-50"
-                  )}
-                >
-                  {action.icon && <span className="opacity-70">{action.icon}</span>}
-                  {action.label}
-                </button>
-              ))}
+              {actions.map((action, idx) => {
+                if (action.type === 'divider') {
+                  return <div key={idx} className="my-1 border-t border-gray-100" />;
+                }
+                
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      action.onClick?.(row);
+                      setIsOpen(false);
+                    }}
+                    className={cn(
+                      "w-full flex items-center gap-2 px-4 py-2 text-sm transition-colors text-left",
+                      action.variant === 'danger' 
+                        ? "text-red-600 hover:bg-red-50" 
+                        : "text-gray-700 hover:bg-gray-50"
+                    )}
+                  >
+                    {action.icon && <span className="opacity-70">{action.icon}</span>}
+                    {action.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>

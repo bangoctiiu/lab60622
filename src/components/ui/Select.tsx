@@ -16,6 +16,7 @@ interface SelectProps {
   icon?: any;
   className?: string;
   label?: string;
+  disabled?: boolean;
 }
 
 export const Select = ({ 
@@ -25,7 +26,8 @@ export const Select = ({
   placeholder = "Chọn...", 
   icon: Icon,
   className,
-  label
+  label,
+  disabled = false
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,10 +55,11 @@ export const Select = ({
       <div className="relative">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          disabled={disabled}
           className={cn(
             "input-base h-14 flex items-center justify-between transition-all w-full",
-            isOpen && "border-blue-700/40 ring-4 ring-blue-900/5 shadow-xl shadow-blue-900/5"
+            isOpen && "border-blue-700/40 ring-4 ring-blue-900/5 shadow-xl shadow-blue-900/5",
+            disabled && "bg-slate-50 text-slate-400 border-slate-100 cursor-not-allowed shadow-none"
           )}
         >
           <div className="flex items-center gap-3 overflow-hidden">

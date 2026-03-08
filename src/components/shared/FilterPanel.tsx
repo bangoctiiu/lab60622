@@ -16,6 +16,44 @@ export interface FilterConfig {
   onSearch?: (query: string) => Promise<{ label: string; value: any }[]>;
 }
 
+const DebouncedInput = ({ 
+  value, 
+  onChange, 
+  placeholder 
+}: { 
+  value: string; 
+  onChange: (val: string) => void; 
+  placeholder: string 
+}) => {
+  const [localValue, setLocalValue] = useState(value);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (localValue !== value) {
+        onChange(localValue);
+      }
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [localValue, onChange, value]);
+
+  return (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <input
+        type="text"
+        placeholder={placeholder}
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        className="w-full h-10 pl-9 pr-3 py-2 text-sm bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
+    </div>
+  );
+};
+
 interface FilterPanelProps {
   filters: FilterConfig[];
   values: Record<string, any>;
@@ -157,16 +195,11 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 </label>
                 
                 {filter.type === 'text' && (
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder={filter.placeholder || 'Tìm kiếm...'}
-                      value={values[filter.key] || ''}
-                      onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                      className="w-full h-10 pl-9 pr-3 py-2 text-sm bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                    />
-                  </div>
+                  <DebouncedInput
+                    placeholder={filter.placeholder || 'Tìm kiếm...'}
+                    value={values[filter.key] || ''}
+                    onChange={(val) => handleFilterChange(filter.key, val)}
+                  />
                 )}
 
                 {filter.type === 'select' && (

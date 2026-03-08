@@ -20,6 +20,7 @@ const InvoiceDetail = lazy(() => import('./views/admin/InvoiceDetail'));
 const ContractList = lazy(() => import('./views/admin/ContractList'));
 const ContractDetail = lazy(() => import('./views/admin/ContractDetail'));
 const CreateContractWizard = lazy(() => import('./views/admin/CreateContractWizard'));
+const ServiceCatalog = lazy(() => import('./views/admin/services/ServiceCatalog'));
 
 // Payment Views
 const PaymentList = lazy(() => import('./views/admin/PaymentList'));
@@ -166,6 +167,9 @@ const App = () => {
                    <Route path="/meters" element={<MeterList />} />
                    <Route path="/meters/bulk-entry" element={<BulkMeterEntry />} />
                    <Route path="/meters/:id/readings" element={<MeterReadingHistory />} />
+                   
+                   {/* Service Catalog Route */}
+                   <Route path="/services" element={<ServiceCatalog />} />
                    
                    {/* Reports Routes (Admin Only) */}
                    <Route element={<ProtectedRoute requiredRole="Admin" />}>
