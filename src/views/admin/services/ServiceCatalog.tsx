@@ -158,27 +158,32 @@ const ServiceCatalog: React.FC = () => {
   const columns = [
     {
       id: "serviceName",
-      header: "Tên dịch vụ",
+      header: "Dịch vụ",
       accessorKey: "serviceName",
       cell: ({ row }: { row: { original: Service } }) => (
-        <div className="flex flex-col">
-          <span className="font-bold text-slate-900 group-hover:text-primary transition-colors">
-            {row.original.serviceName}
-          </span>
-          <span className="text-[10px] text-slate-400 font-mono uppercase tracking-tighter">
-            {row.original.serviceCode}
-          </span>
-        </div>
+        <span className="font-bold text-slate-900 group-hover:text-primary transition-colors">
+          {row.original.serviceName}
+        </span>
+      )
+    },
+    {
+      id: "serviceCode",
+      header: "Mã",
+      accessorKey: "serviceCode",
+      cell: ({ row }: { row: { original: Service } }) => (
+        <span className="text-[11px] text-slate-500 font-mono font-black uppercase tracking-wider bg-slate-100/50 px-2 py-1 rounded-md border border-slate-200/50">
+          {row.original.serviceCode}
+        </span>
       )
     },
     {
       id: "serviceType",
-      header: "Loại",
+      header: "Loại hình",
       accessorKey: "serviceType",
       cell: ({ row }: { row: { original: Service } }) => (
         <span className={cn(
           "px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider",
-          SERVICE_TYPE_COLORS[row.original.serviceType] || "bg-slate-100 text-slate-600"
+          SERVICE_TYPE_COLORS[row.original.serviceType] || "bg-slate-100 text-slate-600 shadow-sm"
         )}>
           {SERVICE_TYPE_LABELS[row.original.serviceType] || row.original.serviceType}
         </span>
@@ -189,14 +194,16 @@ const ServiceCatalog: React.FC = () => {
       header: "Giá hiện tại",
       accessorKey: "currentPrice",
       cell: ({ row }: { row: { original: Service } }) => (
-        <div className="flex flex-col items-start gap-1">
-          {/* RULE-08: Giá lấy từ Lịch sử giá mới nhất */}
-          <span className="text-sm font-black text-slate-800 tabular-nums">
+        <div className="flex flex-col items-start gap-0.5">
+          <span className="text-sm font-black text-slate-900 tabular-nums">
             {formatVND(row.original.currentPrice)}
           </span>
-          <span className="text-[10px] text-slate-400 font-medium italic">
-             áp dụng từ {formatDate(row.original.currentPriceEffectiveFrom)}
-          </span>
+          <div className="flex items-center gap-1.5 opacity-60">
+             <div className="w-1 h-1 rounded-full bg-slate-400" />
+             <span className="text-[10px] text-slate-500 font-medium italic">
+                từ {formatDate(row.original.currentPriceEffectiveFrom)}
+             </span>
+          </div>
         </div>
       )
     },
@@ -206,26 +213,26 @@ const ServiceCatalog: React.FC = () => {
       accessorKey: "unit",
       enableSorting: false,
       cell: ({ row }: { row: { original: Service } }) => (
-        <span className="text-sm font-semibold text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-100">
+        <span className="text-[11px] font-black text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/50 shadow-sm">
            {row.original.unit}
         </span>
       )
     },
     {
       id: "isActive",
-      header: "Trạng thái",
+      header: "Phục vụ",
       accessorKey: "isActive",
       cell: ({ row }: { row: { original: Service } }) => (
         <button
             onClick={() => handleToggleActive(row.original)}
             className={cn(
                 "w-12 h-6 rounded-full relative transition-all p-1",
-                row.original.isActive ? "bg-green-500 shadow-[0_0_15px_-3px_rgba(34,197,94,0.4)]" : "bg-slate-300"
+                row.original.isActive ? "bg-green-500 shadow-[0_4px_12px_-4px_rgba(34,197,94,0.6)]" : "bg-slate-200"
             )}
         >
             <div className={cn(
-                "w-4 h-4 bg-white rounded-full shadow-sm transition-transform",
-                row.original.isActive ? "translate-x-6" : "translate-x-0"
+                "w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-300 ease-out transform",
+                row.original.isActive ? "translate-x-6 scale-110" : "translate-x-0"
             )} />
         </button>
       )
@@ -272,23 +279,23 @@ const ServiceCatalog: React.FC = () => {
     <div className="p-8 space-y-8 animate-in fade-in duration-700">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-             <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-xl shadow-primary/20">
-                <LayoutGrid size={24} />
-             </div>
-             <div>
-                <h1 className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                    Danh mục Dịch vụ
-                    <span className="bg-slate-100 text-slate-500 text-[11px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                        {data?.total || 0} mục
-                    </span>
+        <div className="flex items-center gap-5">
+           <div className="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-[28px] flex items-center justify-center text-white shadow-2xl shadow-primary/30 rotate-3 hover:rotate-0 transition-transform duration-500">
+              <LayoutGrid size={32} />
+           </div>
+           <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                    Dịch vụ & Giá
                 </h1>
-                <p className="text-slate-500 text-sm font-medium italic">
-                    Quản lý các loại dịch vụ tiện ích, phí quản lý và cấu hình giá bất biến (RULE-08).
-                </p>
-             </div>
-          </div>
+                <span className="bg-primary/10 text-primary text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-[2px] border border-primary/20">
+                    {data?.total || 0} ITEMS
+                </span>
+              </div>
+              <p className="text-slate-500 text-sm font-medium mt-1">
+                Thiết lập danh mục dịch vụ và cấu hình <span className="text-slate-900 font-bold underline decoration-primary/30 underline-offset-4 cursor-help" title="Theo RULE-08: Lịch sử giá là bất biến">lịch sử giá bất biến (RULE-08)</span>.
+              </p>
+           </div>
         </div>
 
         <button
@@ -296,10 +303,13 @@ const ServiceCatalog: React.FC = () => {
             setModalMode("create");
             setSelectedServiceId(null);
           }}
-          className="px-8 h-14 bg-primary text-white rounded-[20px] font-black text-[11px] uppercase tracking-[3px] shadow-2xl shadow-primary/30 hover:bg-primary/90 hover:translate-y-[-4px] active:translate-y-[0] transition-all flex items-center gap-3"
+          className="group relative px-10 h-16 bg-slate-900 text-white rounded-[24px] font-black text-[12px] uppercase tracking-[3px] shadow-2xl shadow-slate-200 overflow-hidden hover:translate-y-[-4px] active:translate-y-[0] transition-all"
         >
-          <Plus size={20} />
-          Thêm dịch vụ mới
+          <div className="absolute inset-0 bg-gradient-to-r from-primary to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="relative flex items-center gap-3">
+            <Plus size={22} className="group-hover:rotate-90 transition-transform duration-500" />
+            Thêm dịch vụ mới
+          </div>
         </button>
       </div>
 
