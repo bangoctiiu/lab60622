@@ -1,120 +1,353 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Building2, 
-  UserPlus, 
-  ShieldCheck, 
-  MapPin, 
-  CheckCircle2, 
-  ChevronRight,
-  ArrowRight,
-  Plus,
-  ArrowLeft
-} from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { 
+  User, FileText, PhoneCall, ShieldCheck, 
+  ChevronRight, Camera, Upload, CheckCircle2,
+  Clock, X, Loader2
+} from 'lucide-react';
+import Confetti from 'react-confetti';
+import { toast } from 'sonner';
 
-const Onboarding: React.FC = () => {
+import useAuthStore from '@/stores/authStore';
+import api from '@/services/apiClient';
+import { cn } from '@/utils';
+import { Modal, FileUpload } from '@/components/shared';
+
+// Form Schemas
+const personalInfoSchema = z.object({
+  fullName: z.string().min(1, 'Họ tên là bắt buộc'),
+  phone: z.string().min(10, 'Số điện thoại không hợp lệ'),
+  email: z.string().email('Email không hợp lệ'),
+  birthDate: z.string().min(1, 'Ngày sinh là bắt buộc'),
+  idCard: z.string().min(9, 'Số CCCD không hợp lệ'),
+  address: z.string().min(1, 'Địa chỉ là bắt buộc'),
+});
+
+const emergencyContactSchema = z.object({
+  name: z.string().min(1, 'Họ tên là bắt buộc'),
+  phone: z.string().min(10, 'Số điện thoại không hợp lệ'),
+  relationship: z.string().min(1, 'Mối quan hệ là bắt buộc'),
+});
+
+type PersonalInfoValues = z.infer<typeof personalInfoSchema>;
+type EmergencyContactValues = z.infer<typeof emergencyContactSchema>;
+
+interface OnboardingStep {
+  id: number;
+  title: string;
+  status: 'pending' | 'completed' | 'processing';
+  actionLabel: string;
+  type: 'personal' | 'documents' | 'emergency' | 'handover' | 'deposit' | 'contract';
+  value?: any;
+}
+
+interface OnboardingData {
+  completionPercent: number;
+  steps: OnboardingStep[];
+}
+
+const Onboarding = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuthStore();
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    buildingId: '',
-    roomNumber: '',
-    phone: '',
-    idNumber: ''
+  
+  const [activeModal, setActiveModal] = useState<'personal' | 'documents' | 'emergency' | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // 1. Fetch data
+  const { data, isLoading } = useQuery<OnboardingData>({
+    queryKey: ['portal-onboarding'],
+    queryFn: async () => {
+      const res = await api.get('/api/portal/onboarding');
+      return res.data;
+    },
+    // Mocking initial data to be proactive if API is not yet ready fully
+    placeholderData: {
+      completionPercent: 0,
+      steps: [
+        { id: 1, title: 'Xác nhận thông tin cá nhân', status: 'pending', actionLabel: 'Xác nhận ngay', type: 'personal' },
+        { id: 2, title: 'Upload giấy tờ (CCCD/Hộ chiếu)', status: 'pending', actionLabel: 'Upload ngay', type: 'documents' },
+        { id: 3, title: 'Thêm liên hệ khẩn cấp', status: 'pending', actionLabel: 'Thêm ngay', type: 'emergency' },
+        { id: 4, title: 'Ký biên bản bàn giao (Read-only)', status: 'processing', actionLabel: 'Chờ quản lý bàn giao', type: 'handover' },
+        { id: 5, title: 'Xác nhận đã nộp cọc (Read-only)', status: 'processing', actionLabel: 'Chờ Admin xác nhận', type: 'deposit' },
+        { id: 6, title: 'Ký hợp đồng (Read-only)', status: 'pending', actionLabel: 'Chưa ký', type: 'contract' },
+      ]
+    }
   });
 
-  const nextStep = () => setStep(s => s + 1);
-  const prevStep = () => setStep(s => s - 1);
+  const completionPercent = data?.completionPercent || 0;
 
-  const steps = [
-    { title: 'Chào mừng', icon: Building2, description: 'Chào mừng bạn đến với SmartStay. Hãy bắt đầu bằng việc liên kết với căn hộ của bạn.' },
-    { title: 'Thông tin căn hộ', icon: MapPin, description: 'Nhập mã tòa nhà và số phòng để chúng tôi xác thực cư dân.' },
-    { title: 'Xác minh danh tính', icon: UserPlus, description: 'Cung cấp số điện thoại và CCCD để bảo mật tài khoản.' },
-    { title: 'Hoàn tất', icon: ShieldCheck, description: 'Mọi thứ đã sẵn sàng! Bạn có thể bắt đầu sử dụng các dịch vụ ngay bây giờ.' }
-  ];
+  // 2. Mutations
+  const personalMutation = useMutation({
+    mutationFn: (values: PersonalInfoValues) => api.patch('/api/portal/onboarding/personal-info', values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['portal-onboarding'] });
+      setActiveModal(null);
+      toast.success('Đã cập nhật thông tin cá nhân');
+    }
+  });
+
+  const emergencyMutation = useMutation({
+    mutationFn: (values: EmergencyContactValues) => api.post('/api/portal/onboarding/emergency-contact', values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['portal-onboarding'] });
+      setActiveModal(null);
+      toast.success('Đã thêm liên hệ khẩn cấp');
+    }
+  });
+
+  // 3. Effects for completion
+  useEffect(() => {
+    if (completionPercent === 100 && !celebrating) {
+      setCelebrating(true);
+      setShowConfetti(true);
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 5000);
+    }
+  }, [completionPercent, celebrating]);
+
+  // Forms
+  const personalForm = useForm<PersonalInfoValues>({
+    resolver: zodResolver(personalInfoSchema)
+  });
+
+  const emergencyForm = useForm<EmergencyContactValues>({
+    resolver: zodResolver(emergencyContactSchema)
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white p-6 max-w-[430px] mx-auto">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-12 h-12 text-[#0D8A8A] animate-spin" />
+          <p className="text-[#0D8A8A] font-bold">Đang tải hồ sơ...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleDocumentSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['portal-onboarding'] });
+    setActiveModal(null);
+    toast.success('Đã tải lên tài liệu');
+  };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 bg-gradient-to-br from-white via-slate-50 to-primary/5">
-      {/* Progress Bar */}
-      <div className="w-full max-w-sm flex gap-1.5 mb-12">
-        {[1, 2, 3, 4].map(s => (
-          <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${step >= s ? 'bg-primary' : 'bg-slate-100'}`} />
+    <div className="min-h-screen bg-[#F8FAFC] pb-24 max-w-[430px] mx-auto antialiased">
+      {showConfetti && <Confetti recycle={false} numberOfPieces={300} />}
+      
+      {/* Header Section */}
+      <div className="bg-white p-6 sticky top-0 z-10 border-b border-slate-100 shadow-sm">
+        <h2 className="text-2xl font-bold text-slate-900 mb-4 line-clamp-1">
+          Chào mừng, {user?.fullName || 'Cư dân'}!
+        </h2>
+        
+        <div className="space-y-2">
+          <div className="flex justify-between items-center text-sm font-bold">
+            <span className="text-[#0D8A8A]">{completionPercent}% hoàn thành</span>
+            <span className="text-slate-400">100%</span>
+          </div>
+          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#0D8A8A] transition-all duration-700 ease-out shadow-[0_0_12px_rgba(13,138,138,0.3)]"
+              style={{ width: `${completionPercent}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Steps List */}
+      <div className="p-6 space-y-4">
+        {data?.steps.map((step) => (
+          <OnboardingCard 
+            key={step.id} 
+            step={step} 
+            onAction={() => {
+              if (step.type === 'personal') setActiveModal('personal');
+              if (step.type === 'documents') setActiveModal('documents');
+              if (step.type === 'emergency') setActiveModal('emergency');
+            }}
+          />
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-           key={step}
-           initial={{ opacity: 0, x: 20 }}
-           animate={{ opacity: 1, x: 0 }}
-           exit={{ opacity: 0, x: -20 }}
-           className="w-full max-w-sm space-y-8"
-        >
-          <div className="text-center space-y-4">
-            <div className="w-20 h-20 rounded-[32px] bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-xl shadow-primary/5">
-              {React.createElement(steps[step-1].icon, { size: 32 })}
+      {/* Final Success Message */}
+      {completionPercent === 100 && (
+        <div className="px-6 pb-6 animate-in fade-in zoom-in duration-700">
+          <div className="bg-white p-8 rounded-2xl border-2 border-[#0D8A8A]/20 flex flex-col items-center text-center space-y-4 shadow-xl">
+            <div className="w-20 h-20 bg-[#0D8A8A]/10 rounded-full flex items-center justify-center text-[#0D8A8A]">
+              <CheckCircle2 size={48} />
             </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-black text-slate-800 tracking-tight">{steps[step-1].title}</h1>
-              <p className="text-sm font-medium text-slate-400 leading-relaxed px-4">{steps[step-1].description}</p>
+            <div>
+              <h3 className="text-xl font-bold text-slate-900">Hoàn thành hồ sơ!</h3>
+              <p className="text-slate-500 mt-2">Chúc mừng! Chào mừng đến với SmartStay!</p>
             </div>
+            <button 
+              onClick={() => navigate('/portal')}
+              className="w-full h-14 bg-[#0D8A8A] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-[#0D8A8A]/40 transition-all active:scale-95"
+            >
+              Vào trang chủ
+            </button>
           </div>
+        </div>
+      )}
 
-          <div className="space-y-4">
-            {step === 1 && (
-               <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10">
-                 <p className="text-[12px] font-bold text-center text-primary-dark uppercase tracking-widest italic">
-                    "SmartStay - Trải nghiệm sống hiện đại ngay tại căn hộ của bạn"
-                 </p>
-               </div>
-            )}
+      {/* --- MODALS --- */}
 
-            {step === 2 && (
-              <div className="space-y-4">
-                <input placeholder="Mã tòa nhà (Ví dụ: BLK-A)" className="w-full h-14 bg-slate-50 border-none rounded-2xl px-5 text-sm font-bold focus:ring-2 ring-primary/20 outline-none transition-all" />
-                <input placeholder="Số phòng (Ví dụ: 1205)" className="w-full h-14 bg-slate-50 border-none rounded-2xl px-5 text-sm font-bold focus:ring-2 ring-primary/20 outline-none transition-all" />
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-4">
-                <input placeholder="Số điện thoại" className="w-full h-14 bg-slate-50 border-none rounded-2xl px-5 text-sm font-bold focus:ring-2 ring-primary/20 outline-none transition-all" />
-                <input placeholder="Số CCCD" className="w-full h-14 bg-slate-50 border-none rounded-2xl px-5 text-sm font-bold focus:ring-2 ring-primary/20 outline-none transition-all" />
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="space-y-4">
-                <div className="bg-green-50 p-6 rounded-3xl border border-green-100 flex flex-col items-center">
-                  <CheckCircle2 size={48} className="text-green-500 mb-4" />
-                  <p className="text-sm font-bold text-green-700 text-center">Tài khoản của bạn đã được liên kết thành công!</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      <div className="fixed bottom-12 left-0 right-0 px-6 flex flex-col items-center gap-4">
-        <button 
-           onClick={step === 4 ? () => navigate('/portal') : nextStep}
-           className="w-full max-w-sm h-14 bg-slate-800 text-white rounded-[28px] font-black uppercase tracking-[3px] text-[13px] shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all group"
-        >
-          {step === 4 ? 'Vào trang chủ' : 'Tiếp tục'}
-          {step < 4 && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
-        </button>
-        
-        {step > 1 && step < 4 && (
-          <button onClick={prevStep} className="text-[11px] font-black text-slate-300 uppercase tracking-widest flex items-center gap-1 hover:text-slate-600">
-             <ArrowLeft size={12} />
-             Quay lại
+      {/* 1. Personal Info Modal */}
+      <Modal 
+        isOpen={activeModal === 'personal'} 
+        onClose={() => setActiveModal(null)}
+        title="Thông tin cá nhân"
+      >
+        <form onSubmit={personalForm.handleSubmit((v) => personalMutation.mutate(v))} className="space-y-4 p-4">
+          <FormInput label="Họ tên" {...personalForm.register('fullName')} error={personalForm.formState.errors.fullName?.message} />
+          <FormInput label="Số điện thoại" {...personalForm.register('phone')} error={personalForm.formState.errors.phone?.message} />
+          <FormInput label="Email" type="email" {...personalForm.register('email')} error={personalForm.formState.errors.email?.message} />
+          <FormInput label="Ngày sinh" type="date" {...personalForm.register('birthDate')} error={personalForm.formState.errors.birthDate?.message} />
+          <FormInput label="Số CCCD" {...personalForm.register('idCard')} error={personalForm.formState.errors.idCard?.message} />
+          <FormInput label="Địa chỉ" {...personalForm.register('address')} error={personalForm.formState.errors.address?.message} />
+          <button 
+            type="submit" 
+            disabled={personalMutation.isPending}
+            className="w-full h-14 bg-[#0D8A8A] text-white rounded-xl font-bold mt-4 flex items-center justify-center"
+          >
+            {personalMutation.isPending ? <Loader2 className="animate-spin" /> : 'Lưu thông tin'}
           </button>
-        )}
-      </div>
+        </form>
+      </Modal>
+
+      {/* 2. Documents Modal */}
+      <Modal 
+        isOpen={activeModal === 'documents'} 
+        onClose={() => setActiveModal(null)}
+        title="Tải hồ sơ"
+      >
+        <div className="p-4 space-y-6">
+          <div className="text-center space-y-2">
+            <Camera className="w-16 h-16 mx-auto text-slate-300" />
+            <p className="text-slate-500 text-sm">Chụp hoặc tải ảnh CCCD (mặt trước/mặt sau)</p>
+          </div>
+          <FileUpload 
+            uploadUrl="/api/portal/onboarding/documents"
+            accept="image/*,application/pdf"
+            maxSizeMB={5}
+            onUpload={handleDocumentSuccess}
+          />
+        </div>
+      </Modal>
+
+      {/* 3. Emergency Contact Modal */}
+      <Modal 
+        isOpen={activeModal === 'emergency'} 
+        onClose={() => setActiveModal(null)}
+        title="Liên hệ khẩn cấp"
+      >
+        <form onSubmit={emergencyForm.handleSubmit((v) => emergencyMutation.mutate(v))} className="space-y-4 p-4">
+          <FormInput label="Họ tên người liên hệ" {...emergencyForm.register('name')} error={emergencyForm.formState.errors.name?.message} />
+          <FormInput label="Số điện thoại" {...emergencyForm.register('phone')} error={emergencyForm.formState.errors.phone?.message} />
+          <FormInput label="Mối quan hệ" placeholder="Bố/Mẹ/Vợ/Chồng..." {...emergencyForm.register('relationship')} error={emergencyForm.formState.errors.relationship?.message} />
+          <button 
+            type="submit" 
+            disabled={emergencyMutation.isPending}
+            className="w-full h-14 bg-[#0D8A8A] text-white rounded-xl font-bold mt-4 flex items-center justify-center"
+          >
+            {emergencyMutation.isPending ? <Loader2 className="animate-spin" /> : 'Thêm liên hệ'}
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 };
+
+// Sub-components
+const OnboardingCard = ({ step, onAction }: { step: OnboardingStep, onAction: () => void }) => {
+  const isReadOnly = ['handover', 'deposit'].includes(step.type);
+  const isCompleted = step.status === 'completed';
+  const isProcessing = step.status === 'processing';
+
+  const icons: Record<string, any> = {
+    personal: User,
+    documents: Camera,
+    emergency: PhoneCall,
+    handover: FileText,
+    deposit: ShieldCheck,
+    contract: FileText
+  };
+
+  const Icon = icons[step.type] || ShieldCheck;
+
+  return (
+    <div className={cn(
+      "bg-white p-5 rounded-2xl border transition-all flex items-center gap-4 group",
+      isCompleted ? "border-green-100 bg-green-50/30" : "border-slate-100 shadow-sm",
+      !isCompleted && !isReadOnly && "hover:border-[#0D8A8A]/30 active:scale-[0.98]"
+    )}>
+      <div className={cn(
+        "w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300",
+        isCompleted ? "bg-green-100 text-green-600 scale-105" : 
+        isReadOnly ? "bg-slate-100 text-slate-400" : "bg-[#0D8A8A]/10 text-[#0D8A8A]"
+      )}>
+        <Icon size={28} />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <h4 className={cn("font-bold truncate", isCompleted ? "text-green-800" : "text-slate-800")}>
+          {step.title}
+        </h4>
+        <p className={cn("text-xs font-semibold mt-1", 
+          isCompleted ? "text-green-600" : 
+          isProcessing ? "text-blue-500" : "text-slate-400"
+        )}>
+          {isCompleted ? 'Hoàn thành' : isProcessing ? 'Đang xử lý' : 'Chưa cập nhật'}
+        </p>
+      </div>
+
+      {isCompleted ? (
+        <div className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center animate-in zoom-in">
+          <CheckCircle2 size={18} />
+        </div>
+      ) : isReadOnly || step.type === 'contract' ? (
+        <span className={cn(
+          "text-[10px] uppercase font-bold tracking-tighter w-20 text-right leading-tight",
+          !isCompleted && step.type === 'contract' ? "text-red-400" : "text-slate-300"
+        )}>
+          {step.type === 'contract' && !isCompleted ? 'Chưa ký' : step.actionLabel}
+        </span>
+      ) : (
+        <button 
+          onClick={onAction}
+          className="w-11 h-11 rounded-full bg-[#0D8A8A]/5 text-[#0D8A8A] flex items-center justify-center group-hover:bg-[#0D8A8A] group-hover:text-white transition-all shadow-sm"
+        >
+          <PlusCircle size={24} />
+        </button>
+      )}
+    </div>
+  );
+};
+
+// Fix for missing PlusCircle
+import { PlusCircle } from 'lucide-react';
+
+const FormInput = React.forwardRef<HTMLInputElement, any>(({ label, error, ...props }, ref) => (
+  <div className="space-y-1.5">
+    <label className="text-sm font-bold text-slate-700">{label}</label>
+    <input 
+      ref={ref}
+      className={cn(
+        "w-full h-12 px-4 rounded-xl border-2 outline-none transition-all text-base",
+        error ? "border-red-200 bg-red-50 focus:border-red-500" : "border-slate-100 bg-slate-50 focus:border-[#0D8A8A] focus:bg-white"
+      )}
+      {...props}
+    />
+    {error && <p className="text-[11px] text-red-500 font-bold ml-1">{error}</p>}
+  </div>
+));
 
 export default Onboarding;

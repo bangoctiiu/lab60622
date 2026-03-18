@@ -1,100 +1,115 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { 
   FileText, 
   Download, 
-  ExternalLink, 
-  Search, 
-  ChevronLeft,
-  Filter,
-  Eye,
-  Calendar,
-  ShieldAlert
+  Search,
+  FileCheck,
+  Receipt,
+  FilePlus,
+  ArrowRight,
+  FolderOpen
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import PortalLayout from '@/components/portal/PortalLayout';
+import api from '@/services/apiClient';
+import { cn, formatDate } from '@/utils';
+import { Spinner } from '@/components/ui/Feedback';
+import { toast } from 'sonner';
 
-const Documents: React.FC = () => {
-  const navigate = useNavigate();
+const Documents = () => {
+  const { data: documents, isLoading } = useQuery({
+    queryKey: ['portal-documents'],
+    queryFn: async () => {
+      const res = await api.get('/api/portal/documents');
+      return res.data;
+    }
+  });
 
-  const documents = [
-    { id: 1, name: 'Hợp đồng thuê nhà P.1205', size: '2.4 MB', type: 'PDF', date: '01/01/2024', status: 'Active' },
-    { id: 2, name: 'Nội quy tòa nhà 2024', size: '1.8 MB', type: 'PDF', date: '01/01/2024', status: 'Public' },
-    { id: 3, name: 'Hướng dẫn sử dụng thiết bị', size: '5.2 MB', type: 'PDF', date: '01/01/2024', status: 'Private' },
+  const categories = [
+    { label: 'Hợp đồng', count: 1, icon: FileCheck, color: 'text-teal-600', bg: 'bg-teal-50' },
+    { label: 'Biên lai', count: 8, icon: Receipt, color: 'text-orange-600', bg: 'bg-orange-50' },
+    { label: 'Phụ lục', count: 0, icon: FilePlus, color: 'text-blue-600', bg: 'bg-blue-50' },
   ];
 
   return (
-    <PortalLayout>
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-slate-600">
-            <ChevronLeft size={20} />
-          </button>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">Hồ sơ & Giấy tờ</h1>
+    <PortalLayout title="Kho tài liệu" showBack={true}>
+      <div className="space-y-8 pb-32">
+        {/* 1. Statistics / Categories */}
+        <div className="px-8 pt-8">
+            <div className="grid grid-cols-3 gap-3">
+                {categories.map((cat, idx) => (
+                    <div key={idx} className="bg-white p-4 rounded-[32px] border border-slate-100 flex flex-col items-center gap-2 shadow-sm text-center">
+                        <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center", cat.bg, cat.color)}>
+                            <cat.icon size={20} />
+                        </div>
+                        <div className="space-y-0.5">
+                            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">{cat.label}</span>
+                            <p className="text-sm font-black text-slate-800 leading-none">{cat.count}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
 
-        {/* Search */}
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={20} />
-          <input 
-            type="text"
-            placeholder="Tìm kiếm tài liệu..."
-            className="w-full h-14 bg-white border border-slate-100 rounded-2xl pl-12 pr-4 text-sm font-medium focus:ring-2 ring-primary/20 outline-none transition-all shadow-sm focus:shadow-md"
-          />
-        </div>
+        {/* 2. Search */}
+        <div className="px-8 flex flex-col gap-6">
+            <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0D8A8A] transition-colors" size={18} />
+                <input 
+                    type="text" 
+                    placeholder="Tìm tên tài liệu..."
+                    className="w-full h-14 bg-white rounded-2xl pl-12 pr-4 text-sm font-medium border-2 border-transparent focus:border-[#0D8A8A]/20 focus:bg-white shadow-sm transition-all outline-none"
+                />
+            </div>
 
-        <div className="grid gap-3">
-          {documents.map((doc) => (
-            <motion.div
-              key={doc.id}
-              whileHover={{ y: -2 }}
-              className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4 group"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
-                <FileText size={28} />
-              </div>
+            {/* 3. Document List */}
+            <div className="space-y-6 text-left">
+                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] px-2 flex items-center gap-2">
+                    <FolderOpen size={16} className="text-[#0D8A8A]" /> Danh sách tệp tin
+                </h3>
 
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-black text-slate-800 truncate mb-1">{doc.name}</h3>
-                <div className="flex items-center gap-3">
-                   <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                     <Calendar size={12} />
-                     {doc.date}
-                   </div>
-                   <div className="w-1 h-1 rounded-full bg-slate-200" />
-                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{doc.size}</span>
+                <div className="space-y-4">
+                    {isLoading ? (
+                        <div className="py-20 flex justify-center"><Spinner /></div>
+                    ) : documents?.items?.length > 0 ? (
+                        documents.items.map((doc: any) => <DocumentCard key={doc.id} doc={doc} />)
+                    ) : (
+                        // Mock data
+                        [
+                            { id: 1, name: 'Hợp đồng thuê phòng 902 - Sign.pdf', size: '2.4 MB', type: 'Contract', date: '2023-12-01' },
+                            { id: 2, name: 'Biên lai thanh toán INV-102.pdf', size: '840 KB', type: 'Receipt', date: '2024-01-10' },
+                            { id: 3, name: 'Biên lai thanh toán INV-103.pdf', size: '840 KB', type: 'Receipt', date: '2024-02-12' },
+                        ].map((doc) => <DocumentCard key={doc.id} doc={doc} />)
+                    )}
                 </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/5 flex items-center justify-center transition-all">
-                  <Eye size={18} />
-                </button>
-                <button className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/5 flex items-center justify-center transition-all">
-                  <Download size={18} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Security Warning */}
-        <div className="p-6 bg-slate-900 rounded-[32px] text-white shadow-xl relative overflow-hidden group">
-           <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full -mb-16 -mr-16" />
-           <div className="flex gap-4 items-start relative z-10">
-              <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                <ShieldAlert className="text-amber-400" size={20} />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-sm font-black uppercase tracking-widest">Lưu ý quan trọng</h4>
-                <p className="text-[12px] text-white/60 font-medium leading-relaxed">
-                  Để bảo vệ quyền riêng tư, vui lòng không chia sẻ các tài liệu pháp lý cho bên thứ ba không có thẩm quyền.
-                </p>
-              </div>
-           </div>
+            </div>
         </div>
       </div>
     </PortalLayout>
+  );
+};
+
+const DocumentCard = ({ doc }: { doc: any }) => {
+  const isContract = doc.type === 'Contract';
+
+  return (
+    <div className="bg-white p-6 rounded-[36px] shadow-sm border border-slate-50 flex items-center justify-between group active:scale-[0.99] transition-all">
+        <div className="flex items-center gap-5">
+            <div className={cn(
+                "w-12 h-12 rounded-[22px] flex items-center justify-center transition-transform group-hover:scale-110 shadow-inner",
+                isContract ? "bg-teal-50 text-teal-600" : "bg-orange-50 text-orange-600"
+            )}>
+                <FileText size={24} strokeWidth={2} />
+            </div>
+            <div className="space-y-1">
+                <h4 className="text-[13px] font-black text-slate-800 tracking-tight leading-none uppercase truncate max-w-[160px]">{doc.name}</h4>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{formatDate(doc.date)} • {doc.size}</p>
+            </div>
+        </div>
+        <button onClick={() => toast.info('Chức năng đang phát triển để kết nối Backend')} className="w-10 h-10 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center group-hover:bg-[#0D8A8A] group-hover:text-white transition-all shadow-sm">
+            <Download size={18} />
+        </button>
+    </div>
   );
 };
 

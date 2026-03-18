@@ -16,7 +16,6 @@ import PortalLayout from '@/components/portal/PortalLayout';
 import api from '@/services/apiClient';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
-import { toast } from 'sonner';
 
 const PaymentHistory = () => {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ const PaymentHistory = () => {
       title="Lịch sử thanh toán" 
       showBack={true}
       rightAction={
-        <button onClick={() => toast.info('Chức năng đang phát triển để kết nối Backend')} className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
+        <button className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
           <Filter size={20} />
         </button>
       }
@@ -111,7 +110,7 @@ const PaymentCard = ({ payment, onClick }: { payment: any; onClick?: () => void 
       </div>
       <div className="text-right flex flex-col items-end gap-2">
         <span className="text-sm font-black text-[#0D8A8A] tracking-tighter">{formatVND(payment.amount)}</span>
-        <button onClick={() => toast.info('Chức năng đang phát triển để kết nối Backend')} className="p-1.5 bg-slate-50 rounded-lg text-slate-300 group-hover:bg-[#0D8A8A] group-hover:text-white transition-all shadow-sm">
+        <button className="p-1.5 bg-slate-50 rounded-lg text-slate-300 group-hover:bg-[#0D8A8A] group-hover:text-white transition-all shadow-sm">
           <Download size={14} />
         </button>
       </div>
