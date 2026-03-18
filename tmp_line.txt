@@ -1,0 +1,1 @@
+﻿                                           <Route path="/reports" element={<Suspense fallback={<PageSkeleton />}><Outlet /></Suspense>}>

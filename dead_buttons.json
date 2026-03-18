@@ -1,0 +1,477 @@
+[
+  {
+    "file": "\\src\\components\\contracts\\modals\\TerminateContractModal.tsx",
+    "line": 92,
+    "tag": "<button className=\"btn-danger shadow-lg shadow-danger/20\">"
+  },
+  {
+    "file": "\\src\\components\\invoices\\modals\\BulkInvoiceModal.tsx",
+    "line": 175,
+    "tag": "<button className=\"btn-outline flex items-center gap-2 mx-auto\">"
+  },
+  {
+    "file": "\\src\\components\\invoices\\modals\\CreateInvoiceModal.tsx",
+    "line": 165,
+    "tag": "<button className=\"underline ml-1\">"
+  },
+  {
+    "file": "\\src\\components\\invoices\\modals\\CreateInvoiceModal.tsx",
+    "line": 178,
+    "tag": "<button className=\"btn-primary flex items-center gap-2\">"
+  },
+  {
+    "file": "\\src\\components\\layout\\Topbar.tsx",
+    "line": 81,
+    "tag": "<button className=\"p-2.5 text-muted hover:bg-bg rounded-full transition-all relative\">"
+  },
+  {
+    "file": "\\src\\components\\layout\\Topbar.tsx",
+    "line": 195,
+    "tag": "<button className=\"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-muted hover:text-prima"
+  },
+  {
+    "file": "\\src\\components\\payments\\modals\\ApprovePaymentModal.tsx",
+    "line": 81,
+    "tag": "<button className=\"w-12 h-12 rounded-lg border overflow-hidden hover:ring-2 ring-primary\">"
+  },
+  {
+    "file": "\\src\\components\\ui\\Button.tsx",
+    "line": 31,
+    "tag": "<button ref={ref} disabled={isLoading || disabled} className={cn( 'flex items-center justify-center "
+  },
+  {
+    "file": "\\src\\views\\admin\\AdminDashboard.tsx",
+    "line": 191,
+    "tag": "<button className=\"btn-primary flex items-center gap-2 px-6 shadow-xl shadow-primary/20\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\assets\\AssetCatalog.tsx",
+    "line": 67,
+    "tag": "<button className=\"btn-outline flex items-center gap-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\assets\\AssetCatalog.tsx",
+    "line": 104,
+    "tag": "<button className=\"btn-outline flex items-center justify-center gap-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\assets\\AssetCatalog.tsx",
+    "line": 205,
+    "tag": "<button className=\"p-2 hover:bg-white rounded-xl text-muted transition-all shadow-sm\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\buildings\\BuildingDetail.tsx",
+    "line": 248,
+    "tag": "<button className=\"p-2 hover:bg-bg rounded-lg text-muted hover:text-primary transition tooltip\" titl"
+  },
+  {
+    "file": "\\src\\views\\admin\\buildings\\BuildingDetail.tsx",
+    "line": 299,
+    "tag": "<button onPointerDown={(e) =>"
+  },
+  {
+    "file": "\\src\\views\\admin\\buildings\\BuildingDetail.tsx",
+    "line": 301,
+    "tag": "<button onPointerDown={(e) =>"
+  },
+  {
+    "file": "\\src\\views\\admin\\buildings\\BuildingDetail.tsx",
+    "line": 867,
+    "tag": "<button disabled={totalOwnership >"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\AddendumListPage.tsx",
+    "line": 22,
+    "tag": "<button className=\"btn-primary flex items-center gap-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\AddendumListPage.tsx",
+    "line": 55,
+    "tag": "<button className=\"p-2 hover:bg-white rounded-xl shadow-sm border border-border/50 text-muted hover:"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\ContractDetail.tsx",
+    "line": 281,
+    "tag": "<button className=\"p-2 text-muted hover:text-primary transition-colors\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\ContractDetail.tsx",
+    "line": 287,
+    "tag": "<button className=\"btn-outline w-full mt-6 py-3 border-dashed flex items-center justify-center gap-2"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\ContractList.tsx",
+    "line": 251,
+    "tag": "<button className=\"p-1.5 text-muted hover:text-secondary hover:bg-secondary/5 rounded-md transition-"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\ContractList.tsx",
+    "line": 254,
+    "tag": "<button className=\"p-1.5 text-muted hover:text-accent hover:bg-accent/5 rounded-md transition-all\" t"
+  },
+  {
+    "file": "\\src\\views\\admin\\contracts\\ContractList.tsx",
+    "line": 258,
+    "tag": "<button className=\"p-1.5 text-danger/50 hover:text-danger hover:bg-danger/5 rounded-md transition-al"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\InvoiceDetail.tsx",
+    "line": 316,
+    "tag": "<button className=\"w-12 h-12 rounded-lg border border-border overflow-hidden shrink-0\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\InvoiceList.tsx",
+    "line": 237,
+    "tag": "<button className=\"btn-outline flex-1\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\InvoiceList.tsx",
+    "line": 238,
+    "tag": "<button className=\"btn-outline p-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\InvoiceList.tsx",
+    "line": 359,
+    "tag": "<button className=\"p-2 hover:bg-bg rounded-lg text-muted hover:text-accent transition-all\" title=\"Th"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\PaymentList.tsx",
+    "line": 122,
+    "tag": "<button className=\"btn-outline flex items-center gap-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\PaymentList.tsx",
+    "line": 125,
+    "tag": "<button className=\"btn-primary flex items-center gap-2 shadow-lg shadow-primary/20\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\finance\\PaymentList.tsx",
+    "line": 192,
+    "tag": "<button className=\"btn-outline flex-1\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterList.tsx",
+    "line": 68,
+    "tag": "<button className=\"h-14 w-14 flex items-center justify-center rounded-[20px] bg-white text-muted hov"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterList.tsx",
+    "line": 279,
+    "tag": "<button className=\"h-11 px-6 rounded-xl border border-border text-muted opacity-50 cursor-not-allowe"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterList.tsx",
+    "line": 280,
+    "tag": "<button className=\"h-11 w-11 rounded-xl bg-white border border-border text-primary text-[11px] font-"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterList.tsx",
+    "line": 281,
+    "tag": "<button className=\"h-11 px-6 rounded-xl border border-border text-muted opacity-50 cursor-not-allowe"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterReadingHistory.tsx",
+    "line": 183,
+    "tag": "<button className=\"relative z-10 btn-primary w-full h-14 rounded-2xl bg-white text-slate-900 border-"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterReadingHistory.tsx",
+    "line": 200,
+    "tag": "<button className=\"flex items-center gap-2 text-[11px] font-black uppercase tracking-[2px] text-prim"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterReadingHistory.tsx",
+    "line": 259,
+    "tag": "<button className=\"h-11 w-11 flex items-center justify-center text-primary hover:bg-primary/10 round"
+  },
+  {
+    "file": "\\src\\views\\admin\\meters\\MeterReadingHistory.tsx",
+    "line": 273,
+    "tag": "<button className=\"flex h-11 px-8 items-center gap-2 text-[11px] font-black uppercase tracking-[3px]"
+  },
+  {
+    "file": "\\src\\views\\admin\\owners\\OwnerList.tsx",
+    "line": 66,
+    "tag": "<button className=\"btn-outline flex items-center gap-2 h-11\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\owners\\OwnerList.tsx",
+    "line": 229,
+    "tag": "<button className=\"p-3 bg-white border border-border/50 rounded-2xl text-muted hover:text-primary ho"
+  },
+  {
+    "file": "\\src\\views\\admin\\reports\\AlertsReport.tsx",
+    "line": 187,
+    "tag": "<button className=\"text-xs font-bold text-blue-600 hover:underline inline-flex items-center gap-1\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\reports\\NPSReport.tsx",
+    "line": 333,
+    "tag": "<button className=\"text-[10px] font-black text-blue-600 hover:text-blue-700 uppercase tracking-wides"
+  },
+  {
+    "file": "\\src\\views\\admin\\rooms\\RoomDetail.tsx",
+    "line": 346,
+    "tag": "<button className=\"btn-outline-sm px-4 py-2 flex items-center gap-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\rooms\\RoomDetail.tsx",
+    "line": 347,
+    "tag": "<button className=\"btn-primary-sm px-4 py-2 flex items-center gap-2\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\rooms\\RoomDetail.tsx",
+    "line": 367,
+    "tag": "<button className=\"p-3 bg-white rounded-xl text-primary hover:scale-110 transition-transform shadow-"
+  },
+  {
+    "file": "\\src\\views\\admin\\rooms\\RoomDetail.tsx",
+    "line": 368,
+    "tag": "<button className=\"p-3 bg-white rounded-xl text-danger hover:scale-110 transition-transform shadow-x"
+  },
+  {
+    "file": "\\src\\views\\admin\\rooms\\RoomDetail.tsx",
+    "line": 403,
+    "tag": "<button className=\"p-3 bg-bg/50 rounded-2xl text-muted group-hover:text-primary transition-colors\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\staff\\AmenityCheckin.tsx",
+    "line": 39,
+    "tag": "<button className=\"btn-primary flex items-center gap-2 h-12 px-6\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\staff\\AmenityCheckin.tsx",
+    "line": 135,
+    "tag": "<button className=\"p-2.5 text-muted hover:bg-bg rounded-xl\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantBalance.tsx",
+    "line": 98,
+    "tag": "<button className=\"btn-primary flex items-center justify-center gap-2 py-3 text-small\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantBalance.tsx",
+    "line": 107,
+    "tag": "<button className=\"btn-outline col-span-2 flex items-center justify-center gap-2 py-3 text-small\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 210,
+    "tag": "<button className=\"btn-primary flex items-center gap-2 px-6 shadow-xl shadow-primary/20\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 309,
+    "tag": "<button className=\"w-full py-3 bg-white/10 hover:bg-white/20 text-[10px] font-black uppercase tracki"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 637,
+    "tag": "<button className=\"opacity-0 group-hover:opacity-100 p-2 hover:bg-secondary/10 hover:text-secondary "
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 710,
+    "tag": "<button className=\"text-primary text-[11px] font-black uppercase hover:underline\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 735,
+    "tag": "<button className=\"p-2 hover:bg-bg rounded-lg text-muted transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 736,
+    "tag": "<button className=\"p-2 hover:bg-bg rounded-lg text-danger transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 792,
+    "tag": "<button className=\"btn-outline-sm\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 923,
+    "tag": "<button className=\"px-5 py-2.5 bg-success hover:bg-success/90 text-white text-[12px] font-black uppe"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 926,
+    "tag": "<button className=\"px-5 py-2.5 bg-danger/10 border border-danger/30 hover:bg-danger/20 text-danger t"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantDetail.tsx",
+    "line": 929,
+    "tag": "<button className=\"px-5 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 text-white text-["
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantList.tsx",
+    "line": 86,
+    "tag": "<button className=\"btn-outline flex items-center gap-2 h-11 transition-all hover:bg-white hover:shad"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantList.tsx",
+    "line": 185,
+    "tag": "<button className=\"flex items-center gap-2 px-4 py-2 bg-white rounded-2xl border border-border/50 te"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantList.tsx",
+    "line": 296,
+    "tag": "<button className=\"p-2.5 hover:bg-bg rounded-xl text-muted hover:text-primary transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tenants\\TenantList.tsx",
+    "line": 299,
+    "tag": "<button className=\"p-2.5 hover:bg-bg rounded-xl text-muted hover:text-primary transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\StaffRatings.tsx",
+    "line": 85,
+    "tag": "<button className=\"p-2 hover:bg-bg rounded-xl transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\TicketDetail.tsx",
+    "line": 156,
+    "tag": "<button className=\"btn-outline px-4 h-10 border-border/30 hover:bg-white\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\TicketDetail.tsx",
+    "line": 157,
+    "tag": "<button className=\"p-2 hover:bg-bg rounded-xl transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\TicketDetail.tsx",
+    "line": 266,
+    "tag": "<button className=\"flex items-center gap-2 text-muted hover:text-primary transition-all text-[11px] "
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\TicketDetail.tsx",
+    "line": 331,
+    "tag": "<button className=\"hover:text-primary transition-colors flex items-center gap-1\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\TicketDetail.tsx",
+    "line": 332,
+    "tag": "<button className=\"hover:text-danger transition-colors flex items-center gap-1\">"
+  },
+  {
+    "file": "\\src\\views\\admin\\tickets\\TicketDetail.tsx",
+    "line": 636,
+    "tag": "<button className={cn( \"w-full h-14 rounded-[32px] font-black uppercase tracking-[3px] text-[13px] s"
+  },
+  {
+    "file": "\\src\\views\\auth\\LoginPage.tsx",
+    "line": 202,
+    "tag": "<button className=\"w-full py-3.5 border border-border rounded-md font-semibold text-text hover:bg-bg"
+  },
+  {
+    "file": "\\src\\views\\portal\\amenities\\AmenityList.tsx",
+    "line": 120,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\amenities\\AmenityList.tsx",
+    "line": 174,
+    "tag": "<button className=\"w-14 h-14 bg-white rounded-[22px] border-2 border-slate-50 flex items-center just"
+  },
+  {
+    "file": "\\src\\views\\portal\\amenities\\AmenityList.tsx",
+    "line": 253,
+    "tag": "<button disabled={amenity.status !== 'Available'} className={cn( \"w-full h-13 rounded-[26px] flex it"
+  },
+  {
+    "file": "\\src\\views\\portal\\contracts\\ContractView.tsx",
+    "line": 35,
+    "tag": "<button className=\"p-2 bg-white/10 rounded-xl text-white active:scale-95 transition-all\">"
+  },
+  {
+    "file": "\\src\\views\\portal\\dashboard\\TenantDashboard.tsx",
+    "line": 269,
+    "tag": "<button className=\"h-16 w-full bg-white text-secondary rounded-[28px] font-black text-sm shadow-2xl "
+  },
+  {
+    "file": "\\src\\views\\portal\\finance\\InvoiceDetail.tsx",
+    "line": 138,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\finance\\InvoiceDetail.tsx",
+    "line": 390,
+    "tag": "<button className=\"h-14 bg-white border-2 border-slate-200 text-slate-600 rounded-2xl font-black tex"
+  },
+  {
+    "file": "\\src\\views\\portal\\finance\\InvoiceList.tsx",
+    "line": 134,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\finance\\InvoiceList.tsx",
+    "line": 300,
+    "tag": "<button className={cn( \"h-14 flex items-center justify-center gap-3 rounded-[24px] font-black upperc"
+  },
+  {
+    "file": "\\src\\views\\portal\\finance\\PaymentHistory.tsx",
+    "line": 36,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white acti"
+  },
+  {
+    "file": "\\src\\views\\portal\\finance\\PaymentHistory.tsx",
+    "line": 113,
+    "tag": "<button className=\"p-1.5 bg-slate-50 rounded-lg text-slate-300 group-hover:bg-[#0D8A8A] group-hover:"
+  },
+  {
+    "file": "\\src\\views\\portal\\info\\Announcements.tsx",
+    "line": 91,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\PortalHome.tsx",
+    "line": 62,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\PortalHome.tsx",
+    "line": 191,
+    "tag": "<button className=\"h-10 px-6 bg-white/10 backdrop-blur-md rounded-2xl text-[10px] font-black text-wh"
+  },
+  {
+    "file": "\\src\\views\\portal\\profile\\Documents.tsx",
+    "line": 108,
+    "tag": "<button className=\"w-10 h-10 bg-slate-50 text-slate-300 rounded-full flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\profile\\Profile.tsx",
+    "line": 111,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\tickets\\CreateTicket.tsx",
+    "line": 133,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\tickets\\TicketDetail.tsx",
+    "line": 137,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\portal\\tickets\\TicketDetail.tsx",
+    "line": 343,
+    "tag": "<button className=\"h-15 w-15 bg-slate-50 rounded-[22px] flex items-center justify-center text-slate-"
+  },
+  {
+    "file": "\\src\\views\\portal\\tickets\\TicketList.tsx",
+    "line": 73,
+    "tag": "<button className=\"w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-cente"
+  },
+  {
+    "file": "\\src\\views\\public\\LandingPage.tsx",
+    "line": 87,
+    "tag": "<button className=\"px-8 py-4 bg-accent text-white rounded-md font-bold text-lg hover:scale-105 trans"
+  },
+  {
+    "file": "\\src\\views\\public\\LandingPage.tsx",
+    "line": 90,
+    "tag": "<button className=\"px-8 py-4 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-"
+  }
+]
