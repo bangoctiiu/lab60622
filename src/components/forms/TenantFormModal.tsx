@@ -14,6 +14,7 @@ type TenantFormData = {
   nationality?: string;
   occupation?: string;
   permanentAddress?: string;
+  isRepresentative?: boolean;
 };
 
 interface TenantModalProps {
@@ -142,14 +143,37 @@ export const TenantFormModal = ({ isOpen, onClose, initialData, onSubmit }: Tena
                     </select>
                  </div>
 
-                 {/* DOB */}
-                 <div className="space-y-2">
-                    <label className="text-label text-muted font-black uppercase tracking-widest">Ngày sinh</label>
-                    <div className="relative">
-                       <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-                       <input type="date" {...register('dateOfBirth')} className="input-base pl-12 h-14" />
+                  {/* DOB */}
+                  <div className="space-y-2">
+                     <label className="text-label text-muted font-black uppercase tracking-widest">Ngày sinh</label>
+                     <div className="relative">
+                        <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                        <input 
+                          type="date" 
+                          {...register('dateOfBirth', {
+                            validate: (value) => {
+                              if (!value) return true;
+                              const age = new Date().getFullYear() - new Date(value).getFullYear();
+                              return age >= 18 || "Cư dân phải từ 18 tuổi trở lên";
+                            }
+                          })} 
+                          className={cn("input-base pl-12 h-14", errors.dateOfBirth && "border-danger bg-danger/5")} 
+                        />
+                     </div>
+                     {errors.dateOfBirth && <p className="text-[10px] text-danger font-bold uppercase">{errors.dateOfBirth.message}</p>}
+                  </div>
+
+                  {/* Representative Toggle (Rule 5) */}
+                  <div className="flex items-center gap-4 bg-accent/5 p-4 rounded-2xl border border-accent/10">
+                    <div className="flex-1">
+                      <p className="text-small font-black text-accent uppercase tracking-widest">Người đại diện</p>
+                      <p className="text-[10px] text-muted leading-tight">Chỉ định cư dân này làm người đại diện cho hợp đồng.</p>
                     </div>
-                 </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" {...register('isRepresentative')} className="sr-only peer" />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent ring-0 border-0 focus:ring-0"></div>
+                    </label>
+                  </div>
 
                   {/* Nationality */}
                   <div className="space-y-2">

@@ -40,14 +40,18 @@ export const maskPhone = (phone: string): string => {
   return phone.substring(0, 3) + '****' + phone.substring(phone.length - 3);
 };
 
-/**
- * Format age from date of birth
- */
-import { differenceInYears } from 'date-fns';
+import { differenceInYears, formatDistanceToNow } from 'date-fns';
 export const calculateAge = (dob: string | Date): string => {
   if (!dob) return '--';
   const age = differenceInYears(new Date(), new Date(dob));
   return `${age} tuổi`;
+};
+
+/**
+ * Format relative time (e.g. "2 mins ago")
+ */
+export const formatRelativeTime = (date: string | Date): string => {
+  return formatDistanceToNow(new Date(date), { addSuffix: true, locale: vi });
 };
 
 /**

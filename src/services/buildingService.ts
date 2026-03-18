@@ -164,5 +164,25 @@ export const buildingService = {
     if (districtId === '101') return [{ id: '10101', name: 'Mễ Trì' }];
     if (districtId === '102') return [{ id: '10201', name: 'Ngọc Khánh' }];
     return [{ id: '790101', name: 'Bến Nghé' }];
+  },
+
+  checkBuildingCodeUnique: async (code: string): Promise<boolean> => {
+    await new Promise(r => setTimeout(r, 400));
+    return !MOCK_BUILDINGS.some(b => b.buildingCode.toLowerCase() === code.toLowerCase());
+  },
+
+  createBuilding: async (data: any): Promise<Building> => {
+    await new Promise(r => setTimeout(r, 800));
+    const newBuilding = {
+      ...data,
+      id: `B${MOCK_BUILDINGS.length + 1}`,
+      isDeleted: false
+    };
+    return newBuilding;
+  },
+
+  updateBuilding: async (id: string, data: any): Promise<Building> => {
+    await new Promise(r => setTimeout(r, 800));
+    return { ...data, id };
   }
 };

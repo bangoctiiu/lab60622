@@ -76,4 +76,17 @@ export interface NPSSurvey {
 
 export interface TenantSummary extends Tenant {
   hasActiveContract: boolean;
+  isRepresentative?: boolean;
+}
+
+export interface TenantBalanceTransaction {
+  id: string;
+  tenantId: string;
+  amount: number;
+  type: 'Payment' | 'Refund' | 'Correction' | 'Other';
+  description: string;
+  balanceBefore: number;
+  balanceAfter: number;
+  createdAt: string;
+  referenceId?: string;
 }

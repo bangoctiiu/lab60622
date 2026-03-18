@@ -258,12 +258,18 @@ const TenantList = () => {
                     </td>
                     <td className="px-6 py-4">
                        {tenant.currentRoomCode ? (
-                         <button 
-                          onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${tenant.currentRoomId}`); }}
-                          className="px-3 py-1 bg-primary/5 text-primary text-[11px] font-black rounded-lg border border-primary/10 hover:bg-primary hover:text-white transition-all shadow-sm"
-                         >
-                            {tenant.currentRoomCode}
-                         </button>
+                         <div className="flex items-center gap-2">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${tenant.currentRoomId}`); }}
+                              className="px-3 py-1 bg-primary/5 text-primary text-[11px] font-black rounded-lg border border-primary/10 hover:bg-primary hover:text-white transition-all shadow-sm flex items-center gap-1.5"
+                            >
+                               <Building size={12} />
+                               {tenant.currentRoomCode}
+                            </button>
+                            {tenant.isRepresentative && (
+                              <span className="px-2 py-0.5 bg-accent/10 text-accent text-[9px] font-black rounded uppercase border border-accent/20">Đại diện</span>
+                            )}
+                         </div>
                        ) : (
                          <span className="text-muted italic opacity-50">--</span>
                        )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import useAuthStore from '@/stores/authStore';
 import AdminDashboard from './AdminDashboard';
-import StaffDashboard from './StaffDashboard';
+import StaffDashboard from './staff/StaffDashboard';
 
 const Dashboard = () => {
   const { user } = useAuthStore();

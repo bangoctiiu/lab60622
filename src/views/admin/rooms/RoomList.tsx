@@ -15,6 +15,7 @@ import { cn, formatVND } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import useUIStore from '@/stores/uiStore';
 import { usePermission } from '@/hooks/usePermission';
+import { RoomModal } from '@/components/rooms/RoomModal';
 
 const RoomList = () => {
   const navigate = useNavigate();
@@ -26,6 +27,19 @@ const RoomList = () => {
     (localStorage.getItem('roomViewMode') as 'List' | 'Grid') || 'Grid'
   );
   const [search, setSearch] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+
+  // Filter states
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [typeFilter, setTypeFilter] = useState('');
+  const [minPrice, setMinPrice] = useState<number | undefined>();
+  const [maxPrice, setMaxPrice] = useState<number | undefined>();
+  const [minFloor, setMinFloor] = useState<number | undefined>();
+  const [maxFloor, setMaxFloor] = useState<number | undefined>();
+  const [minArea, setMinArea] = useState<number | undefined>();
+  const [maxArea, setMaxArea] = useState<number | undefined>();
+  const [hasMeter, setHasMeter] = useState<boolean | undefined>();
 
   // 1.1.1 Handle view toggle persistence
   const toggleView = (mode: 'List' | 'Grid') => {
@@ -35,9 +49,32 @@ const RoomList = () => {
 
   // Queries
   const { data: rooms, isLoading } = useQuery<Room[]>({
-    queryKey: ['rooms', activeBuildingId, search],
-    queryFn: () => roomService.getRooms({ buildingId: activeBuildingId, search })
+    queryKey: ['rooms', activeBuildingId, search, statusFilter, typeFilter, minPrice, maxPrice, minFloor, maxFloor, minArea, maxArea, hasMeter],
+    queryFn: () => roomService.getRooms({
+      buildingId: activeBuildingId,
+      search,
+      status: statusFilter.length > 0 ? statusFilter as RoomStatus[] : undefined,
+      roomType: typeFilter || undefined,
+      minPrice,
+      maxPrice,
+      minFloor,
+      maxFloor,
+      minArea,
+      maxArea,
+      hasMeter
+    })
   });
+
+  const handleCreateRoom = () => {
+    setSelectedRoom(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEditRoom = (room: Room, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedRoom(room);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -49,7 +86,7 @@ const RoomList = () => {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center bg-bg/50 p-1 rounded-xl border border-border/50">
-            <button 
+            <button
               onClick={() => toggleView('Grid')}
               className={cn(
                 "p-2 rounded-lg transition-all",
@@ -59,7 +96,7 @@ const RoomList = () => {
             >
               <LayoutGrid size={18} />
             </button>
-            <button 
+            <button
               onClick={() => toggleView('List')}
               className={cn(
                 "p-2 rounded-lg transition-all",
@@ -71,7 +108,10 @@ const RoomList = () => {
             </button>
           </div>
           {canManage && (
-            <button className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20">
+            <button
+              onClick={handleCreateRoom}
+              className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20"
+            >
               <Plus size={18} /> Tạo phòng mới
             </button>
           )}
@@ -79,44 +119,125 @@ const RoomList = () => {
       </div>
 
       {/* 1.1.2 Filter Panel */}
-      <div className="card-container p-4 bg-white/60 backdrop-blur-md">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-           {/* Building (Sync with Store via activeBuildingId prop) */}
-           <div className="col-span-1 lg:col-span-2 relative">
+      <div className="card-container p-6 bg-white/60 backdrop-blur-md space-y-6 shadow-xl shadow-primary/5 border-none">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+           {/* Search */}
+           <div className="relative">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-             <input 
-              type="text" 
-              placeholder="Tìm mã phòng, tầng..." 
-              className="input-base w-full pl-10" 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+             <input
+               type="text"
+               placeholder="Tìm mã phòng, tầng..."
+               className="input-base w-full pl-10 h-11"
+               value={search}
+               onChange={(e) => setSearch(e.target.value)}
              />
            </div>
-           
-           <select className="input-base">
-             <option value="">Tất cả trạng thái</option>
-             <option value="Vacant">Trống</option>
-             <option value="Occupied">Đang ở</option>
-             <option value="Maintenance">Bảo trì</option>
-             <option value="Reserved">Đã đặt</option>
-           </select>
 
-           <select className="input-base">
-             <option value="">Loại phòng</option>
+           {/* RoomType */}
+           <select
+             className="input-base h-11"
+             value={typeFilter}
+             onChange={(e) => setTypeFilter(e.target.value)}
+           >
+             <option value="">Tất cả loại phòng</option>
              <option value="Studio">Studio</option>
-             <option value="1BR">1 Ngủ</option>
-             <option value="2BR">2 Ngủ</option>
+             <option value="1BR">1 Phòng ngủ</option>
+             <option value="2BR">2 Phòng ngủ</option>
+             <option value="3BR">3 Phòng ngủ</option>
+             <option value="Penthouse">Penthouse</option>
              <option value="Commercial">Kinh doanh</option>
            </select>
 
+           {/* Price Range */}
            <div className="flex items-center gap-2">
-             <input type="number" placeholder="Min Price" className="input-base w-full" />
-             <input type="number" placeholder="Max Price" className="input-base w-full" />
+             <input
+               type="number" placeholder="Giá Min" className="input-base w-full h-11"
+               onChange={(e) => setMinPrice(e.target.value ? Number(e.target.value) : undefined)}
+             />
+             <span className="text-muted">-</span>
+             <input
+               type="number" placeholder="Giá Max" className="input-base w-full h-11"
+               onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : undefined)}
+             />
            </div>
 
-           <button className="btn-outline flex items-center justify-center gap-2">
-             <Filter size={16} /> Lọc nâng cao
-           </button>
+           {/* Floor Range */}
+           <div className="flex items-center gap-2">
+             <input
+               type="number" placeholder="Tầng Min" className="input-base w-full h-11"
+               onChange={(e) => setMinFloor(e.target.value ? Number(e.target.value) : undefined)}
+             />
+             <span className="text-muted">-</span>
+             <input
+               type="number" placeholder="Tầng Max" className="input-base w-full h-11"
+               onChange={(e) => setMaxFloor(e.target.value ? Number(e.target.value) : undefined)}
+             />
+           </div>
+
+            {/* Area Range */}
+            <div className="flex items-center gap-2">
+              <input
+                type="number" placeholder="DT Min (m2)" className="input-base w-full h-11"
+                onChange={(e) => setMinArea(e.target.value ? Number(e.target.value) : undefined)}
+              />
+              <span className="text-muted">-</span>
+              <input
+                type="number" placeholder="DT Max (m2)" className="input-base w-full h-11"
+                onChange={(e) => setMaxArea(e.target.value ? Number(e.target.value) : undefined)}
+              />
+            </div>
+        </div>
+
+        {/* Status MultiSelect Simulation */}
+        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-dashed">
+           <span className="text-[10px] font-black text-muted uppercase tracking-widest mr-2">Trạng thái:</span>
+           {['Vacant', 'Occupied', 'Maintenance', 'Reserved'].map((status) => (
+             <button
+               key={status}
+               onClick={() => {
+                 setStatusFilter(prev =>
+                   prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
+                 );
+               }}
+               className={cn(
+                 "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
+                 statusFilter.includes(status)
+                   ? "bg-primary text-white border-primary shadow-lg"
+                   : "bg-white text-muted border-border hover:border-primary/30"
+               )}
+             >
+               {status === 'Vacant' ? 'Trống' : status === 'Occupied' ? 'Đang ở' : status === 'Maintenance' ? 'Bảo trì' : 'Đã đặt'}
+             </button>
+           ))}
+
+           <div className="ml-auto flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                 <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                  checked={hasMeter === true}
+                  onChange={(e) => setHasMeter(e.target.checked ? true : undefined)}
+                 />
+                 <span className="text-[10px] font-black uppercase text-muted group-hover:text-primary transition-colors">Có đồng hồ</span>
+              </label>
+              <button
+                onClick={() => {
+                  setSearch('');
+                  setStatusFilter([]);
+                  setTypeFilter('');
+                  setMinPrice(undefined);
+                  setMaxPrice(undefined);
+                  setMinFloor(undefined);
+                  setMaxFloor(undefined);
+                  setMinArea(undefined);
+                  setMaxArea(undefined);
+                  setHasMeter(undefined);
+                }}
+                className="text-[10px] font-black text-danger uppercase tracking-widest hover:underline"
+              >
+                Xoá bộ lọc
+              </button>
+           </div>
         </div>
       </div>
 
@@ -176,12 +297,20 @@ const RoomList = () => {
                 </div>
 
                 <div className="flex items-center justify-between gap-2 pt-2">
-                   <button className="flex-1 btn-outline-sm group-hover:bg-primary group-hover:text-white transition-all py-2 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                      Detail
-                   </button>
-                   <button className="p-2 hover:bg-bg rounded-xl text-muted">
-                      <MoreVertical size={16} />
-                   </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${room.id}`); }}
+                      className="flex-1 btn-outline-sm group-hover:bg-primary group-hover:text-white transition-all py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                    >
+                       Chi tiết
+                    </button>
+                    {canManage && (
+                      <button 
+                        onClick={(e) => handleEditRoom(room, e)}
+                        className="p-2 hover:bg-bg rounded-xl text-muted hover:text-primary transition-all"
+                      >
+                         <Edit size={16} />
+                      </button>
+                    )}
                 </div>
               </div>
             </div>
@@ -241,9 +370,19 @@ const RoomList = () => {
                        </div>
                     </td>
                     <td className="px-6 py-3 text-right">
-                      <button className="p-2 hover:bg-white hover:shadow-lg rounded-xl text-muted transition-all">
-                        <MoreVertical size={18} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {canManage && (
+                          <button 
+                            onClick={(e) => handleEditRoom(room, e)}
+                            className="p-2 hover:bg-white hover:shadow-lg rounded-xl text-muted hover:text-primary transition-all"
+                          >
+                            <Edit size={18} />
+                          </button>
+                        )}
+                        <button className="p-2 hover:bg-white hover:shadow-lg rounded-xl text-muted transition-all">
+                          <MoreVertical size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -252,6 +391,12 @@ const RoomList = () => {
           </div>
         </div>
       )}
+
+      <RoomModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        room={selectedRoom}
+      />
     </div>
   );
 };

@@ -61,7 +61,83 @@ const MOCK_ROOMS: Room[] = [
 export const roomService = {
   getRooms: async (filters?: any): Promise<Room[]> => {
     await new Promise(r => setTimeout(r, 800));
-    return MOCK_ROOMS;
+    let result = [...MOCK_ROOMS];
+    
+    if (filters?.buildingId) {
+      result = result.filter(r => r.buildingId === filters.buildingId);
+    }
+    
+    if (filters?.search) {
+      const search = filters.search.toLowerCase();
+      result = result.filter(r => 
+        r.roomCode.toLowerCase().includes(search) || 
+        r.buildingName?.toLowerCase().includes(search)
+      );
+    }
+
+    if (filters?.status && filters.status.length > 0) {
+      result = result.filter(r => filters.status.includes(r.status));
+    }
+
+    if (filters?.roomType && filters.roomType !== '') {
+      result = result.filter(r => r.roomType === filters.roomType);
+    }
+
+    if (filters?.minFloor !== undefined) {
+      result = result.filter(r => r.floorNumber >= filters.minFloor);
+    }
+    if (filters?.maxFloor !== undefined) {
+      result = result.filter(r => r.floorNumber <= filters.maxFloor);
+    }
+
+    if (filters?.minArea !== undefined) {
+      result = result.filter(r => r.areaSqm >= filters.minArea);
+    }
+
+    if (filters?.minPrice !== undefined) {
+      result = result.filter(r => r.baseRentPrice >= filters.minPrice);
+    }
+    if (filters?.maxPrice !== undefined) {
+      result = result.filter(r => r.baseRentPrice <= filters.maxPrice);
+    }
+
+    return result;
+  },
+
+  getRoomHandoverChecklist: async (roomId: string): Promise<HandoverChecklist[]> => {
+    await new Promise(r => setTimeout(r, 600));
+    return [
+      {
+        id: 'HO1',
+        roomId,
+        roomCode: 'A-101',
+        handoverType: 'CheckIn',
+        date: '2024-12-20',
+        status: 'Completed',
+        sections: [
+          {
+            id: 'S1',
+            title: 'Hệ thống điện & nước',
+            items: [
+              { id: 'I1', name: 'Hệ thống đèn', status: 'OK' },
+              { id: 'I2', name: 'Vòi sen', status: 'NotOK', note: 'Rò rỉ nhẹ', imageUrl: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400' },
+            ]
+          },
+          {
+            id: 'S2',
+            title: 'Nội thất',
+            items: [
+              { id: 'I3', name: 'Giường ngủ', status: 'OK' },
+            ]
+          }
+        ],
+        assets: [
+          { id: 'A1', assetName: 'Điều hòa Daikin', assetCode: 'AC-001', conditionBefore: 'New', conditionAfter: 'Good' }
+        ],
+        witnessSignatureUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+        tenantSignatureUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+      }
+    ];
   },
 
   getRoomDetail: async (id: string): Promise<RoomDetail> => {

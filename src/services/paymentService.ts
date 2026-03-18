@@ -3,7 +3,8 @@ import {
   TenantBalanceTransaction, 
   WebhookLog, 
   ChannelHealth,
-  PaymentStatus
+  PaymentStatus,
+  TransactionType
 } from '@/models/Payment';
 import { format, subDays, subHours } from 'date-fns';
 
@@ -104,6 +105,7 @@ export const paymentService = {
     };
   },
 
+  // 4.1.4 Quick Inline Actions for Pending rows
   approvePayment: async (id: string) => {
     await new Promise(r => setTimeout(r, 800));
     console.log(`Approved payment: ${id}`);
@@ -113,6 +115,57 @@ export const paymentService = {
   rejectPayment: async (id: string, reason: string) => {
     await new Promise(r => setTimeout(r, 800));
     console.log(`Rejected payment: ${id}, reason: ${reason}`);
+    return true;
+  },
+
+  // 4.2 Record Payment
+  recordPayment: async (payment: Omit<PaymentTransaction, 'id' | 'createdAt'>) => {
+    await new Promise(r => setTimeout(r, 1000));
+    const newPayment = {
+      ...payment,
+      id: `TX${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+    MOCK_PAYMENTS.unshift(newPayment as PaymentTransaction);
+    return newPayment;
+  },
+
+  // 4.4.2 Manual Top-up / 4.4.3 Manual Deduct
+  manualBalanceAdjustment: async (tenantId: string, amount: number, type: TransactionType, note: string) => {
+    await new Promise(r => setTimeout(r, 800));
+    const balance = await paymentService.getTenantBalance(tenantId);
+    const newTransaction: TenantBalanceTransaction = {
+      id: `L${Date.now()}`,
+      tenantId,
+      type,
+      amount,
+      balanceBefore: balance.currentBalance,
+      balanceAfter: balance.currentBalance + amount,
+      note,
+      createdAt: new Date().toISOString()
+    };
+    MOCK_LEDGER.unshift(newTransaction);
+    return newTransaction;
+  },
+
+  // 4.4.3 Auto-offset Modal (bu tru hoa don)
+  autoOffsetInvoices: async (tenantId: string, invoiceIds: string[]) => {
+    await new Promise(r => setTimeout(r, 1200));
+    const balance = await paymentService.getTenantBalance(tenantId);
+    // Simple mock logic: deduct total amount of invoices
+    // In real app, this would be more complex
+    const totalDeduct = -1500000; // Mock total
+    const newTransaction: TenantBalanceTransaction = {
+      id: `L-OFFSET-${Date.now()}`,
+      tenantId,
+      type: 'AutoOffset',
+      amount: totalDeduct,
+      balanceBefore: balance.currentBalance,
+      balanceAfter: balance.currentBalance + totalDeduct,
+      note: `Khấu trừ cho ${invoiceIds.length} hóa đơn`,
+      createdAt: new Date().toISOString()
+    };
+    MOCK_LEDGER.unshift(newTransaction);
     return true;
   },
 

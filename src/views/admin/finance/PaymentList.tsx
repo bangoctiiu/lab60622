@@ -99,41 +99,57 @@ const PaymentList = () => {
 
       {/* 4.1.1 Sticky Pending Panel */}
       {pendingInfo && pendingInfo.count > 0 && (
-        <div className="sticky top-4 z-20 bg-warning/10 border border-warning/20 p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-warning/5 backdrop-blur-md animate-in slide-in-from-top duration-500">
+        <div className="sticky top-4 z-20 bg-[#FFFBEB] border border-orange-200 p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-orange-100/50 backdrop-blur-md animate-in slide-in-from-top duration-500">
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-warning/20 text-warning rounded-full flex items-center justify-center">
+             <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center">
                 <Clock size={20} className="animate-pulse" />
              </div>
              <div>
-                <p className="text-body font-bold text-orange-700">
+                <p className="text-body font-black text-orange-800 uppercase tracking-tight">
                   {pendingInfo.count} giao dịch chờ xác nhận — Tổng: {formatVND(pendingInfo.total)}
                 </p>
-                <p className="text-small text-orange-700/70 font-medium">Vui lòng kiểm tra minh chứng trước khi duyệt.</p>
+                <p className="text-[11px] text-orange-700/70 font-bold uppercase tracking-widest mt-0.5">Vui lòng kiểm tra minh chứng trước khi duyệt.</p>
              </div>
           </div>
-          <button className="btn-primary bg-orange-600 hover:bg-orange-700 border-none px-6">Duyệt tất cả</button>
+          <button className="btn-primary bg-orange-600 hover:bg-orange-700 border-none px-8 py-3 text-small shadow-xl shadow-orange-600/20">Duyệt tất cả</button>
         </div>
       )}
 
       {/* 4.1.2 Filter Panel */}
-      <div className="card-container p-4 bg-white/60 backdrop-blur-md">
-         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <div className="col-span-1 md:col-span-2 relative">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-               <input type="text" placeholder="Mã GD, hóa đơn, tên cư dân..." className="input-base w-full pl-10" />
+      <div className="card-container p-6 bg-white/60 backdrop-blur-md border-white/40 shadow-xl shadow-primary/5">
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-2 relative">
+               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" size={18} />
+               <input type="text" placeholder="Tìm theo mã GD, hóa đơn, cư dân..." className="input-base w-full pl-12 h-12" />
             </div>
-            <select className="input-base">
-               <option>Tất cả phương thức</option>
-               <option>Tiền mặt</option>
-               <option>Chuyển khoản</option>
-            </select>
-            <select className="input-base">
-               <option>Tất cả trạng thái</option>
-               <option>Chờ xác nhận</option>
-               <option>Đã xác nhận</option>
-            </select>
-            <div className="flex items-center gap-2">
-               <button className="btn-outline flex-1"><Filter size={16} /> Lọc</button>
+            
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Phương thức</label>
+               <select className="input-base w-full h-11 bg-white/50">
+                  <option>Tất cả phương thức</option>
+                  <option>Tiền mặt</option>
+                  <option>Chuyển khoản</option>
+                  <option>VNPay</option>
+                  <option>MoMo</option>
+                  <option>ZaloPay</option>
+               </select>
+            </div>
+
+            <div className="space-y-1.5">
+               <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Trạng thái</label>
+               <select className="input-base w-full h-11 bg-white/50">
+                  <option>Tất cả trạng thái</option>
+                  <option>Đang chờ (Pending)</option>
+                  <option>Đã xác nhận</option>
+                  <option>Đã từ chối</option>
+                  <option>Đã hoàn tiền</option>
+               </select>
+            </div>
+
+            <div className="flex flex-col justify-end">
+               <button className="h-11 btn-outline flex items-center justify-center gap-2 border-2 hover:bg-primary hover:text-white hover:border-primary transition-all duration-300">
+                  <Filter size={18} /> Lọc nâng cao
+               </button>
             </div>
          </div>
       </div>

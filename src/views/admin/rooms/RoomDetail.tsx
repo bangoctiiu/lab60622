@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
+import { RoomModal } from '@/components/rooms/RoomModal';
 
 // Reusable Tab Component
 const TabItem = ({ active, children, onClick, icon: Icon }: any) => (
@@ -36,6 +37,7 @@ const RoomDetail = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('Overview');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: room, isLoading } = useQuery<RoomDetailType>({
     queryKey: ['room', id],
@@ -111,7 +113,10 @@ const RoomDetail = () => {
                 <Wrench size={18} /> Đặt bảo trì
              </button>
           )}
-          <button className="p-2.5 bg-white border border-border/50 rounded-xl text-muted hover:text-primary hover:shadow-lg transition-all">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="p-2.5 bg-white border border-border/50 rounded-xl text-muted hover:text-primary hover:shadow-lg transition-all"
+          >
              <Edit size={20} />
           </button>
           <button className="p-2.5 bg-white border border-border/50 rounded-xl text-muted hover:text-danger hover:shadow-lg transition-all">
@@ -119,8 +124,6 @@ const RoomDetail = () => {
           </button>
         </div>
       </div>
-
-      {/* 1.2.2 Tab Structure */}
       <div className="bg-white/40 backdrop-blur-md rounded-[32px] overflow-hidden shadow-2xl shadow-primary/5">
         <div className="flex flex-wrap border-b bg-bg/20">
           <TabItem active={activeTab === 'Overview'} onClick={() => setActiveTab('Overview')} icon={Info}>Tổng quan</TabItem>
@@ -426,6 +429,12 @@ const RoomDetail = () => {
           )}
         </div>
       </div>
+
+      <RoomModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        room={room}
+      />
     </div>
   );
 };

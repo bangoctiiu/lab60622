@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
+import { BuildingModal } from '@/components/buildings/BuildingModal';
 
 // Reusable Tab Component
 const TabItem = ({ active, children, onClick, icon: Icon }: any) => (
@@ -35,6 +36,7 @@ const BuildingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Overview');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: building, isLoading } = useQuery<BuildingDetailType>({
     queryKey: ['building', id],
@@ -71,7 +73,12 @@ const BuildingDetail = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="btn-outline flex items-center gap-2 px-6 h-11"><Edit size={18} /> Cập nhật</button>
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="btn-outline flex items-center gap-2 px-6 h-11"
+          >
+            <Edit size={18} /> Cập nhật
+          </button>
           <button className="btn-primary flex items-center gap-2 px-8 h-11 shadow-xl shadow-primary/20"><Printer size={18} /> Báo cáo vận hành</button>
         </div>
       </div>
@@ -393,6 +400,12 @@ const BuildingDetail = () => {
           )}
         </div>
       </div>
+
+      <BuildingModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        building={building}
+      />
     </div>
   );
 };

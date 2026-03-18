@@ -1,7 +1,8 @@
 import { 
   Tenant, TenantProfile, TenantStatus, 
   EmergencyContact, OnboardingProgress, 
-  TenantFeedback, NPSSurvey, TenantSummary 
+  TenantFeedback, NPSSurvey, TenantSummary,
+  TenantBalanceTransaction 
 } from '@/models/Tenant';
 import { format, subDays, subMonths } from 'date-fns';
 
@@ -131,5 +132,32 @@ export const tenantService = {
       { id: 'N1', tenantId, score: 9, triggerType: 'Monthly', comment: 'Dịch vụ rất tốt.', scoreDate: subMonths(new Date(), 1).toISOString() },
       { id: 'N2', tenantId, score: 6, triggerType: 'PostMaintenance', comment: 'Thời gian phản hồi hơi chậm.', scoreDate: subDays(new Date(), 15).toISOString() },
     ];
+  },
+
+  getTenantBalanceTransactions: async (tenantId: string): Promise<TenantBalanceTransaction[]> => {
+    await new Promise(r => setTimeout(r, 500));
+    return [
+      { 
+        id: 'L1', tenantId, amount: -3500000, type: 'Payment', description: 'Thanh toán hóa đơn tháng 02/2026', 
+        balanceBefore: 28000000, balanceAfter: 24500000, createdAt: subDays(new Date(), 5).toISOString(), referenceId: 'INV1' 
+      },
+      { 
+        id: 'L2', tenantId, amount: 15000000, type: 'Payment', description: 'Nạp tiền vào ví điện tử', 
+        balanceBefore: 13000000, balanceAfter: 28000000, createdAt: subDays(new Date(), 10).toISOString() 
+      },
+      { 
+        id: 'L3', tenantId, amount: -500000, type: 'Correction', description: 'Điều chỉnh phí dịch vụ dư', 
+        balanceBefore: 13500000, balanceAfter: 13000000, createdAt: subDays(new Date(), 15).toISOString() 
+      }
+    ];
+  },
+
+  addTenantBalanceTransaction: async (data: Omit<TenantBalanceTransaction, 'id' | 'createdAt'>): Promise<TenantBalanceTransaction> => {
+    const newTransaction: TenantBalanceTransaction = {
+      ...data,
+      id: 'L' + Math.random().toString(36).substr(2, 9),
+      createdAt: new Date().toISOString()
+    };
+    return newTransaction;
   }
 };

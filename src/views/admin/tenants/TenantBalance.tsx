@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import { 
   DollarSign, ArrowUpRight, ArrowDownRight, 
   History, ShieldCheck, ChevronRight, FileText,
-  AlertTriangle, CheckCircle2, TrendingUp, Info
+  AlertTriangle, CheckCircle2, TrendingUp, Info,
+  ArrowUpRight, ArrowDownRight, X
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { paymentService } from '@/services/paymentService';
+import { invoiceService } from '@/services/invoiceService';
 import { TenantBalanceTransaction, TransactionType } from '@/models/Payment';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
+import { toast } from 'sonner';
+import { TopUpModal, DeductModal, AutoOffsetModal } from './components/BalanceModals';
 
 const TenantBalance = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [activeModal, setActiveModal] = useState<'topup' | 'deduct' | 'offset' | null>(null);
 
   const handleOnboardingAction = (key: string) => {
     // toast.success(`Đã cập nhật bước: ${key}`); // Commented out as toast is not imported
@@ -90,13 +95,22 @@ const TenantBalance = () => {
                </div>
 
                <div className="w-full grid grid-cols-2 gap-3 pt-6 border-t border-border/20">
-                  <button className="btn-primary flex items-center justify-center gap-2 py-3 text-small">
+                  <button 
+                    onClick={() => setActiveModal('topup')}
+                    className="btn-primary flex items-center justify-center gap-2 py-3 text-small"
+                  >
                      <ArrowUpRight size={16} /> Nạp tiền
                   </button>
-                  <button className="btn-outline flex items-center justify-center gap-2 py-3 text-small">
+                  <button 
+                    onClick={() => setActiveModal('deduct')}
+                    className="btn-outline flex items-center justify-center gap-2 py-3 text-small"
+                  >
                      <ArrowDownRight size={16} /> Khấu trừ
                   </button>
-                  <button className="btn-outline col-span-2 flex items-center justify-center gap-2 py-3 text-small">
+                  <button 
+                    onClick={() => setActiveModal('offset')}
+                    className="btn-outline col-span-2 flex items-center justify-center gap-2 py-3 text-small"
+                  >
                      <TrendingUp size={16} /> Bù trừ hóa đơn
                   </button>
                </div>
@@ -194,6 +208,17 @@ const TenantBalance = () => {
            </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {activeModal === 'topup' && (
+        <TopUpModal tenantId={id || ''} onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === 'deduct' && (
+        <DeductModal tenantId={id || ''} onClose={() => setActiveModal(null)} />
+      )}
+      {activeModal === 'offset' && (
+        <AutoOffsetModal tenantId={id || ''} onClose={() => setActiveModal(null)} />
+      )}
     </div>
   );
 };
