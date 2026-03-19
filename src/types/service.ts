@@ -44,6 +44,7 @@ export interface UpdateServiceDto {
   unit: string
   billingMethod: BillingMethod
   description?: string
+  isActive: boolean
 }
 
 export interface UpdateServicePriceDto {

@@ -3,7 +3,12 @@ import {
   TicketPriority, TicketType, TicketComment, 
   StaffServiceRating, TicketStatistics 
 } from '@/models/Ticket';
-import { MOCK_TICKETS, MOCK_TICKET_COMMENTS } from '@/mocks/ticketMocks';
+import { 
+  MOCK_TICKETS, 
+  MOCK_TICKET_COMMENTS, 
+  MOCK_TICKET_STATISTICS, 
+  MOCK_STAFF_RATINGS 
+} from "@/mocks/ticketMocks";
 
 export const ticketService = {
   getTickets: async (filters?: any): Promise<Ticket[]> => {
@@ -26,16 +31,7 @@ export const ticketService = {
   },
 
   getTicketStatistics: async (): Promise<TicketStatistics> => {
-    return {
-      total: 156,
-      open: 12,
-      inProgress: 8,
-      resolved: 130,
-      cancelled: 6,
-      slaBreached: 3,
-      avgResolutionTimeHours: 4.5,
-      satisfactionRate: 4.8
-    };
+    return MOCK_TICKET_STATISTICS;
   },
 
   createTicket: async (ticket: Omit<Ticket, 'id' | 'ticketCode' | 'createdAt' | 'updatedAt'>): Promise<Ticket> => {
@@ -77,25 +73,7 @@ export const ticketService = {
 
   getStaffRatings: async (staffId: string): Promise<{ average: number, summary: Record<number, number>, list: StaffServiceRating[] }> => {
     await new Promise(r => setTimeout(r, 700));
-    return {
-      average: 4.8,
-      summary: { 5: 120, 4: 25, 3: 5, 2: 2, 1: 0 },
-      list: [
-        {
-          id: '1',
-          ticketId: 'TK-001',
-          ticketCode: 'TK-001',
-          rating: 5,
-          comment: 'Rất nhiệt tình và chuyên nghiệp!',
-          tenantId: 'tenant1',
-          tenantName: 'Nguyễn Văn A',
-          staffId: staffId,
-          staffName: 'Lê Kỹ Thuật',
-          staffRole: 'Senior Maintenance Staff',
-          createdAt: new Date().toISOString()
-        }
-      ]
-    };
+    return MOCK_STAFF_RATINGS(staffId);
   }
 };
 

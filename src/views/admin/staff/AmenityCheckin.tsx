@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/utils';
 import { toast } from 'sonner';
-import { StatusBadge } from '@/components/shared/StatusBadge';
+import { StatusBadge } from '@/components/ui';
 
 const AmenityCheckin = () => {
   const [bookings, setBookings] = useState([

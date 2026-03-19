@@ -1,5 +1,36 @@
 import { Ticket, TicketComment } from "@/models/Ticket";
 
+export const MOCK_TICKET_STATISTICS = {
+  total: 156,
+  open: 12,
+  inProgress: 8,
+  resolved: 130,
+  cancelled: 6,
+  slaBreached: 3,
+  avgResolutionTimeHours: 4.5,
+  satisfactionRate: 4.8
+};
+
+export const MOCK_STAFF_RATINGS = (staffId: string) => ({
+  average: 4.8,
+  summary: { 5: 120, 4: 25, 3: 5, 2: 2, 1: 0 },
+  list: [
+    {
+      id: '1',
+      ticketId: 'TK-001',
+      ticketCode: 'TK-001',
+      rating: 5,
+      comment: 'Rất nhiệt tình và chuyên nghiệp!',
+      tenantId: 'tenant1',
+      tenantName: 'Nguyễn Văn A',
+      staffId: staffId,
+      staffName: 'Lê Kỹ Thuật',
+      staffRole: 'Senior Maintenance Staff',
+      createdAt: new Date().toISOString()
+    }
+  ]
+});
+
 export const MOCK_TICKETS: Ticket[] = [
   {
     id: "123",

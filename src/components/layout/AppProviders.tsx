@@ -1,13 +1,25 @@
 import { QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { queryClient } from '@/lib/queryClient';
 import { Toaster } from 'sonner';
 import { OfflineBanner, SessionExpiredOverlay } from '../ui/StatusStates';
 import useAuthStore from '@/stores/authStore';
+import useUIStore from '@/stores/uiStore';
 
 export const AppProviders = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, logout, sessionExpired, setSessionExpired } = useAuthStore();
+  const { theme } = useUIStore();
   
+  // Apply theme to document
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
   const handleLoginRedirect = () => {
     setSessionExpired(false);
     logout();

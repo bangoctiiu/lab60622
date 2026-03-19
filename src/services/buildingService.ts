@@ -2,6 +2,7 @@ import { BuildingSummary, BuildingDetail, Building } from '@/models/Building';
 import { OwnerSummary, OwnerDetail } from '@/models/Owner';
 import { MOCK_BUILDING_SUMMARIES, MOCK_BUILDINGS } from '@/mocks/buildingMocks';
 import { MOCK_OWNERS } from '@/mocks/ownerMocks';
+import { MOCK_PROVINCES, MOCK_DISTRICTS, MOCK_WARDS } from '@/mocks/systemMocks';
 
 export const buildingService = {
   getBuildings: async (filters?: { search?: string }): Promise<BuildingSummary[]> => {
@@ -59,18 +60,15 @@ export const buildingService = {
   },
 
   getProvinces: async () => {
-    return [{ id: '1', name: 'Hà Nội' }, { id: '79', name: 'TP. Hồ Chí Minh' }];
+    return MOCK_PROVINCES;
   },
 
   getDistricts: async (provinceId: string) => {
-    if (provinceId === '1') return [{ id: '101', name: 'Nam Từ Liêm' }, { id: '102', name: 'Ba Đình' }];
-    return [{ id: '7901', name: 'Quận 1' }];
+    return MOCK_DISTRICTS[provinceId] || [];
   },
 
   getWards: async (districtId: string) => {
-    if (districtId === '101') return [{ id: '10101', name: 'Mễ Trì' }];
-    if (districtId === '102') return [{ id: '10201', name: 'Ngọc Khánh' }];
-    return [{ id: '790101', name: 'Bến Nghé' }];
+    return MOCK_WARDS[districtId] || [];
   },
 
   checkBuildingCodeUnique: async (code: string): Promise<boolean> => {

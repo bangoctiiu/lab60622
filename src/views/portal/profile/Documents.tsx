@@ -10,82 +10,74 @@ import {
   ArrowRight,
   FolderOpen
 } from 'lucide-react';
-import PortalLayout from '@/components/layout/PortalLayout';
 import api from '@/services/apiClient';
 import { cn, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
 
 const Documents = () => {
-  const { data: documents, isLoading } = useQuery({
-    queryKey: ['portal-documents'],
-    queryFn: async () => {
-      const res = await api.get('/api/portal/documents');
-      return res.data;
-    }
-  });
+  // Mock data for Documents
+  const mockDocuments = {
+    items: [
+      { id: '1', name: 'Hợp đồng thuê phòng 902 - Signed.pdf', size: '2.4 MB', type: 'Contract', date: '2024-03-01', status: 'Signed' },
+      { id: '2', name: 'Biên lai thanh toán INV-2024-001.pdf', size: '840 KB', type: 'Receipt', date: '2024-03-10', status: 'Paid' },
+      { id: '3', name: 'Phụ lục hợp đồng - Diện tích.pdf', size: '1.2 MB', type: 'Addendum', date: '2024-03-12', status: 'Pending' },
+      { id: '4', name: 'Nội quy tòa nhà 2024.pdf', size: '3.1 MB', type: 'Policy', date: '2024-01-01', status: 'Active' },
+      { id: '5', name: 'Biên lai tiền điện tháng 02.pdf', size: '420 KB', type: 'Receipt', date: '2024-02-28', status: 'Paid' },
+    ]
+  };
 
   const categories = [
     { label: 'Hợp đồng', count: 1, icon: FileCheck, color: 'text-teal-600', bg: 'bg-teal-50' },
     { label: 'Biên lai', count: 8, icon: Receipt, color: 'text-orange-600', bg: 'bg-orange-50' },
-    { label: 'Phụ lục', count: 0, icon: FilePlus, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Phụ lục', count: 1, icon: FilePlus, color: 'text-blue-600', bg: 'bg-blue-50' },
   ];
 
   return (
-    <PortalLayout title="Kho tài liệu" showBack={true}>
-      <div className="space-y-8 pb-32">
+    <div className="space-y-8 pb-32 animate-in fade-in duration-700">
         {/* 1. Statistics / Categories */}
         <div className="px-8 pt-8">
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-4">
                 {categories.map((cat, idx) => (
-                    <div key={idx} className="bg-white p-4 rounded-[32px] border border-slate-100 flex flex-col items-center gap-2 shadow-sm text-center">
-                        <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center", cat.bg, cat.color)}>
-                            <cat.icon size={20} />
+                    <div key={idx} className="bg-white/80 backdrop-blur-md p-6 rounded-[32px] border border-white flex flex-col items-center gap-3 shadow-xl shadow-primary/5 text-center group hover:-translate-y-1 transition-all">
+                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg", cat.bg, cat.color)}>
+                            <cat.icon size={24} className="stroke-[2.5]" />
                         </div>
-                        <div className="space-y-0.5">
-                            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">{cat.label}</span>
-                            <p className="text-sm font-black text-slate-800 leading-none">{cat.count}</p>
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-black text-muted uppercase tracking-[0.2em]">{cat.label}</span>
+                            <p className="text-xl font-black text-primary leading-none">{cat.count}</p>
                         </div>
                     </div>
                 ))}
             </div>
         </div>
 
-        {/* 2. Search */}
-        <div className="px-8 flex flex-col gap-6">
+        {/* 2. Search & List */}
+        <div className="px-8 flex flex-col gap-8">
             <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0D8A8A] transition-colors" size={18} />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" size={20} />
                 <input 
                     type="text" 
-                    placeholder="Tìm tên tài liệu..."
-                    className="w-full h-14 bg-white rounded-2xl pl-12 pr-4 text-sm font-medium border-2 border-transparent focus:border-[#0D8A8A]/20 focus:bg-white shadow-sm transition-all outline-none"
+                    placeholder="Tìm kiếm tài liệu của bạn..."
+                    className="w-full h-16 bg-white rounded-3xl pl-14 pr-6 text-base font-bold border-2 border-transparent focus:border-primary/10 shadow-xl shadow-primary/5 transition-all outline-none placeholder:text-muted/40"
                 />
             </div>
 
             {/* 3. Document List */}
             <div className="space-y-6 text-left">
-                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] px-2 flex items-center gap-2">
-                    <FolderOpen size={16} className="text-[#0D8A8A]" /> Danh sách tệp tin
-                </h3>
+                <div className="flex items-center justify-between px-2">
+                    <h3 className="text-[12px] font-black text-primary/40 uppercase tracking-[0.3em] flex items-center gap-2">
+                        <FolderOpen size={18} className="text-primary" /> Tệp tin gần đây
+                    </h3>
+                    <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">Xem tất cả</button>
+                </div>
 
                 <div className="space-y-4">
-                    {isLoading ? (
-                        <div className="py-20 flex justify-center"><Spinner /></div>
-                    ) : documents?.items?.length > 0 ? (
-                        documents.items.map((doc: any) => <DocumentCard key={doc.id} doc={doc} />)
-                    ) : (
-                        // Mock data
-                        [
-                            { id: 1, name: 'Hợp đồng thuê phòng 902 - Sign.pdf', size: '2.4 MB', type: 'Contract', date: '2023-12-01' },
-                            { id: 2, name: 'Biên lai thanh toán INV-102.pdf', size: '840 KB', type: 'Receipt', date: '2024-01-10' },
-                            { id: 3, name: 'Biên lai thanh toán INV-103.pdf', size: '840 KB', type: 'Receipt', date: '2024-02-12' },
-                        ].map((doc) => <DocumentCard key={doc.id} doc={doc} />)
-                    )}
+                    {mockDocuments.items.map((doc) => <DocumentCard key={doc.id} doc={doc} />)}
                 </div>
             </div>
         </div>
-      </div>
-    </PortalLayout>
+    </div>
   );
 };
 

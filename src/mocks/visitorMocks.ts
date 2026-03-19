@@ -1,12 +1,15 @@
+export type VisitorStatus = 'Expected' | 'Arrived' | 'Departed';
+
 export interface Visitor {
   id: string;
   name: string;
+  idCard?: string;
   phone: string;
   visitDate: string;
   visitTime: string;
-  status: 'Expected' | 'Arrived' | 'Departed';
+  status: VisitorStatus;
   qrCode: string;
-  roomCode: string;
+  roomCode?: string;
   tenantId: string;
 }
 

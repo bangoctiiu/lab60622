@@ -154,3 +154,27 @@ export const PageSkeleton = () => (
     </div>
   </div>
 );
+
+// --- Grid Skeleton for Card Lists ---
+export const GridSkeleton = ({ count = 6, className }: { count?: number; className?: string }) => (
+  <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8", className)}>
+    {Array.from({ length: count }).map((_, i) => (
+      <div key={i} className="card-container p-0 overflow-hidden h-[450px] bg-slate-50 animate-pulse border border-slate-100 flex flex-col">
+        <div className="h-60 bg-slate-200" />
+        <div className="p-6 flex-1 space-y-6">
+          <div className="h-8 bg-slate-200 rounded-lg w-3/4" />
+          <div className="h-4 bg-slate-100 rounded-lg w-1/2" />
+          <div className="grid grid-cols-3 gap-4 border-b border-dashed pb-6">
+             <div className="h-10 bg-slate-100 rounded" />
+             <div className="h-10 bg-slate-100 rounded" />
+             <div className="h-10 bg-slate-100 rounded" />
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="h-8 w-24 bg-slate-100 rounded-full" />
+            <div className="h-6 w-32 bg-slate-100 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
-import { 
-  Bell, ChevronLeft
+import {
 } from 'lucide-react';
 import BottomNavigation from '@/components/layout/BottomNavigation';
 
@@ -55,59 +54,9 @@ export const AdminLayout = () => {
 // --- TODO: 4.3 StaffLayout is handled implicitly within AdminLayout via role-based sidebar items.
 // In a real app we might add Staff-specific widgets in the Dashboard component based on role.
 
-// --- 4.2 PortalLayout (Tenant) ---
-export const PortalLayout = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+// PortalLayout has been moved to @/components/layout/PortalLayout.tsx to consolidate implementation.
 
-  const getTitleFromRoute = () => {
-    switch (location.pathname) {
-      case '/portal/dashboard': return 'Dashboard';
-      case '/portal/invoices': return 'Hoá đơn';
-      case '/portal/tickets': return 'Ticket';
-      case '/portal/amenities': return 'Tiện ích';
-      case '/portal/profile': return 'Hồ sơ';
-      default: return 'SmartStay';
-    }
-  };
 
-  return (
-    <div className="portal-container">
-      {/* Sticky Top Bar */}
-      <header className="portal-topbar">
-        <div className="w-10">
-          {location.pathname !== '/portal' && location.pathname !== '/portal/dashboard' && (
-            <button 
-              onClick={() => navigate(-1)}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <ChevronLeft size={24} />
-            </button>
-          )}
-        </div>
-        
-        <h1 className="flex-1 text-center font-bold text-lg truncate uppercase tracking-wide">
-          {getTitleFromRoute()}
-        </h1>
-        
-        <div className="w-10 flex justify-end">
-          <button className="p-2 hover:bg-white/10 rounded-full transition-colors relative">
-            <Bell size={20} />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-[var(--portal-primary)]"></span>
-          </button>
-        </div>
-      </header>
-
-      {/* Content Area */}
-      <main className="portal-content min-h-[calc(100vh-120px)] p-4">
-        <Outlet />
-      </main>
-
-      {/* Sticky Bottom Nav */}
-      <BottomNavigation />
-    </div>
-  );
-};
 
 
 
@@ -122,5 +71,3 @@ export const PublicLayout = ({ showHeader = true }: { showHeader?: boolean }) =>
   </div>
 );
 
-// Specific Icons fix
-import { Receipt as ReceiptIcon, MessageSquare as MessageSquareIcon, Bell as BellBadgeIcon, User as UserCircleIcon } from 'lucide-react';

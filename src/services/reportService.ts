@@ -40,7 +40,8 @@ import {
   MOCK_OCCUPANCY_KPI,
   MOCK_OCCUPANCY_TREND,
   MOCK_HEATMAP,
-  MOCK_STAFF_PERFORMANCE
+  MOCK_STAFF_PERFORMANCE,
+  MOCK_GENERIC_REPORT_DATA
 } from '@/mocks/reportMocks';
 
 export const reportService = {
@@ -51,22 +52,7 @@ export const reportService = {
 
   getReportData: async (id: string, params: any): Promise<ReportData> => {
     await new Promise(r => setTimeout(r, 1200));
-    return {
-      reportId: id,
-      title: 'Báo cáo chi tiết',
-      generatedAt: new Date().toISOString(),
-      columns: [
-        { key: 'period', label: 'Kỳ' },
-        { key: 'amount', label: 'Số tiền' }
-      ],
-      data: [
-        { period: '2024-01', amount: 12000000 },
-        { period: '2024-02', amount: 15400000 }
-      ],
-      summaryData: {
-        total: 27400000
-      }
-    };
+    return MOCK_GENERIC_REPORT_DATA(id);
   },
 
   getRoomLifecycle: async (filters: ReportFilter): Promise<RoomLifecycleSegment[]> => {

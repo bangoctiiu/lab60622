@@ -1,0 +1,25 @@
+src/components/service/ServiceDetailModal.tsx(154,57): error TS2554: Expected 1 arguments, but got 2.
+src/components/service/ServiceDetailModal.tsx(164,57): error TS2554: Expected 1 arguments, but got 2.
+src/components/shared/RichTextEditor.tsx(60,7): error TS2322: Type 'Extension<StarterKitOptions, any>' is not assignable to type 'AnyExtension'.
+  Type 'Extension<StarterKitOptions, any>' is not assignable to type 'Mark<any, any>'.
+    Types of property 'parent' are incompatible.
+      Type 'Extension<any, any> | null' is not assignable to type 'Mark<any, any> | null'.
+        Type 'Extension<any, any>' is not assignable to type 'Mark<any, any>'.
+          The types of 'config.addGlobalAttributes' are incompatible between these types.
+            Type '((this: { name: string; options: any; storage: any; extensions: (Node<any, any> | Mark<any, any>)[]; parent: (() => GlobalAttributes) | undefined; }) => GlobalAttributes) | undefined' is not assignable to type '((this: { name: string; options: any; storage: any; parent: (() => {} | GlobalAttributes) | undefined; }) => {} | GlobalAttributes) | undefined'.
+              Type '(this: { name: string; options: any; storage: any; extensions: (Node<any, any> | Mark<any, any>)[]; parent: (() => GlobalAttributes) | undefined; }) => GlobalAttributes' is not assignable to type '(this: { name: string; options: any; storage: any; parent: (() => {} | GlobalAttributes) | undefined; }) => {} | GlobalAttributes'.
+                The 'this' types of each signature are incompatible.
+                  Property 'extensions' is missing in type '{ name: string; options: any; storage: any; parent: (() => {} | GlobalAttributes) | undefined; }' but required in type '{ name: string; options: any; storage: any; extensions: (Node<any, any> | Mark<any, any>)[]; parent: (() => GlobalAttributes) | undefined; }'.
+src/components/shared/RichTextEditor.tsx(85,51): error TS2339: Property 'toggleHeading' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(91,51): error TS2339: Property 'toggleHeading' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(100,51): error TS2551: Property 'toggleBold' does not exist on type 'ChainedCommands'. Did you mean 'toggleNode'?
+src/components/shared/RichTextEditor.tsx(106,51): error TS2339: Property 'toggleItalic' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(121,51): error TS2339: Property 'toggleBulletList' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(127,51): error TS2339: Property 'toggleOrderedList' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(133,51): error TS2339: Property 'toggleBlockquote' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(157,64): error TS2339: Property 'undo' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(157,102): error TS2339: Property 'undo' does not exist on type 'CanCommands'.
+src/components/shared/RichTextEditor.tsx(160,64): error TS2339: Property 'redo' does not exist on type 'ChainedCommands'.
+src/components/shared/RichTextEditor.tsx(160,102): error TS2339: Property 'redo' does not exist on type 'CanCommands'.
+src/routes/ProtectedRoute.tsx(4,10): error TS2305: Module '"@/models/User"' has no exported member 'UserRole'.
+src/stores/authStore.ts(3,16): error TS2305: Module '"../models/User"' has no exported member 'UserRole'.

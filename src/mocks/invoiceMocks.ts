@@ -1,4 +1,44 @@
-import { Invoice } from '@/models/Invoice';
+import { Invoice, InvoiceDetail, InvoiceItem } from '@/models/Invoice';
+
+export const MOCK_BANK_INFO = {
+  accountName: 'CONG TY SMARTSTAY',
+  accountNumber: '190345678910',
+  bankName: 'Techcombank',
+  qrContent: (invoiceCode: string) => `PAY ${invoiceCode}`
+};
+
+export const MOCK_INVOICE_ITEMS_TEMPLATE: InvoiceItem[] = [
+  {
+    id: 'ITEM1',
+    description: 'Tiền thuê phòng',
+    quantity: 1,
+    unitPriceSnapshot: 0, // Should be totalAmount - 1000000
+    amount: 0,
+    type: 'Rent'
+  },
+  {
+    id: 'ITEM2',
+    description: 'Tiền điện tháng 02/2025',
+    quantity: 250,
+    unitPriceSnapshot: 3500,
+    amount: 875000,
+    type: 'Electricity',
+    tierBreakdown: [
+      { tierOrder: 1, fromKwh: 0, toKwh: 50, kwh: 50, price: 1806, amount: 90300 },
+      { tierOrder: 2, fromKwh: 51, toKwh: 100, kwh: 50, price: 1866, amount: 93300 },
+      { tierOrder: 3, fromKwh: 101, toKwh: 200, kwh: 100, price: 2167, amount: 216700 },
+      { tierOrder: 4, fromKwh: 201, toKwh: 300, kwh: 50, price: 2729, amount: 136450 }
+    ]
+  },
+  {
+    id: 'ITEM3',
+    description: 'Phí dịch vụ chung',
+    quantity: 1,
+    unitPriceSnapshot: 200000,
+    amount: 200000,
+    type: 'Service'
+  }
+];
 
 export const MOCK_INVOICES: Invoice[] = [
   {

@@ -1,4 +1,10 @@
-import { PaymentTransaction, TenantBalanceTransaction, WebhookLog } from '@/models/Payment';
+import { PaymentTransaction, TenantBalanceTransaction, WebhookLog, ChannelHealth } from '@/models/Payment';
+
+export const MOCK_CHANNEL_HEALTH: ChannelHealth[] = [
+  { provider: 'VNPay', successRate24h: 99.8, status: 'OK', lastReceivedAt: new Date().toISOString() },
+  { provider: 'Momo', successRate24h: 94.2, status: 'Degraded', lastReceivedAt: new Date(Date.now() - 3600000).toISOString() },
+  { provider: 'ZaloPay', successRate24h: 100, status: 'OK', lastReceivedAt: new Date(Date.now() - 7200000).toISOString() }
+];
 
 export const MOCK_PAYMENTS: PaymentTransaction[] = [
   {

@@ -7,7 +7,7 @@ import {
   UpdateServiceDto,
   UpdateServicePriceDto,
 } from "@/types/service";
-import { MOCK_SERVICES } from "@/mocks/serviceMocks";
+import { MOCK_SERVICES, MOCK_SERVICE_PRICE_HISTORY } from "@/mocks/serviceMocks";
 
 export const getServices = async (
   filter: ServiceFilter
@@ -30,18 +30,7 @@ export const getServiceById = async (id: number): Promise<Service | undefined> =
 export const getPriceHistory = async (
   serviceId: number
 ): Promise<ServicePriceHistory[]> => {
-  return [
-    {
-      priceHistoryId: 1,
-      serviceId,
-      price: 200000,
-      effectiveFrom: "2025-01-01",
-      effectiveTo: null,
-      setByName: "Admin",
-      reason: "Cập nhật đầu năm 2025",
-      isActive: true,
-    }
-  ];
+  return MOCK_SERVICE_PRICE_HISTORY.filter(h => h.serviceId === serviceId);
 };
 
 export const createService = async (dto: CreateServiceDto): Promise<Service> => {
@@ -69,6 +58,6 @@ export const updateServicePrice = async (
   await apiClient.post(`/services/${serviceId}/price-history`, dto);
 };
 
-export const checkServiceCodeUnique = async (code: string): Promise<boolean> => true;
-export const checkServiceNameUnique = async (name: string): Promise<boolean> => true;
+export const checkServiceCodeUnique = async (code: string, excludeId?: number): Promise<boolean> => true;
+export const checkServiceNameUnique = async (name: string, excludeId?: number): Promise<boolean> => true;
 export const generateServiceCode = (): string => `SVC-${Date.now().toString(36).toUpperCase().slice(-4)}`;

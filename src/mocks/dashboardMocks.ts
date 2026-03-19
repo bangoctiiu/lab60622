@@ -70,3 +70,13 @@ export const MOCK_ANALYTICS_ALERTS: AnalyticsAlert[] = [
   { id: '2', type: 'RevenueGap', severity: 3, message: 'Doanh thu tháng 3 chưa đạt kế hoạch (thiếu 15%).', affectedEntity: 'Toàn hệ thống', isResolved: false, createdAt: new Date().toISOString() },
   { id: '3', type: 'OverdueSpike', severity: 1, message: 'Cảnh báo nợ quá hạn tăng cao tại tòa Lotte.', affectedEntity: 'Lotte Center', isResolved: false, createdAt: new Date().toISOString() },
 ];
+export const MOCK_STAFF_KPI = {
+  assignedTickets: 8,
+  slaOverdueTickets: 2,
+  todayTickets: 3,
+  avgRating: 4.8,
+  unprocessedTickets: 5,
+  processingTickets: 2,
+  completedThisWeek: 12,
+  slaOnTimeRate: 94,
+};

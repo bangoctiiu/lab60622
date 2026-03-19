@@ -18,7 +18,14 @@ export interface PaginatedResponse<T> {
   totalPages: number;
 }
 
-export type UserRole = "Admin" | "Staff" | "Tenant" | "Viewer";
+export type UserRoleType = "Admin" | "Staff" | "Tenant" | "Viewer";
+
+export interface Role {
+  id: string;
+  name: string;
+  description: string;
+  isSystem: boolean;
+}
 
 export interface User {
   id: number;
@@ -27,10 +34,8 @@ export interface User {
   email: string;
   phone?: string;
   avatar?: string;
-  role: UserRole;
-  buildingId?: number | string;
+  role: UserRoleType;
   buildingsAccess?: (number | string)[];
-  buildingAccess?: any[]; // For compatibility with mocks
   isActive: boolean;
   lastLoginAt?: string;
   isTwoFactorEnabled: boolean;
@@ -40,12 +45,28 @@ export interface User {
 }
 
 export interface Permission {
-  permissionKey: string;
-  module: string;
-  description: string;
+  key: string;
+  group: string;
+  name: string;
+}
+
+export interface RolePermission {
+  roleId: string;
+  permissions: string[]; // array of permission keys
 }
 
 export interface RolePermissionMatrix {
-  permissions: Permission[];
+  permissions: { permissionKey: string; module: string; description: string }[];
   roleMap: Record<string, string[]>;
+}
+
+export interface AuditLog {
+  id: number;
+  timestamp: string;
+  userId: number;
+  username: string;
+  action: string;
+  module: string;
+  details: string;
+  ipAddress?: string;
 }

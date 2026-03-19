@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   UserPlus, 
@@ -8,12 +9,13 @@ import {
   MoreVertical, 
   Lock,
   UserX,
-  History
+  History,
+  X
 } from 'lucide-react';
 import { DataTable, RowAction } from '@/components/shared/DataTable';
 import { FilterPanel, FilterConfig } from '@/components/shared/FilterPanel';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { User, UserRole } from '@/types';
+import { User, UserRoleType } from '@/types';
 import { userService } from '@/services/userService';
 import { formatRelativeTime, cn } from '@/utils';
 import UserModal from './UserModal';
@@ -23,6 +25,7 @@ import { toast } from 'sonner';
 import { ColumnDef } from '@tanstack/react-table';
 
 const UserListPage: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,24 +38,8 @@ const UserListPage: React.FC = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await userService.getUsers();
-      // Apply filters locally for mock data
-      let filtered = data;
-      if (filterValues.search) {
-        const s = filterValues.search.toLowerCase();
-        filtered = filtered.filter(u => 
-          u.fullName.toLowerCase().includes(s) || 
-          u.username.toLowerCase().includes(s) || 
-          u.email.toLowerCase().includes(s)
-        );
-      }
-      if (filterValues.role) {
-        filtered = filtered.filter(u => u.role === filterValues.role);
-      }
-      if (filterValues.isActive !== '') {
-        filtered = filtered.filter(u => String(u.isActive) === filterValues.isActive);
-      }
-      setUsers(filtered);
+      const data = await userService.getUsers(filterValues);
+      setUsers(data);
     } catch (error) {
       toast.error('Không thể tải danh sách người dùng');
     } finally {
@@ -82,8 +69,8 @@ const UserListPage: React.FC = () => {
         const user = row.original;
         return (
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border-2 border-white shadow-sm">
-               {user.fullName.charAt(0)}
+            <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border-2 border-white shadow-sm overflow-hidden">
+               {user.avatar ? <img src={user.avatar} className="w-full h-full object-cover" /> : user.fullName.charAt(0)}
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-slate-900 leading-tight">{user.fullName}</span>
@@ -101,12 +88,16 @@ const UserListPage: React.FC = () => {
     {
       header: 'Email',
       accessorKey: 'email',
-      cell: ({ getValue }) => (
-        <a href={`mailto:${getValue()}`} className="text-blue-600 hover:underline flex items-center gap-1.5 text-xs font-medium">
-          <Mail className="h-3 w-3" />
-          {getValue()}
-        </a>
-      ),
+      cell: ({ getValue }) => {
+        const email = getValue() as string;
+        const maskedEmail = email.replace(/^(.)(.*)(.@.*)$/, (_, a, b, c) => a + '*'.repeat(Math.min(b.length, 5)) + c);
+        return (
+          <a href={`mailto:${email}`} title={email} className="text-blue-600 hover:underline flex items-center gap-1.5 text-xs font-medium">
+            <Mail className="h-3 w-3" />
+            {maskedEmail}
+          </a>
+        );
+      },
     },
     {
       header: 'Vai trò',
@@ -116,7 +107,7 @@ const UserListPage: React.FC = () => {
         let status = 'Info';
         if (role === 'Admin') status = 'Critical';
         if (role === 'Staff') status = 'Warning';
-        return <StatusBadge status={status} size="sm" />;
+        return <StatusBadge status={status as any} size="sm" />;
       },
     },
     {
@@ -132,7 +123,7 @@ const UserListPage: React.FC = () => {
             )}
             onClick={(e) => {
               e.stopPropagation();
-              if (user.id !== 1) handleToggleStatus(user);
+              if (user.role !== 'Admin') handleToggleStatus(user);
             }}
           >
             <div className={cn(
@@ -186,15 +177,32 @@ const UserListPage: React.FC = () => {
       onClick: (user) => toast.info(`Đang mở log của ${user.username}`)
     },
     {
-      label: 'Khóa tài khoản',
+      label: 'Khóa/Mở tài khoản',
       icon: <UserX className="w-4 h-4" />,
       variant: 'danger',
       onClick: (user) => {
-        if (user.id === 1) {
+        if (user.role === 'Admin') {
           toast.error('Không thể khóa tài khoản Admin hệ thống');
           return;
         }
         handleToggleStatus(user);
+      }
+    },
+    {
+      label: 'Xóa tài khoản',
+      icon: <X className="w-4 h-4" />,
+      variant: 'danger',
+      onClick: (user) => {
+        if (user.role === 'Admin') {
+          toast.error('Không thể xóa tài khoản Admin hệ thống');
+          return;
+        }
+        if (confirm(`Bạn có chắc muốn xóa người dùng ${user.username}?`)) {
+          userService.deleteUser(user.id).then(() => {
+            fetchUsers();
+            toast.success('Đã xóa người dùng');
+          });
+        }
       }
     }
   ];
@@ -228,6 +236,12 @@ const UserListPage: React.FC = () => {
         { label: 'Bị khóa', value: 'false' },
       ]
     },
+    {
+      key: 'buildingId',
+      label: 'Tòa nhà',
+      type: 'selectAsync',
+      placeholder: 'Chọn tòa nhà...',
+    }
   ];
 
   return (
@@ -243,7 +257,7 @@ const UserListPage: React.FC = () => {
            </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => window.location.href='/admin/settings/users/permissions'} className="rounded-2xl border-indigo-100 hover:bg-indigo-50 font-bold">
+          <Button variant="outline" onClick={() => navigate('/settings/users/permissions')} className="rounded-2xl border-indigo-100 hover:bg-indigo-50 font-bold">
             <Shield className="mr-2 h-4 w-4 text-indigo-600" /> Phân quyền (RBAC)
           </Button>
           <Button onClick={() => { setSelectedUser(null); setIsModalOpen(true); }} className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-600/20">

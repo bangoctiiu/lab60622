@@ -66,7 +66,7 @@ export const PublicTopbar = () => {
             Đăng nhập
           </Link>
           <Link 
-            to="/register" 
+            to="/public/register" 
             className="px-6 py-2 bg-accent text-white rounded-md text-sm font-bold hover:scale-105 transition-transform"
           >
             Bắt đầu miễn phí
@@ -100,7 +100,7 @@ export const PublicTopbar = () => {
           ))}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
             <Link to="/public/login" className="btn-primary bg-bg text-primary border text-center">Đăng nhập</Link>
-            <Link to="/register" className="btn-primary text-center">Đăng ký</Link>
+            <Link to="/public/register" className="btn-primary text-center">Đăng ký</Link>
           </div>
         </div>
       </div>

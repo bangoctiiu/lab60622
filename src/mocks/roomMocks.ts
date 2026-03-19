@@ -1,4 +1,37 @@
-import { Room, RoomDetail } from '@/models/Room';
+import { Room, RoomDetail, HandoverChecklist } from '@/models/Room';
+
+export const MOCK_HANDOVER_CHECKLIST: HandoverChecklist[] = [
+  {
+    id: 'HO1',
+    roomId: 'R001',
+    roomCode: 'A-101',
+    handoverType: 'CheckIn',
+    date: '2024-12-20',
+    status: 'Completed',
+    sections: [
+      {
+        id: 'S1',
+        title: 'Hệ thống điện & nước',
+        items: [
+          { id: 'I1', name: 'Hệ thống đèn', status: 'OK' },
+          { id: 'I2', name: 'Vòi sen', status: 'NotOK', note: 'Rò rỉ nhẹ', imageUrl: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400' },
+        ]
+      },
+      {
+        id: 'S2',
+        title: 'Nội thất',
+        items: [
+          { id: 'I3', name: 'Giường ngủ', status: 'OK' },
+        ]
+      }
+    ],
+    assets: [
+      { id: 'A1', assetName: 'Điều hòa Daikin', assetCode: 'AC-001', conditionBefore: 'New', conditionAfter: 'Good' }
+    ],
+    witnessSignatureUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+    tenantSignatureUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+  }
+];
 
 export const MOCK_ROOMS: Room[] = [
   {

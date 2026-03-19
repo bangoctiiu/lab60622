@@ -15,7 +15,8 @@ import {
   MOCK_RECENT_PAYMENTS, 
   MOCK_RECENT_TICKETS, 
   MOCK_ELECTRICITY_CHART, 
-  MOCK_ANALYTICS_ALERTS 
+  MOCK_ANALYTICS_ALERTS,
+  MOCK_STAFF_KPI 
 } from '@/mocks/dashboardMocks';
 
 export const dashboardService = {
@@ -55,23 +56,11 @@ export const dashboardService = {
   },
 
   getStaffKPIs: async (buildingId?: string | number): Promise<any> => {
-    return {
-      assignedTickets: 8,
-      slaOverdueTickets: 2,
-      todayTickets: 3,
-      avgRating: 4.8,
-      unprocessedTickets: 5,
-      processingTickets: 2,
-      completedThisWeek: 12,
-      slaOnTimeRate: 94,
-    };
+    return MOCK_STAFF_KPI;
   },
 
   getStaffTickets: async (buildingId?: string | number): Promise<RecentTicket[]> => {
-    return [
-      { id: '1', ticketCode: 'TK-102', title: 'Hỏng vòi nước nhà vệ sinh', roomName: 'P.1002', priority: 'High', status: 'Open', createdAt: new Date().toISOString(), slaDeadline: new Date(Date.now() + 1000 * 60 * 120).toISOString() },
-      { id: '2', ticketCode: 'TK-105', title: 'Mất kết nối Internet tầng 5', roomName: 'Floor 5', priority: 'Critical', status: 'InProgress', createdAt: new Date().toISOString(), slaDeadline: new Date(Date.now() + 1000 * 60 * 30).toISOString() },
-    ];
+    return MOCK_RECENT_TICKETS.slice(0, 2);
   },
 
   dismissAlert: async (id: string): Promise<void> => {

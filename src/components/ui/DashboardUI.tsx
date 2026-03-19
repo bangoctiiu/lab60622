@@ -9,7 +9,7 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export const EmptyState = ({ 
+export const DashboardEmptyState = ({ 
   title = "Không có dữ liệu", 
   description = "Hiện chưa có thông tin nào để hiển thị trong mục này.", 
   icon: Icon = Database,

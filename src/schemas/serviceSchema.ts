@@ -38,6 +38,7 @@ export const updateServiceSchema = z.object({
   unit: z.string().min(1, "Đơn vị không được trống"),
   billingMethod: z.enum(["Fixed", "PerPerson", "PerM2", "Metered", "Usage"]),
   description: z.string().max(2000).optional(),
+  isActive: z.boolean(),
 });
 
 // Cập nhật giá mới — RULE-08: INSERT only

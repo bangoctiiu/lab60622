@@ -4,8 +4,9 @@ import {
   TenantFeedback, NPSSurvey, ContactGroup
 } from '@/models/Tenant';
 import { TenantBalance, TenantBalanceTransaction } from '@/models/TenantBalance';
-import { MOCK_TENANTS, getMockTenantDetail } from '@/mocks/tenantMocks';
+import { MOCK_TENANTS, getMockTenantDetail, MOCK_EMERGENCY_CONTACTS, MOCK_ONBOARDING_PROGRESS } from '@/mocks/tenantMocks';
 import { MOCK_LEDGER } from '@/mocks/paymentMocks';
+import { MOCK_BALANCE } from '@/mocks/tenantBalanceMocks';
 
 export const tenantService = {
   getTenants: async (filters?: any): Promise<TenantSummary[]> => {
@@ -28,14 +29,7 @@ export const tenantService = {
 
   getTenantBalance: async (id: string): Promise<TenantBalance> => {
     await new Promise(r => setTimeout(r, 400));
-    return {
-      tenantId: id,
-      currentBalance: 2450000,
-      totalPaid: 15000000,
-      totalUnpaid: 2450000,
-      lastUpdated: new Date().toISOString(),
-      lastUpdatedAt: new Date().toISOString()
-    };
+    return { ...MOCK_BALANCE, tenantId: id, lastUpdatedAt: new Date().toISOString() };
   },
 
   getTenantLedger: async (id: string): Promise<TenantBalanceTransaction[]> => {
@@ -44,22 +38,11 @@ export const tenantService = {
   },
 
   getEmergencyContacts: async (id: string): Promise<EmergencyContact[]> => {
-    return [
-      { id: 'ec1', tenantId: id, contactName: 'Nguyễn Văn Phụ', relationship: 'Khac', phone: '0988776655', isPrimary: true }
-    ];
+    return MOCK_EMERGENCY_CONTACTS.filter(ec => ec.tenantId === id || ec.tenantId === 'T1');
   },
 
   getOnboardingProgress: async (id: string): Promise<OnboardingProgress> => {
-    return {
-      tenantId: id,
-      isPersonalInfoConfirmed: true,
-      isCCCDUploaded: true,
-      isEmergencyContactAdded: true,
-      isContractSigned: true,
-      isDepositPaid: true,
-      isRoomHandovered: false,
-      completionPercent: 85
-    };
+    return { ...MOCK_ONBOARDING_PROGRESS, tenantId: id };
   },
 
   // Mock methods for other tabs

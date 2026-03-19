@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import useAuthStore from '@/stores/authStore';
-import { UserRole } from '@/models/User';
+import { UserRoleType } from '@/models/User';
 
 interface ProtectedRouteProps {
-  requiredRole?: UserRole;
+  requiredRole?: UserRoleType;
 }
 
 /**

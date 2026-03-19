@@ -27,7 +27,8 @@ import {
   Smartphone,
   CheckCircle,
   AlertTriangle,
-  FileText
+  FileText,
+  ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -35,6 +36,7 @@ import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 
 import api from '@/services/apiClient';
+import portalProfileService from '@/services/portalProfileService';
 import { cn, formatVND } from '@/utils';
 import useAuthStore from '@/stores/authStore';
 import { useConfirm } from '@/hooks/useConfirm';
@@ -54,10 +56,7 @@ const Profile = () => {
   // 1. Fetch Profile Details
   const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ['portal-profile-detail'],
-    queryFn: async () => {
-      const res = await api.get('/api/portal/profile');
-      return res.data;
-    }
+    queryFn: () => portalProfileService.getProfile()
   });
 
   // Actions
@@ -79,11 +78,7 @@ const Profile = () => {
   };
 
   const updateAvatarMutation = useMutation({
-    mutationFn: (file: File) => {
-      const formData = new FormData();
-      formData.append('avatar', file);
-      return api.post('/api/portal/profile/avatar', formData);
-    },
+    mutationFn: (file: File) => portalProfileService.updateAvatar(file),
     onSuccess: (res: any) => {
       queryClient.invalidateQueries({ queryKey: ['portal-profile-detail'] });
       if (user) {
@@ -104,19 +99,12 @@ const Profile = () => {
   };
 
   return (
-    <PortalLayout 
-      title="Trung tâm cư dân"
-      headerTransparent={true}
-      rightAction={
-        <button className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white active:scale-90 transition-all border border-white/10 shadow-lg">
-          <Settings size={20} />
-        </button>
-      }
-    >
-      <div className="bg-slate-50 min-h-screen relative overflow-x-hidden">
+    <>
+    <div className="min-h-screen bg-slate-50 relative overflow-x-hidden animate-in fade-in slide-in-from-right-6 duration-700">
+        {/* 1. Lush High-End Premium Banner */}
         
         {/* 1. Lush High-End Premium Banner */}
-        <div className="bg-[#0D8A8A] pt-24 pb-28 px-8 rounded-b-[48px] shadow-2xl shadow-teal-500/10 relative overflow-hidden">
+        <div className="bg-[#0D8A8A] pt-12 pb-28 px-8 rounded-b-[48px] shadow-2xl shadow-[#0D8A8A]/10 relative overflow-hidden">
            <div className="absolute top-[-5%] left-[-5%] w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse" />
            <div className="absolute bottom-[-15%] right-[-10%] w-56 h-56 bg-teal-400/10 rounded-full blur-2xl" />
 
@@ -133,7 +121,7 @@ const Profile = () => {
                         )}
                     </div>
                  </div>
-                 <label className="absolute -bottom-1 -right-1 w-12 h-12 bg-white text-[#0D8A8A] rounded-[20px] flex items-center justify-center shadow-2xl border border-slate-100 cursor-pointer active:scale-90 transition-all hover:bg-teal-50 hover:shadow-teal-500/20">
+                 <label className="absolute -bottom-1 -right-1 w-12 h-12 bg-white text-[var(--portal-primary)] rounded-[20px] flex items-center justify-center shadow-2xl border border-slate-100 cursor-pointer active:scale-90 transition-all hover:bg-teal-50 hover:shadow-[var(--portal-primary)]/20">
                     <Camera size={24} strokeWidth={2.5} />
                     <input 
                       type="file" 
@@ -164,15 +152,15 @@ const Profile = () => {
            <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 opacity-5 rotate-12 pointer-events-none">
               <UserIcon size={300} className="text-white" />
            </div>
-        </div>
-
+      </div>
+ 
         {/* 2. Overlapping Tactical Hub (Overlap) */}
         <div className="px-6 -mt-12 relative z-20 pb-40 space-y-10">
            
            {/* Section: Quick Digital Identity */}
            <div className="grid grid-cols-2 gap-4">
               <div className="bg-white rounded-[32px] p-5 shadow-2xl shadow-slate-200/50 border border-slate-100 flex flex-col items-center gap-3 group active:scale-[0.98] transition-all" onClick={() => setActiveSheet('qr')}>
-                 <div className="w-12 h-12 rounded-2xl bg-teal-50 text-[#0D8A8A] flex items-center justify-center shadow-inner group-hover:rotate-6 transition-transform">
+                 <div className="w-12 h-12 rounded-2xl bg-teal-50 text-[var(--portal-primary)] flex items-center justify-center shadow-inner group-hover:rotate-6 transition-transform">
                     <QrCode size={24} strokeWidth={2.5} />
                  </div>
                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Digital Pass</span>
@@ -192,7 +180,7 @@ const Profile = () => {
                  <ShieldAlert size={14} className="text-red-400 opacity-50" />
               </div>
               <div className="bg-white rounded-[44px] p-3 shadow-2xl shadow-slate-200/40 border border-slate-100 divide-y divide-slate-50 overflow-hidden">
-                 <MenuButton icon={Smartphone} label="Hồ sơ định danh" sub="Đã đồng bộ v1.2" onClick={() => setActiveSheet('personal')} color="text-[#0D8A8A]" />
+                 <MenuButton icon={Smartphone} label="Hồ sơ định danh" sub="Đã đồng bộ v1.2" onClick={() => setActiveSheet('personal')} color="text-[var(--portal-primary)]" />
                  <MenuButton icon={Fingerprint} label="Khóa vân tay / FaceID" sub="Đang tắt" onClick={() => toast.info('Tính năng đang phát triển')} color="text-blue-500" />
                  <MenuButton icon={ShieldCheck} label="Bảo mật 2 lớp (2FA)" sub="Kích hoạt ngay" onClick={() => setActiveSheet('security')} color="text-amber-500" />
                  <MenuButton icon={Lock} label="Thay đổi mật khẩu" sub="Lớp bảo vệ Secure+" onClick={() => setActiveSheet('security')} color="text-indigo-500" />
@@ -206,7 +194,7 @@ const Profile = () => {
                  <Sparkles size={14} className="text-teal-400 opacity-50" />
               </div>
               <div className="bg-white rounded-[44px] p-3 shadow-2xl shadow-slate-200/40 border border-slate-100 divide-y divide-slate-50 overflow-hidden">
-                 <MenuButton icon={Bell} label="Tùy chọn thông báo" sub="App, SMS, Email" onClick={() => setActiveSheet('notifications')} color="text-[#0D8A8A]" />
+                 <MenuButton icon={Bell} label="Tùy chọn thông báo" sub="App, SMS, Email" onClick={() => setActiveSheet('notifications')} color="text-[var(--portal-primary)]" />
                  <MenuButton icon={Globe} label="Ngôn ngữ hiện tại" sub={language} onClick={toggleLanguage} color="text-emerald-500" />
                   <MenuButton icon={HelpCircle} label="Trung tâm trợ giúp" sub="Câu hỏi thường gặp" onClick={() => setActiveSheet('feedback')} color="text-rose-600" />
                   <MenuButton icon={InfoIcon} label="Về SmartLife Resident" sub="Phiên bản v2.5.8 Build 99" onClick={() => setActiveSheet('about')} color="text-slate-600" />
@@ -231,12 +219,11 @@ const Profile = () => {
                     <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.4em]">Integrated Protection Protocol</p>
                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">SmartStay Secured Endpoint • ID-G99F-X1</p>
                  </div>
-              </div>
-           </div>
-        </div>
+            </div>
+         </div>
       </div>
-
-      {/* --- PREMIUM BOTTOM SHEETS --- */}
+ 
+       {/* --- PREMIUM BOTTOM SHEETS --- */}
       
       {/* Personal Info Sheet */}
       <BottomSheet isOpen={activeSheet === 'personal'} onClose={() => setActiveSheet(null)} title="Định danh cư dân">
@@ -277,7 +264,7 @@ const Profile = () => {
             </div>
             <button 
               onClick={() => setActiveSheet(null)}
-              className="w-full h-16 bg-[#0D8A8A] text-white rounded-[28px] font-black text-sm shadow-2xl shadow-teal-500/30 uppercase tracking-[0.2em] active:scale-95 transition-all"
+              className="w-full h-16 bg-[var(--portal-primary)] text-white rounded-[28px] font-black text-sm shadow-2xl shadow-[var(--portal-primary)]/30 uppercase tracking-[0.2em] active:scale-95 transition-all border-none"
             >
                HOÀN TẤT XÁC THỰC
             </button>
@@ -289,7 +276,7 @@ const Profile = () => {
         <div className="space-y-10 pb-10 text-center animate-in fade-in duration-700 pt-6">
            <div className="relative mx-auto w-24 h-24">
               <div className="absolute inset-0 bg-teal-500/10 rounded-[32px] rotate-6 animate-pulse" />
-              <div className="relative w-full h-full bg-white rounded-[32px] border-2 border-teal-50 flex items-center justify-center text-[#0D8A8A] shadow-2xl">
+              <div className="relative w-full h-full bg-white rounded-[32px] border-2 border-teal-50 flex items-center justify-center text-[var(--portal-primary)] shadow-2xl">
                  <Smartphone size={56} strokeWidth={1} className="animate-bounce-slow" />
               </div>
            </div>
@@ -307,7 +294,8 @@ const Profile = () => {
            </div>
         </div>
       </BottomSheet>
-    </PortalLayout>
+    </div>
+    </>
   );
 };
 
@@ -321,11 +309,11 @@ const MenuButton = ({ icon: Icon, label, sub, onClick, color }: any) => (
         <Icon size={26} strokeWidth={1.5} />
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-sm font-black text-slate-800 tracking-tight uppercase leading-none group-hover:text-[#0D8A8A] transition-colors">{label}</span>
-        <span className="text-[10px] font-black uppercase tracking-widest opacity-60 leading-none group-hover:text-[#0D8A8A] transition-all italic">{sub}</span>
+        <span className="text-sm font-black text-slate-800 tracking-tight uppercase leading-none group-hover:text-[var(--portal-primary)] transition-colors">{label}</span>
+        <span className="text-[10px] font-black uppercase tracking-widest opacity-60 leading-none group-hover:text-[var(--portal-primary)] transition-all italic">{sub}</span>
       </div>
     </div>
-    <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-200 group-active:translate-x-1 group-hover:text-[#0D8A8A] group-hover:bg-white group-hover:shadow-lg transition-all">
+    <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-200 group-active:translate-x-1 group-hover:text-[var(--portal-primary)] group-hover:bg-white group-hover:shadow-lg transition-all">
        <ChevronRight size={20} strokeWidth={3} />
     </div>
   </button>
@@ -334,7 +322,7 @@ const MenuButton = ({ icon: Icon, label, sub, onClick, color }: any) => (
 const AboutRow = ({ label, value, infoOnly }: any) => (
   <div className="py-5 px-8 text-left flex justify-between items-center bg-white group hover:bg-slate-50 transition-all">
      <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{label}</span>
-     <span className={cn("text-[11px] font-black uppercase tracking-tighter truncate max-w-[150px]", infoOnly ? "text-[#0D8A8A] underline cursor-pointer" : "text-slate-800")}>{value}</span>
+     <span className={cn("text-[11px] font-black uppercase tracking-tighter truncate max-w-[150px]", infoOnly ? "text-[var(--portal-primary)] underline cursor-pointer" : "text-slate-800")}>{value}</span>
   </div>
 );
 
@@ -346,7 +334,7 @@ const PersonalInfoForm = ({ profile, onClose }: any) => {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: any) => api.patch('/api/portal/profile', data),
+    mutationFn: (data: any) => portalProfileService.updateProfile(data),
     onSuccess: () => {
       toast.success('Hồ sơ định danh đã được cập nhật.');
       onClose();
@@ -363,7 +351,7 @@ const PersonalInfoForm = ({ profile, onClose }: any) => {
        <button 
         onClick={() => mutation.mutate(formData)}
         disabled={mutation.isPending}
-        className="w-full h-18 bg-[#0D8A8A] text-white rounded-[32px] font-black shadow-2xl shadow-teal-500/30 flex items-center justify-center gap-4 active:scale-95 transition-all uppercase tracking-[0.3em] text-sm"
+        className="w-full h-18 bg-[var(--portal-primary)] text-white rounded-[32px] font-black shadow-2xl shadow-[var(--portal-primary)]/30 flex items-center justify-center gap-4 active:scale-95 transition-all uppercase tracking-[0.3em] text-sm border-none"
        >
          <ShieldCheck size={24} strokeWidth={2.5} />
          {mutation.isPending ? 'Đang đồng bộ...' : 'CẬP NHẬT HỒ SƠ'}
@@ -427,7 +415,7 @@ const SecuritySettings = ({ onClose }: any) => {
 const ChangePasswordForm = ({ onBack, onComplete }: any) => {
   const [data, setData] = useState({ old: '', new: '', confirm: '' });
   const mutation = useMutation({
-    mutationFn: (pass: any) => api.post('/api/portal/auth/change-password', pass),
+    mutationFn: (pass: any) => portalProfileService.changePassword(pass),
     onSuccess: () => {
       toast.success('Hệ thống đã cập nhật mật khẩu mới.');
       onComplete();
@@ -438,7 +426,7 @@ const ChangePasswordForm = ({ onBack, onComplete }: any) => {
 
   return (
     <div className="space-y-10 pb-10 animate-in slide-in-from-right-12 duration-500 text-left pt-4">
-       <button onClick={onBack} className="h-12 inline-flex items-center gap-3 text-[10px] font-black text-[#0D8A8A] uppercase tracking-[0.2em] px-6 bg-teal-50 rounded-full active:scale-95 transition-all shadow-sm">
+       <button onClick={onBack} className="h-12 inline-flex items-center gap-3 text-[10px] font-black text-[var(--portal-primary)] uppercase tracking-[0.2em] px-6 bg-teal-50 rounded-full active:scale-95 transition-all shadow-sm border-none">
           <ChevronRight size={16} className="rotate-180" strokeWidth={4} /> QUAY LẠI CÀI ĐẶT
        </button>
        <div className="space-y-6">
@@ -466,7 +454,7 @@ const ChangePasswordForm = ({ onBack, onComplete }: any) => {
 const FeedbackForm = ({ onClose }: any) => {
   const [content, setContent] = useState('');
   const mutation = useMutation({
-    mutationFn: (c: string) => api.post('/api/portal/feedbacks', { type: "feedback", content: c }),
+    mutationFn: (c: string) => portalProfileService.submitFeedback(c),
     onSuccess: () => {
       toast.success('Cảm ơn bạn đã đồng hành cùng SmartStay!');
       onClose();
@@ -507,14 +495,14 @@ const FeedbackForm = ({ onClose }: any) => {
 const InputGroup = ({ label, value, onChange, placeholder, type = "text", icon: Icon }: any) => (
   <div className="space-y-3 group px-1">
      <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] ml-6 flex items-center gap-2">
-        {Icon && <Icon size={12} className="text-[#0D8A8A] opacity-50" />} {label}
+        {Icon && <Icon size={12} className="text-[var(--portal-primary)] opacity-50" />} {label}
      </label>
      <input 
       type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full h-18 px-10 bg-slate-50 rounded-[32px] border-2 border-slate-100 focus:bg-white focus:ring-8 focus:ring-teal-500/5 focus:border-[#0D8A8A] text-sm transition-all shadow-sm font-black text-slate-800 uppercase tracking-tight placeholder:opacity-30 placeholder:font-normal"
+      className="w-full h-18 px-10 bg-slate-50 rounded-[32px] border-2 border-slate-100 focus:bg-white focus:ring-8 focus:ring-[var(--portal-primary)]/5 focus:border-[var(--portal-primary)] text-sm transition-all shadow-sm font-black text-slate-800 uppercase tracking-tight placeholder:opacity-30 placeholder:font-normal"
      />
   </div>
 );
@@ -543,7 +531,7 @@ const NotificationPrefs = ({ profile }: any) => {
             desc="Sổ thu chi & Bảng kê Invoice"
             active={prefs.email} 
             onToggle={() => setPrefs({...prefs, email: !prefs.email})} 
-            color="text-[#0D8A8A] bg-teal-50"
+            color="text-[var(--portal-primary)] bg-teal-50"
           />
           <NotificationSwitch 
             icon={Bell}
@@ -581,7 +569,7 @@ const Switch = ({ active, onClick }: { active: boolean, onClick: () => void }) =
     onClick={onClick}
     className={cn(
       "w-16 h-10 rounded-full relative transition-all duration-700 shadow-2xl",
-      active ? "bg-[#0D8A8A] ring-8 ring-teal-500/10" : "bg-slate-200"
+      active ? "bg-[var(--portal-primary)] ring-8 ring-[var(--portal-primary)]/10" : "bg-slate-200"
     )}
   >
     <div className={cn(

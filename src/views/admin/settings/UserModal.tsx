@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { User, UserRole } from '@/types';
+import { User, UserRoleType } from '@/types';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/Button';
 import { userService } from '@/services/userService';
 import { toast } from 'sonner';
-import { Shield, User as UserIcon, Mail, Phone, Lock, Building2 } from 'lucide-react';
+import { Shield, User as UserIcon, Mail, Phone, Lock, Building2, X } from 'lucide-react';
+import { SelectAsync } from '@/components/ui/SelectAsync';
+import { FileUpload } from '@/components/shared/FileUpload';
 
 interface UserModalProps {
   open: boolean;
@@ -21,10 +23,11 @@ const UserModal: React.FC<UserModalProps> = ({ open, onOpenChange, user, onSucce
     username: '',
     email: '',
     phone: '',
-    role: 'Staff' as UserRole,
+    role: 'Staff' as UserRoleType,
     isActive: true,
     isTwoFactorEnabled: false,
     buildingsAccess: [],
+    forceChangePassword: true,
   });
 
   useEffect(() => {
@@ -40,6 +43,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, onOpenChange, user, onSucce
         isActive: true,
         isTwoFactorEnabled: false,
         buildingsAccess: [],
+        forceChangePassword: true,
       });
     }
   }, [user, open]);
@@ -134,7 +138,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, onOpenChange, user, onSucce
             <select
               className="w-full h-11 px-4 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all bg-slate-50"
               value={formData.role}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRoleType })}
             >
               <option value="Admin">Admin</option>
               <option value="Staff">Staff</option>
@@ -146,26 +150,58 @@ const UserModal: React.FC<UserModalProps> = ({ open, onOpenChange, user, onSucce
                <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                  <Building2 className="h-4 w-4 text-indigo-500" /> Quản lý tòa nhà
                </label>
-               {/* Simplified MultiSelect for now */}
-               <div className="text-xs text-slate-500 italic pb-1">Phân quyền cho nhân viên theo tòa nhà.</div>
-               <div className="flex gap-2 flex-wrap min-h-[44px] p-2 bg-slate-100 rounded-xl border border-dashed border-slate-300">
-                  {formData.buildingsAccess?.length === 0 && <span className="text-slate-400">Tất cả (nếu là Admin)</span>}
+               <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 min-h-[56px]">
                   {formData.buildingsAccess?.map(bid => (
-                    <span key={bid} className="bg-white px-2 py-0.5 rounded-lg border text-indigo-600 text-xs font-bold">Building #{bid}</span>
+                    <span key={bid} className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                      Building #{bid}
+                      <X className="h-3 w-3 cursor-pointer hover:text-red-500" onClick={() => setFormData({...formData, buildingsAccess: formData.buildingsAccess?.filter(id => id !== bid)})} />
+                    </span>
                   ))}
+                  <SelectAsync
+                    placeholder="Thêm..."
+                    loadOptions={async (s) => {
+                      return [
+                        { label: 'Hanoi Center', value: 1 },
+                        { label: 'HCM Tower', value: 2 },
+                        { label: 'Da Nang Plaza', value: 3 },
+                      ].filter(b => b.label.toLowerCase().includes(s.toLowerCase()));
+                    }}
+                    value=""
+                    onChange={(val) => {
+                      if (val && !formData.buildingsAccess?.includes(val)) {
+                        setFormData({ ...formData, buildingsAccess: [...(formData.buildingsAccess || []), val] });
+                      }
+                    }}
+                  />
                </div>
           </div>
         </div>
 
-        {!isEdit && (
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 flex items-start gap-3">
-             <Lock className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-             <div className="space-y-1">
-                <span className="text-sm font-bold text-amber-700 block">Thiết lập mật khẩu</span>
-                <span className="text-xs text-amber-600">Hệ thống sẽ tự động tạo mật khẩu mạnh và gửi email hướng dẫn kích hoạt cho người dùng. <strong>ForceChangePassword</strong> sẽ được bật mặc định.</span>
+        <div className="grid grid-cols-2 gap-4">
+           <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+             <div className="flex-1">
+               <h4 className="text-sm font-bold text-slate-700">Force Change Password</h4>
+               <p className="text-[10px] text-slate-500 italic">Yêu cầu đổi mật khẩu lần đầu</p>
              </div>
-          </div>
-        )}
+             <input 
+               type="checkbox" 
+               checked={formData.forceChangePassword}
+               onChange={(e) => setFormData({...formData, forceChangePassword: e.target.checked})}
+               className="w-5 h-5 accent-indigo-600 rounded"
+             />
+           </div>
+           <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+             <div className="flex-1">
+               <h4 className="text-sm font-bold text-slate-700">Avatar</h4>
+               <p className="text-[10px] text-slate-500 italic">Max 2MB</p>
+             </div>
+             <FileUpload 
+               onUpload={(urls) => setFormData({...formData, avatar: urls[0]})}
+               maxSizeMB={2}
+               accept="image/*"
+             />
+           </div>
+        </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-6 rounded-xl font-bold">Hủy</Button>

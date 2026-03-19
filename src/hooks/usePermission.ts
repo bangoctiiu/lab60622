@@ -1,22 +1,26 @@
-import { create } from 'zustand';
+import { useMemo } from 'react';
+import { mockRolePermissions } from '@/mocks/userMocks';
 
-interface PermissionState {
-  permissions: string[];
-  setPermissions: (perms: string[]) => void;
-  hasPermission: (perm: string) => boolean;
-}
-
-export const usePermissionStore = create<PermissionState>((set, get) => ({
-  permissions: [],
-  setPermissions: (perms) => set({ permissions: perms }),
-  hasPermission: (perm) => get().permissions.includes(perm),
-}));
+// Assuming we have a global auth store or context
+// For now, we'll mock the current user's role
+const CURRENT_USER_ROLE = 'Admin'; 
 
 export const usePermission = () => {
-  const { permissions, hasPermission } = usePermissionStore();
+  const userPermissions = useMemo(() => {
+    const roleConfig = mockRolePermissions.find(rp => rp.roleId === CURRENT_USER_ROLE);
+    return roleConfig ? roleConfig.permissions : [];
+  }, []);
+
+  const can = (permissionKey: string): boolean => {
+    if (CURRENT_USER_ROLE === 'Admin') return true;
+    return userPermissions.includes(permissionKey);
+  };
+
   return { 
-    permissions, 
-    hasPermission,
-    can: hasPermission 
+    can, 
+    hasPermission: can, // Alias for legacy/existing code
+    role: CURRENT_USER_ROLE 
   };
 };
+
+export default usePermission;

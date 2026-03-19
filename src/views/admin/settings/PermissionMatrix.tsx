@@ -48,7 +48,7 @@ const PermissionMatrix: React.FC = () => {
   }, []);
 
   const togglePermission = (roleId: string, permKey: string) => {
-    if (roleId === 'admin') return; // Admin is locked
+    if (roleId === 'Admin') return; // Admin is locked
     
     setRolePerms(prev => {
       const index = prev.findIndex(rp => rp.roleId === roleId);
@@ -143,7 +143,7 @@ const PermissionMatrix: React.FC = () => {
                   <th key={role.id} className="p-6 text-center min-w-[120px]">
                     <div className="flex flex-col items-center gap-1">
                       <span className="text-sm font-black text-slate-800">{role.name}</span>
-                      {role.id === 'admin' && (
+                      {role.id === 'Admin' && (
                         <span className="flex items-center gap-1 text-[9px] font-bold text-amber-600 uppercase bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                           <Lock size={10} /> Read Only
                         </span>
@@ -174,7 +174,7 @@ const PermissionMatrix: React.FC = () => {
                       </td>
                       {roles.map(role => {
                         const isChecked = rolePerms.find(rp => rp.roleId === role.id)?.permissions.includes(perm.key);
-                        const isAdmin = role.id === 'admin';
+                        const isAdmin = role.id === 'Admin';
                         return (
                           <td key={`${role.id}-${perm.key}`} className="p-6 text-center">
                             <label className={cn(

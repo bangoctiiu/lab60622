@@ -29,16 +29,7 @@ const PaymentHistory = () => {
   });
 
   return (
-    <PortalLayout 
-      title="Lịch sử thanh toán" 
-      showBack={true}
-      rightAction={
-        <button className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
-          <Filter size={20} />
-        </button>
-      }
-    >
-      <div className="space-y-6 px-6 pt-6">
+    <div className="space-y-6 px-6 pt-6">
         {/* Search Bar */}
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0D8A8A] transition-colors" size={18} />
@@ -50,7 +41,7 @@ const PaymentHistory = () => {
         </div>
 
         {/* Payment List */}
-        <div className="space-y-4">
+        <div className="space-y-4 pb-32">
           {isLoading ? (
             <div className="py-20 flex justify-center">
               <Spinner />
@@ -76,8 +67,7 @@ const PaymentHistory = () => {
             ))
           )}
         </div>
-      </div>
-    </PortalLayout>
+    </div>
   );
 };
 

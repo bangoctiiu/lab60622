@@ -10,43 +10,29 @@ import {
   ShieldCheck,
   Activity
 } from 'lucide-react';
-import PortalLayout from '@/components/layout/PortalLayout';
 import api from '@/services/apiClient';
+import portalFinanceService from '@/services/portalFinanceService';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
+import { toast } from 'sonner';
 
 const BalanceDetail = () => {
   // RULE-05: currentBalance MUST be fresh, dashboard cache is display-only
   const { data: balanceInfo, isLoading: loadingBalance } = useQuery({
     queryKey: ['portal-fresh-balance'],
-    queryFn: async () => {
-      const res = await api.get('/api/portal/balance');
-      return res.data;
-    }
+    queryFn: () => portalFinanceService.getFreshBalance()
   });
 
   // RULE-07: TenantBalanceTransactions is IMMUTABLE LEDGER
   const { data: transactions, isLoading: loadingDocs } = useQuery({
     queryKey: ['portal-balance-ledger'],
-    queryFn: async () => {
-      const res = await api.get('/api/portal/balance/transactions');
-      return res.data;
-    }
+    queryFn: () => portalFinanceService.getBalanceTransactions()
   });
 
   const isLoading = loadingBalance || loadingDocs;
 
   return (
-    <PortalLayout 
-      title="Ví cư dân & Số dư" 
-      showBack={true}
-      rightAction={
-        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
-          <Activity size={20} />
-        </div>
-      }
-    >
-      <div className="space-y-8 pb-32">
+    <div className="space-y-8 pb-32">
         {/* 1. Real-time Balance Card */}
         <div className="px-8 pt-8">
             <div className="bg-[#0D8A8A] rounded-[48px] p-10 text-white shadow-2xl shadow-teal-500/20 relative overflow-hidden">
@@ -113,8 +99,7 @@ const BalanceDetail = () => {
                 )}
             </div>
         </div>
-      </div>
-    </PortalLayout>
+    </div>
   );
 };
 

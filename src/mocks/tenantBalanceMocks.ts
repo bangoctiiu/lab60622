@@ -6,7 +6,8 @@ export const MOCK_BALANCE: TenantBalance = {
   currentBalance: 2500000,
   totalPaid: 125000000,
   totalUnpaid: 0,
-  lastUpdated: new Date().toISOString()
+  lastUpdated: new Date().toISOString(),
+  lastUpdatedAt: new Date().toISOString()
 };
 
 export const MOCK_BALANCE_TRANSACTIONS: TenantBalanceTransaction[] = [

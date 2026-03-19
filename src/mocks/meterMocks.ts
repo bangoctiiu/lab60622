@@ -28,18 +28,7 @@ export const MOCK_METERS: Meter[] = [
 ];
 
 export const MOCK_LATEST_READINGS: Record<string, LatestMeterReading> = {
-  'M1': {
-    meterId: 'M1',
-    currentIndex: 1250,
-    monthYear: '2024-03',
-    readingDate: '2024-03-25',
-    consumption: 150
-  },
-  'M2': {
-    meterId: 'M2',
-    currentIndex: 45,
-    monthYear: '2024-03',
-    readingDate: '2024-03-25',
-    consumption: 5
-  }
+  'M1': { meterId: 'M1', currentIndex: 12450, monthYear: '2026-02', readingDate: '2026-02-25', consumption: 450 },
+  'M2': { meterId: 'M2', currentIndex: 342, monthYear: '2026-02', readingDate: '2026-02-25', consumption: 12 },
+  'M3': { meterId: 'M3', currentIndex: 8900, monthYear: '2026-02', readingDate: '2026-02-25', consumption: 380 },
 };

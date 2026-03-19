@@ -16,7 +16,7 @@ export const MOCK_USERS: User[] = [
     isTwoFactorEnabled: true, 
     forceChangePassword: false,
     lastLoginAt: new Date().toISOString(), 
-    buildingAccess: [],
+    buildingsAccess: [],
     createdAt: "2024-01-01" 
   },
   { 
@@ -30,7 +30,7 @@ export const MOCK_USERS: User[] = [
     isTwoFactorEnabled: false,
     forceChangePassword: false,
     lastLoginAt: new Date(Date.now() - 3600000).toISOString(),
-    buildingAccess: [{ buildingId: "B1", buildingName: "Keangnam Landmark" }],
+    buildingsAccess: ["B1"],
     createdAt: "2024-03-01" 
   },
   { 
@@ -43,7 +43,7 @@ export const MOCK_USERS: User[] = [
     isTwoFactorEnabled: false,
     forceChangePassword: true,
     lastLoginAt: undefined, 
-    buildingAccess: [],
+    buildingsAccess: [],
     createdAt: "2024-06-01" 
   },
 ];

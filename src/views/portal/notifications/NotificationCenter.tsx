@@ -1,338 +1,273 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Bell, 
-  Receipt, 
-  CheckCircle, 
-  Wrench, 
-  Calendar, 
-  Megaphone,
+  CheckCircle2,
+  Info,
+  AlertTriangle,
+  CreditCard,
+  Ticket,
+  History,
   Trash2,
   ChevronRight,
-  Info,
-  Loader2,
-  Inbox,
+  Clock,
   Sparkles,
-  ShieldCheck,
-  CheckCheck,
-  ArrowRight
+  ArrowLeft,
+  Calendar,
+  Wrench,
+  Megaphone,
+  Check
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 import api from '@/services/apiClient';
+import notificationService from '@/services/notificationService';
 import { cn } from '@/utils';
-import PortalLayout from '@/components/layout/PortalLayout';
 
-const NOTIFICATION_ICONS: Record<string, any> = {
-  'Invoice': { icon: Receipt, color: 'bg-orange-50 text-orange-600 border-orange-100', route: '/portal/invoices' },
-  'Payment': { icon: CheckCircle, color: 'bg-emerald-50 text-emerald-600 border-emerald-100', route: '/portal/invoices' },
-  'Ticket': { icon: Wrench, color: 'bg-teal-50 text-teal-600 border-teal-100', route: '/portal/tickets' },
-  'Contract': { icon: Calendar, color: 'bg-red-50 text-red-600 border-red-100', route: '/portal' },
-  'Announcement': { icon: Megaphone, color: 'bg-blue-50 text-blue-600 border-blue-100', route: '/portal/announcements' },
-  'Reminder': { icon: Bell, color: 'bg-amber-50 text-amber-600 border-amber-100', route: '/portal' },
-  'Default': { icon: Info, color: 'bg-slate-50 text-slate-600 border-slate-100', route: '#' }
+const SwipeableNotificationItem = ({ item, onRead, onDelete }: { item: any; onRead: () => void; onDelete: () => void }) => {
+  const [offset, setOffset] = useState(0);
+  const [startX, setStartX] = useState(0);
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'invoice_new': return <CreditCard size={20} />;
+      case 'invoice_due': return <Bell size={20} />;
+      case 'payment_success': return <Check size={20} />;
+      case 'ticket_update': return <Wrench size={20} />;
+      case 'contract_expiring': return <Calendar size={20} />;
+      case 'announcement': return <Megaphone size={20} />;
+      default: return <Bell size={20} />;
+    }
+  };
+
+  const getIconColor = (type: string) => {
+    switch (type) {
+      case 'invoice_new': return 'bg-blue-50 text-blue-600 border-blue-100';
+      case 'invoice_due': return 'bg-amber-50 text-amber-600 border-amber-100';
+      case 'payment_success': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'ticket_update': return 'bg-teal-50 text-[#0D8A8A] border-teal-100';
+      case 'contract_expiring': return 'bg-rose-50 text-rose-600 border-rose-100';
+      case 'announcement': return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+      default: return 'bg-slate-50 text-slate-500 border-slate-100';
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+    if (diff < 0) setOffset(diff);
+  };
+
+  const handleTouchEnd = () => {
+    if (offset < -80) {
+      setOffset(-window.innerWidth);
+      setTimeout(onDelete, 300);
+    } else {
+      setOffset(0);
+    }
+  };
+
+  return (
+    <div className="relative mb-4 overflow-hidden group">
+      {/* Background Delete Action */}
+      <div className="absolute inset-0 bg-rose-500 rounded-3xl flex items-center justify-end px-8 text-white">
+        <div className="flex flex-col items-center gap-1">
+          <Trash2 size={24} />
+          <span className="text-[10px] font-bold uppercase tracking-wider">Xóa</span>
+        </div>
+      </div>
+      
+      {/* Foreground Item */}
+      <div 
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClick={onRead}
+        style={{ transform: `translateX(${offset}px)` }}
+        className={cn(
+          "bg-white rounded-3xl p-5 shadow-sm border transition-all relative z-10 active:scale-[0.99] cursor-pointer",
+          item.isRead ? "border-slate-50 opacity-60" : "border-[#0D8A8A]/10 shadow-md shadow-[#0D8A8A]/5",
+          offset === 0 && "duration-300 ease-out"
+        )}
+      >
+        <div className="flex gap-4">
+          <div className={cn(
+            "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border shadow-inner transition-transform group-hover:scale-105",
+            getIconColor(item.type)
+          )}>
+            {getIcon(item.type)}
+          </div>
+          
+          <div className="flex-1 space-y-1.5 min-w-0">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {format(new Date(item.createdAt), 'HH:mm • dd MMM')}
+              </span>
+              {!item.isRead && (
+                 <div className="w-2 h-2 bg-[#0D8A8A] rounded-full shadow-lg shadow-[#0D8A8A]/20 animate-pulse" />
+              )}
+            </div>
+            
+            <h4 className={cn(
+              "text-[14px] leading-snug tracking-tight line-clamp-2",
+              !item.isRead ? "font-bold text-slate-900" : "font-semibold text-slate-600"
+            )}>
+               {item.title}
+            </h4>
+            
+            <p className="text-[12px] font-medium text-slate-500 leading-relaxed line-clamp-2">
+               {item.content}
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Metadata */}
+        {!item.isRead && (
+          <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between">
+             <div className="flex items-center gap-1.5 opacity-60">
+                <Sparkles size={12} className="text-[#0D8A8A]" />
+                <span className="text-[10px] font-bold text-[#0D8A8A] uppercase tracking-wider">SmartStay AI</span>
+             </div>
+             <ChevronRight size={14} className="text-slate-300" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 const NotificationCenter = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<'unread' | 'all'>('unread');
+  const [activeTab, setActiveTab] = useState<'all' | 'unread'>('unread');
 
-  // 1. Fetch Notifications
-  const { data: notifications, isLoading, refetch } = useQuery({
-    queryKey: ['portal-notifications', activeTab],
-    queryFn: async () => {
-      const res = await api.get('/api/portal/notifications', { 
-        params: { 
-          unreadOnly: activeTab === 'unread',
-          limit: 50 
-        } 
-      });
-      return res.data;
-    }
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ['portal-notifications'],
+    queryFn: () => notificationService.getNotifications()
   });
 
-  // 2. Mutations
-  const markReadAllMutation = useMutation({
-    mutationFn: () => api.patch('/api/portal/notifications/read-all'),
+  const markAsReadMutation = useMutation({
+    mutationFn: (id?: string) => notificationService.markAsRead(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['portal-notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['portal-unread-count'] });
-      toast.success('Đã đánh dấu tất cả là đã đọc');
     }
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => api.delete(`/api/portal/notifications/${id}`),
+    mutationFn: (id: string) => notificationService.deleteNotification(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['portal-notifications'] });
       toast.success('Đã xóa thông báo');
     }
   });
 
-  const markReadMutation = useMutation({
-    mutationFn: (id: string) => api.patch(`/api/portal/notifications/${id}/read`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['portal-notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['portal-unread-count'] });
-    }
-  });
-
-  // 3. Polling Realtime
-  useEffect(() => {
-    const pollInterval = setInterval(() => {
-      refetch();
-    }, 45000);
-    
-    return () => clearInterval(pollInterval);
-  }, [refetch]);
-
-  const handleNotifyClick = (item: any) => {
-    if (!item.isRead) markReadMutation.mutate(item.id);
-    const config = NOTIFICATION_ICONS[item.entityType] || NOTIFICATION_ICONS.Default;
-    
-    if (config.route !== '#') {
-      let targetRoute = config.route;
-      
-      if (item.entityId) {
-        if (item.entityType === 'Invoice') targetRoute = `/portal/invoices/${item.entityId}`;
-        else if (item.entityType === 'Ticket') targetRoute = `/portal/tickets/${item.entityId}`;
-        else if (item.entityType === 'Announcement') targetRoute = `/portal/announcements`;
-      }
-      
-      navigate(targetRoute);
-    }
+  const getIcon = (type: string) => {
+    const t = (type || '').toLowerCase();
+    if (t.includes('invoice')) return <CreditCard size={20} />;
+    if (t.includes('payment')) return <Check size={20} />;
+    if (t.includes('ticket')) return <Wrench size={20} />;
+    if (t.includes('contract')) return <Calendar size={20} />;
+    if (t.includes('announcement')) return <Megaphone size={20} />;
+    return <Bell size={20} />;
   };
 
-  const notificationList = Array.isArray(notifications?.items) ? notifications.items : [];
+  const getIconColor = (type: string) => {
+    const t = (type || '').toLowerCase();
+    if (t.includes('invoice')) return 'bg-amber-50 text-amber-600 border-amber-100';
+    if (t.includes('payment')) return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+    if (t.includes('ticket')) return 'bg-teal-50 text-[#0D8A8A] border-teal-100';
+    if (t.includes('contract')) return 'bg-rose-50 text-rose-600 border-rose-100';
+    if (t.includes('announcement')) return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+    return 'bg-slate-50 text-slate-500 border-slate-100';
+  };
+
+  const handleNotificationClick = (item: any) => {
+    if (!item.isRead) markAsReadMutation.mutate(item.id);
+    const t = (item.type || '').toLowerCase();
+    if (t.includes('invoice') || t.includes('payment')) navigate('/portal/invoices');
+    else if (t.includes('ticket')) navigate('/portal/tickets');
+    else if (t.includes('announcement')) navigate('/portal/announcements');
+    else if (t.includes('contract')) navigate('/portal/profile');
+  };
+
+  const filteredNotifications = notifications?.filter((n: any) => 
+    activeTab === 'all' ? true : !n.isRead
+  ) || [];
+
+  const unreadCount = notifications?.filter((n: any) => !n.isRead).length || 0;
 
   return (
-    <PortalLayout 
-      title="Trung tâm thông báo"
-      headerTransparent={true}
-      rightAction={
-        <button 
-          onClick={() => markReadAllMutation.mutate()}
-          className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white active:scale-90 transition-all border border-white/10 shadow-lg"
-        >
-          <CheckCheck size={20} />
-        </button>
-      }
-    >
-      <div className="bg-slate-50 min-h-screen">
-        
-        {/* 1. Lush Notification Banner */}
-        <div className="bg-[#0D8A8A] pt-24 pb-24 px-8 rounded-b-[48px] shadow-2xl shadow-teal-500/10 relative overflow-hidden">
-           <div className="absolute top-[-5%] right-[-5%] w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-           <div className="absolute bottom-[-15%] left-[-10%] w-48 h-48 bg-teal-400/10 rounded-full blur-2xl" />
-           
-           <div className="relative z-10 flex flex-col gap-6 text-left">
-              <div className="flex items-center gap-4">
-                 <div className="w-14 h-14 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 flex items-center justify-center text-white shadow-2xl relative">
-                    <Bell size={28} strokeWidth={1.5} className="animate-bounce-slow" />
-                    {notifications?.unreadCount > 0 && <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-4 border-[#0D8A8A] animate-pulse" />}
-                 </div>
-                 <div className="space-y-0.5">
-                    <h2 className="text-2xl font-black text-white tracking-tight leading-none uppercase">Thông báo</h2>
-                    <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] leading-none mt-1">SmartStay Alert System</p>
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                 <div className="bg-white/10 backdrop-blur-md px-5 py-3 rounded-[24px] border border-white/10 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                       <ShieldCheck size={16} />
-                    </div>
-                    <span className="text-[11px] font-black text-white uppercase tracking-widest leading-none">Chế độ giám sát</span>
-                 </div>
-                 <div className="flex-1 bg-white px-5 py-3 rounded-[24px] shadow-xl shadow-black/10 flex items-center justify-between group active:scale-95 transition-all overflow-hidden relative">
-                    <span className="text-[11px] font-black text-slate-800 uppercase tracking-tight relative z-10">TỔNG {notifications?.total || 0}</span>
-                    <ArrowRight size={16} className="text-[#0D8A8A] relative z-10" />
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-teal-50 rounded-full -mr-8 -mt-8 opacity-0 group-hover:opacity-100 transition-all duration-700" />
-                 </div>
-              </div>
-           </div>
-           
-           <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 opacity-5 -rotate-12">
-              <Bell size={200} className="text-white" />
-           </div>
+    <div className="min-h-full bg-transparent pb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="p-5 space-y-6 max-w-[430px] mx-auto pt-4">
+        {/* Header Section */}
+        <div className="flex items-center justify-between px-1">
+          <div className="space-y-0.5">
+            <h2 className="text-[20px] font-bold text-slate-900 tracking-tight">Thông báo</h2>
+            <p className="text-[12px] font-medium text-slate-400">Bạn có {unreadCount} mục chưa đọc</p>
+          </div>
+          <button 
+            onClick={() => markAsReadMutation.mutate(undefined)}
+            className="w-10 h-10 flex items-center justify-center rounded-2xl bg-white border border-slate-100 text-[#0D8A8A] shadow-sm shadow-slate-200/50 active:scale-90 transition-all"
+            title="Đánh dấu đã đọc tất cả"
+          >
+             <CheckCircle2 size={20} />
+          </button>
         </div>
 
-        {/* 2. Tactical Tab Hub (Overlap) */}
-        <div className="px-6 -mt-10 relative z-20">
-           <div className="bg-white rounded-[32px] p-2 shadow-2xl shadow-slate-200/50 border-2 border-slate-200 flex items-center gap-1">
-              <button 
-                onClick={() => setActiveTab('unread')}
-                className={cn(
-                  "flex-1 h-12 rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all relative flex items-center justify-center gap-2",
-                  activeTab === 'unread' ? "bg-[#0D8A8A] text-white shadow-lg shadow-teal-500/20" : "text-slate-400 hover:text-slate-600"
-                )}
-              >
-                Chưa đọc
-                {notifications?.unreadCount > 0 && (
-                  <div className={cn(
-                     "w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black",
-                     activeTab === 'unread' ? "bg-white text-[#0D8A8A]" : "bg-red-500 text-white shadow-sm"
-                  )}>
-                    {notifications.unreadCount}
-                  </div>
-                )}
-              </button>
-              <button 
-                onClick={() => setActiveTab('all')}
-                className={cn(
-                  "flex-1 h-12 rounded-[24px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center",
-                  activeTab === 'all' ? "bg-[#0D8A8A] text-white shadow-lg shadow-teal-500/20" : "text-slate-400 hover:text-slate-600"
-                )}
-              >
-                TẤT CẢ
-              </button>
-           </div>
+        {/* Tabs */}
+        <div className="flex gap-2 p-1.5 bg-slate-100/50 rounded-2xl border border-slate-100">
+           <button 
+             onClick={() => setActiveTab('unread')}
+             className={cn(
+               "flex-1 h-10 rounded-xl text-[12px] font-bold transition-all",
+               activeTab === 'unread' ? "bg-white text-[#0D8A8A] shadow-sm" : "text-slate-500 hover:text-slate-700"
+             )}
+           >
+              Chưa đọc {unreadCount > 0 && `(${unreadCount})`}
+           </button>
+           <button 
+             onClick={() => setActiveTab('all')}
+             className={cn(
+               "flex-1 h-10 rounded-xl text-[12px] font-bold transition-all",
+               activeTab === 'all' ? "bg-white text-[#0D8A8A] shadow-sm" : "text-slate-500 hover:text-slate-700"
+             )}
+           >
+              Tất cả
+           </button>
         </div>
 
-        {/* 3. Personalized Notification Feed */}
-        <div className="px-6 pt-10 pb-32 space-y-6 text-left">
-           <div className="flex items-center justify-between px-3">
-              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{activeTab === 'unread' ? 'Tin mới gửi đến' : 'Lịch sử hoạt động'}</h3>
-              <div className="bg-white px-3 py-1 rounded-full border border-slate-200">
-                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Thời gian thực</span>
-              </div>
-           </div>
-
+        {/* Notification List */}
+        <div className="space-y-2 pt-2">
           {isLoading ? (
-            <div className="space-y-4">
-               {Array(5).fill(0).map((_, i) => (
-                  <div key={i} className="h-28 bg-white rounded-[32px] animate-pulse border border-slate-100" />
-               ))}
-            </div>
-          ) : notificationList.length > 0 ? (
-            <div className="space-y-4">
-              {notificationList.map((item: any) => (
-                 <NotificationItem 
-                   key={item.id} 
-                   item={item} 
-                   onClick={() => handleNotifyClick(item)} 
-                   onDelete={() => deleteMutation.mutate(item.id)}
-                 />
-              ))}
+            Array(3).fill(0).map((_, i) => (
+              <div key={i} className="h-28 bg-white/50 rounded-3xl border border-slate-50 animate-pulse"></div>
+            ))
+          ) : filteredNotifications.length === 0 ? (
+            <div className="py-24 text-center space-y-4">
+               <div className="w-20 h-20 bg-emerald-50 rounded-[32px] flex items-center justify-center mx-auto shadow-inner">
+                 <Sparkles size={32} className="text-emerald-500 opacity-50" />
+               </div>
+               <div className="space-y-1">
+                 <p className="text-[15px] font-bold text-slate-900">Tuyệt vời!</p>
+                 <p className="text-[13px] font-medium text-slate-400">Bạn đã xem hết tất cả thông báo.</p>
+               </div>
             </div>
           ) : (
-            <div className="text-center py-24 bg-white rounded-[48px] shadow-xl shadow-slate-200/50 border-2 border-slate-100 px-10 animate-in zoom-in-95 duration-500">
-               <div className="w-24 h-24 bg-slate-50 rounded-[40px] flex items-center justify-center mx-auto mb-8 shadow-inner text-slate-200 italic">
-                  <Inbox size={48} strokeWidth={1} />
-               </div>
-               <div className="space-y-2">
-                  <h3 className="text-slate-800 font-black text-xl tracking-tight uppercase uppercase">Nhà cửa yên bình</h3>
-                  <p className="text-slate-400 text-xs leading-relaxed font-bold uppercase tracking-wider px-6 opacity-60 italic">
-                    Hiện tại bạn không có thông báo nào chưa đọc. Mọi thứ đang được vận hành tốt.
-                  </p>
-               </div>
-               <button 
-                 onClick={() => setActiveTab('all')}
-                 className="mt-10 h-16 w-full bg-[#0D8A8A] text-white rounded-[28px] font-black text-sm shadow-2xl shadow-teal-500/30 active:scale-95 transition-all uppercase tracking-widest"
-               >
-                 Xem lịch sử thông báo
-               </button>
-            </div>
+            filteredNotifications.map((item: any) => (
+              <SwipeableNotificationItem 
+                key={item.id} 
+                item={item} 
+                onRead={() => handleNotificationClick(item)}
+                onDelete={() => deleteMutation.mutate(item.id)}
+              />
+            ))
           )}
-
-           <div className="mt-6 p-8 bg-teal-50/30 rounded-[48px] border-2 border-dashed border-teal-200/40 text-center space-y-4">
-              <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center mx-auto text-teal-600 shadow-xl border border-slate-50">
-                 <ShieldCheck size={28} strokeWidth={2} />
-              </div>
-              <div className="space-y-1 px-4">
-                 <p className="text-[11px] font-black text-teal-800 uppercase tracking-[0.2em] leading-relaxed">Luôn cập nhật thông tin</p>
-                 <p className="text-[10px] font-bold text-teal-600/40 uppercase tracking-widest leading-loose">Bật thông báo đẩy để không bỏ lỡ mọi tin tức quan trọng từ SmartStay.</p>
-              </div>
-           </div>
-        </div>
-      </div>
-    </PortalLayout>
-  );
-};
-
-const NotificationItem = ({ item, onClick, onDelete }: any) => {
-  const config = NOTIFICATION_ICONS[item.entityType] || NOTIFICATION_ICONS.Default;
-  const Icon = config.icon;
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const [swiped, setSwiped] = useState(false);
-
-  const minSwipeDistance = 80;
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-    if (touchStart) {
-      const distance = touchStart - e.targetTouches[0].clientX;
-      if (distance > 20) setSwiped(true);
-      if (distance < -20) setSwiped(false);
-    }
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    if (isLeftSwipe) setSwiped(true);
-    else setSwiped(false);
-  };
-
-  return (
-    <div 
-      className="relative group overflow-hidden rounded-[32px] active:scale-[0.98] transition-all shadow-xl shadow-slate-200/30 border-2 border-white"
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      <div 
-        className={cn(
-          "absolute inset-y-0 right-0 w-24 bg-red-500 flex items-center justify-center transition-transform duration-300 z-0",
-          swiped ? "translate-x-0" : "translate-x-full group-hover:translate-x-0"
-        )} 
-        onClick={(e) => { e.stopPropagation(); onDelete(); }}
-      >
-         <Trash2 className="text-white" size={24} />
-      </div>
-
-      <div 
-        onClick={onClick}
-        className={cn(
-          "relative bg-white p-6 flex gap-5 transition-transform duration-500 z-10 border border-slate-50",
-          swiped ? "-translate-x-24" : "group-hover:-translate-x-24",
-          !item.isRead && "bg-gradient-to-r from-teal-50/40 to-transparent"
-        )}
-      >
-        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner border", config.color)}>
-           <Icon size={28} strokeWidth={1.5} className="group-hover:rotate-6 transition-transform" />
-        </div>
-        
-        <div className="flex-1 flex flex-col justify-center min-w-0 pr-2 gap-1.5">
-           <div className="flex justify-between items-start">
-             <h4 className={cn("text-sm font-black truncate uppercase tracking-tight", !item.isRead ? "text-slate-800" : "text-slate-400")}>
-               {item.title}
-             </h4>
-             {!item.isRead && <div className="w-2.5 h-2.5 bg-red-500 rounded-full shrink-0 mt-1 relative"><div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-40" /></div>}
-           </div>
-           <p className={cn("text-[11px] leading-relaxed line-clamp-2 uppercase tracking-wide font-medium", !item.isRead ? "text-slate-500" : "text-slate-300")}>
-             {item.content}
-           </p>
-           <div className="flex items-center gap-2 pt-1">
-              <span className="text-[10px] text-[#0D8A8A] font-black uppercase tracking-widest opacity-60">
-                {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: vi })}
-              </span>
-           </div>
-        </div>
-        
-        <div className="flex flex-col justify-center text-slate-200 group-hover:opacity-0 transition-opacity">
-           <ChevronRight size={18} strokeWidth={3} />
         </div>
       </div>
     </div>

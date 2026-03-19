@@ -12,6 +12,9 @@ export const roleService = {
   getRolePermissions: async (): Promise<RolePermission[]> => {
     return [...mockRolePermissions];
   },
+  getRoleById: async (id: string): Promise<Role | undefined> => {
+    return mockRoles.find(r => r.id === id);
+  },
   updateRolePermissions: async (roleId: string, permissions: string[]): Promise<void> => {
     const index = mockRolePermissions.findIndex(p => p.roleId === roleId);
     if (index !== -1) {

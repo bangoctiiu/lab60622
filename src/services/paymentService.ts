@@ -7,7 +7,8 @@ import {
   TransactionType
 } from '@/models/Payment';
 import { format, subDays, subHours } from 'date-fns';
-import { MOCK_PAYMENTS, MOCK_LEDGER, MOCK_WEBHOOKS } from '@/mocks/paymentMocks';
+import { MOCK_PAYMENTS, MOCK_LEDGER, MOCK_WEBHOOKS, MOCK_CHANNEL_HEALTH } from '@/mocks/paymentMocks';
+import { MOCK_BALANCE } from '@/mocks/tenantBalanceMocks';
 
 export const paymentService = {
   getPayments: async (filters?: any): Promise<PaymentTransaction[]> => {
@@ -59,7 +60,7 @@ export const paymentService = {
       amount,
       balanceBefore: balance.currentBalance,
       balanceAfter: balance.currentBalance + amount,
-      note,
+      description: note,
       createdAt: new Date().toISOString()
     };
     MOCK_LEDGER.unshift(newTransaction);
@@ -80,7 +81,7 @@ export const paymentService = {
       amount: totalDeduct,
       balanceBefore: balance.currentBalance,
       balanceAfter: balance.currentBalance + totalDeduct,
-      note: `Khấu trừ cho ${invoiceIds.length} hóa đơn`,
+      description: `Khấu trừ cho ${invoiceIds.length} hóa đơn`,
       createdAt: new Date().toISOString()
     };
     MOCK_LEDGER.unshift(newTransaction);
@@ -90,8 +91,8 @@ export const paymentService = {
   getTenantBalance: async (tenantId: string) => {
     await new Promise(r => setTimeout(r, 400));
     return {
+      ...MOCK_BALANCE,
       tenantId,
-      currentBalance: 2450000,
       lastUpdatedAt: new Date().toISOString()
     };
   },
@@ -107,11 +108,7 @@ export const paymentService = {
   },
 
   getChannelHealth: async (): Promise<ChannelHealth[]> => {
-    return [
-      { provider: 'VNPay', successRate24h: 99.8, status: 'OK', lastReceivedAt: new Date().toISOString() },
-      { provider: 'Momo', successRate24h: 94.2, status: 'Degraded', lastReceivedAt: subHours(new Date(), 1).toISOString() },
-      { provider: 'ZaloPay', successRate24h: 100, status: 'OK', lastReceivedAt: subHours(new Date(), 2).toISOString() }
-    ];
+    return MOCK_CHANNEL_HEALTH;
   },
 
   retryWebhook: async (id: string) => {

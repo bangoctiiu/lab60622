@@ -29,7 +29,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     return (
-      <button onClick={() => toast.info('Chức năng đang phát triển để kết nối Backend')} ref={ref}
+      <button ref={ref}
         disabled={isLoading || disabled}
         className={cn(
           'flex items-center justify-center gap-2 font-black uppercase tracking-widest transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed',

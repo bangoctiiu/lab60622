@@ -1,93 +1,110 @@
 import React from 'react';
 import { cn } from '@/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-/**
- * 2.4 Status Badge Variants -- 16 trang thai
- */
-export type StatusType = 
-  | 'Active' | 'Paid' | 'Completed' 
-  | 'Pending' | 'Draft' 
-  | 'Overdue' | 'Expired' | 'Terminated' | 'Cancelled'
-  | 'Open' | 'InProgress' | 'Resolved' | 'Closed'
-  | 'Confirmed' | 'Submitted' | 'Published' 
-  | 'Vacant' | 'Occupied' | 'Maintenance' | 'Reserved'
-  | 'Apartment' | 'Office' | 'Mixed' | 'Shophouse'
-  | 'FullOwner' | 'CoOwner' | 'Investor'
-  | 'CheckedOut' | 'Blacklisted';
+const badgeVariants = cva(
+  'inline-flex items-center rounded-full font-medium transition-colors uppercase tracking-wider',
+  {
+    variants: {
+      status: {
+        Active: 'bg-green-100 text-green-800 border-green-200',
+        Paid: 'bg-green-100 text-green-800 border-green-200',
+        Completed: 'bg-green-100 text-green-800 border-green-200',
+        Confirmed: 'bg-green-100 text-green-800 border-green-200',
+        Resolved: 'bg-green-100 text-green-800 border-green-200',
+        
+        Pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        Draft: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        Submitted: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        Warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        
+        Overdue: 'bg-red-100 text-red-800 border-red-200',
+        Expired: 'bg-red-100 text-red-800 border-red-200',
+        Terminated: 'bg-red-100 text-red-800 border-red-200',
+        Rejected: 'bg-red-100 text-red-800 border-red-200',
+        Critical: 'bg-red-100 text-red-800 border-red-200',
+        Blacklisted: 'bg-red-100 text-red-800 border-red-200',
+        
+        InProgress: 'bg-blue-100 text-blue-800 border-blue-200',
+        Occupied: 'bg-blue-100 text-blue-800 border-blue-200',
+        Open: 'bg-blue-100 text-blue-800 border-blue-200',
+        Info: 'bg-blue-100 text-blue-800 border-blue-200',
+        Apartment: 'bg-blue-100 text-blue-800 border-blue-200',
+        
+        Vacant: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        Published: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        Investor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        
+        Maintenance: 'bg-amber-100 text-amber-800 border-amber-200',
+        Shophouse: 'bg-amber-100 text-amber-800 border-amber-200',
+        
+        Reserved: 'bg-purple-100 text-purple-800 border-purple-200',
+        CoOwner: 'bg-purple-100 text-purple-800 border-purple-200',
+        Mixed: 'bg-purple-100 text-purple-800 border-purple-200',
+        
+        Cancelled: 'bg-gray-100 text-gray-600 border-gray-200',
+        Closed: 'bg-gray-100 text-gray-600 border-gray-200',
+        CheckedOut: 'bg-gray-100 text-gray-600 border-gray-200',
+        
+        Office: 'bg-sky-100 text-sky-800 border-sky-200',
+        FullOwner: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      },
+      size: {
+        sm: 'px-1.5 py-0 text-[10px] font-bold',
+        md: 'px-2.5 py-0.5 text-[11px] font-medium',
+        lg: 'px-4 py-1.5 text-sm font-bold',
+      },
+    },
+    defaultVariants: {
+      status: 'Draft',
+      size: 'md',
+    },
+  }
+);
 
-interface StatusBadgeProps {
-  status: StatusType | string;
-  className?: string;
-  size?: 'sm' | 'md' | 'lg';
-}
-
-const statusConfig: Record<string, { bg: string; text: string }> = {
-  Active: { bg: '#D1FAE5', text: '#065F46' },
-  Paid: { bg: '#D1FAE5', text: '#065F46' },
-  Completed: { bg: '#D1FAE5', text: '#065F46' },
-  Confirmed: { bg: '#D1FAE5', text: '#065F46' },
-  Vacant: { bg: '#D1FAE5', text: '#065F46' },
-  Occupied: { bg: '#DBEAFE', text: '#1E40AF' },
-  Maintenance: { bg: '#FEF3C7', text: '#92400E' },
-  Reserved: { bg: '#EDE9FE', text: '#5B21B6' },
-  
-  Pending: { bg: '#FEF3C7', text: '#92400E' },
-  Expired: { bg: '#FDE68A', text: '#92400E' },
-  
-  Draft: { bg: '#F3F4F6', text: '#374151' },
-  Cancelled: { bg: '#F3F4F6', text: '#6B7280' },
-  Terminated: { bg: '#E5E7EB', text: '#6B7280' },
-  
-  Overdue: { bg: '#FEE2E2', text: '#991B1B' },
-  
-  Open: { bg: '#DBEAFE', text: '#1E40AF' },
-  Submitted: { bg: '#BFDBFE', text: '#1E40AF' },
-  
-  InProgress: { bg: '#E0F2FE', text: '#0369A1' },
-  Resolved: { bg: '#DCFCE7', text: '#166534' },
-  Closed: { bg: '#F1F5F9', text: '#475569' },
-  Published: { bg: '#CCFBF1', text: '#0F766E' },
-  
-  Critical: { bg: '#FEE2E2', text: '#991B1B' }, 
-  Warning: { bg: '#FEF3C7', text: '#92400E' },
-  Info: { bg: '#DBEAFE', text: '#1E40AF' },
-  
-  // Building Types
-  Apartment: { bg: '#DBEAFE', text: '#1E40AF' },
-  Office: { bg: '#E0F2FE', text: '#0369A1' },
-  Mixed: { bg: '#EDE9FE', text: '#5B21B6' },
-  Shophouse: { bg: '#FEF3C7', text: '#92400E' },
-  
-  // Ownership Types
-  FullOwner: { bg: '#DBEAFE', text: '#1E40AF' },
-  CoOwner: { bg: '#EDE9FE', text: '#5B21B6' },
-  Investor: { bg: '#D1FAE5', text: '#065F46' },
-  CheckedOut: { bg: '#F3F4F6', text: '#6B7280' },
-  Blacklisted: { bg: '#FEE2E2', text: '#991B1B' },
+const statusMap: Record<string, string> = {
+  Active: 'Hoàn thành',
+  Paid: 'Đã thanh toán',
+  Completed: 'Đã hoàn thành',
+  Pending: 'Chờ xử lý',
+  Draft: 'Bản nháp',
+  Submitted: 'Đã gửi',
+  Overdue: 'Quá hạn',
+  Expired: 'Hết hạn',
+  Terminated: 'Chấm dứt',
+  InProgress: 'Đang xử lý',
+  Confirmed: 'Đã xác nhận',
+  Open: 'Mở',
+  Cancelled: 'Đã hủy',
+  Rejected: 'Bị từ chối',
+  Closed: 'Đã đóng',
+  Vacant: 'Phòng trống',
+  Occupied: 'Đang ở',
+  Maintenance: 'Bảo trì',
+  Reserved: 'Đã đặt chỗ',
+  Resolved: 'Đã hoàn thành',
+  Published: 'Đã xuất bản',
 };
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, className, size = 'md' }) => {
-  const config = statusConfig[status] || statusConfig['Draft'];
+export interface StatusBadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {
+  label?: string;
+}
 
-  const sizeClasses = {
-    sm: 'px-1.5 py-0 text-[10px] font-bold',
-    md: 'px-2.5 py-0.5 text-[11px] font-medium',
-    lg: 'px-4 py-1.5 text-small font-bold'
-  };
-
+export const StatusBadge: React.FC<StatusBadgeProps> = ({
+  status,
+  size,
+  className,
+  children,
+  label,
+  ...props
+}) => {
+  const displayLabel = label || children || (status ? statusMap[status as string] || status : '');
+  
   return (
-    <span 
-      className={cn(
-        "inline-flex items-center justify-center rounded-full uppercase tracking-wider",
-        sizeClasses[size],
-        className
-      )}
-      style={{
-        backgroundColor: config.bg,
-        color: config.text
-      }}
-    >
-      {status}
+    <span className={cn(badgeVariants({ status: status as any, size, className }), "border")} {...props}>
+      {displayLabel}
     </span>
   );
 };

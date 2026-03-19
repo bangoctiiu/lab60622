@@ -18,7 +18,25 @@ import {
   StaffPerformance,
   ReportMetadata,
   AlertAnalytics,
+  ReportData,
 } from '@/types/reports';
+
+export const MOCK_GENERIC_REPORT_DATA = (id: string): ReportData => ({
+  reportId: id,
+  title: 'Báo cáo chi tiết',
+  generatedAt: new Date().toISOString(),
+  columns: [
+    { key: 'period', label: 'Kỳ' },
+    { key: 'amount', label: 'Số tiền' }
+  ],
+  data: [
+    { period: '2024-01', amount: 12000000 },
+    { period: '2024-02', amount: 15400000 }
+  ],
+  summaryData: {
+    total: 27400000
+  }
+});
 
 export const MOCK_REPORTS: ReportMetadata[] = [
   { id: 'occupancy', name: 'Tỷ lệ lấp đầy', category: 'Operational', description: 'Phân tích hiệu suất khai thác phòng' },

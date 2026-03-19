@@ -22,10 +22,15 @@ export const API_ENDPOINTS = {
     DASHBOARD: '/api/portal/dashboard',
     BALANCE: '/api/portal/balance',
     PROFILE: '/api/portal/profile',
+    DOCUMENTS: '/api/portal/profile/documents',
     INVOICES: '/api/portal/invoices',
+    CONTRACTS: '/api/portal/contracts',
+    METERS: '/api/portal/meters',
+    SERVICES: '/api/portal/services',
     TICKETS: '/api/portal/tickets',
     ANNOUNCEMENTS: '/api/portal/announcements',
     AMENITIES: '/api/portal/amenities',
     VISITORS: '/api/portal/visitors',
+    FAQ: '/api/portal/faq',
   }
 };

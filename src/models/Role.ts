@@ -1,6 +1,1 @@
-export interface Role {
-  id: string;
-  name: string;
-  description: string;
-  isSystem: boolean;
-}
+export * from '../types/index';

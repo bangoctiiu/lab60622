@@ -11,7 +11,7 @@ import { cn, formatDate } from '@/utils';
 import useUIStore from '@/stores/uiStore';
 import { dashboardService } from '@/services/dashboardService';
 import { KPICard } from '@/components/data/KPICard';
-import { StatusBadge } from '@/components/shared/StatusBadge';
+import { StatusBadge } from '@/components/ui';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 

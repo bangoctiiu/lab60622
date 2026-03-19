@@ -1,6 +1,6 @@
 import { ElectricityPolicy, WaterPolicy } from '../types/policy';
 
-export const MOCK_ELECTRICITY_HISTORY: ElectricityPolicy[] = [
+export const MOCK_ELECTRICITY_POLICIES: ElectricityPolicy[] = [
   {
     policyId: 1,
     policyName: 'Giá điện sinh hoạt 2024',
@@ -15,7 +15,7 @@ export const MOCK_ELECTRICITY_HISTORY: ElectricityPolicy[] = [
   }
 ];
 
-export const MOCK_WATER_HISTORY: WaterPolicy[] = [
+export const MOCK_WATER_POLICIES: WaterPolicy[] = [
   {
     policyId: 1,
     policyName: 'Giá nước sinh hoạt 2024',

@@ -1,6 +1,6 @@
 export * from './DataTable';
 export * from './FilterPanel';
-export * from './StatusBadge';
+
 export * from './CurrencyInput';
 export * from './ConfirmDialog';
 export * from './RichTextEditor';

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Search, Bell, User, Menu, ChevronRight, 
   HelpCircle, Settings, LogOut, CheckCircle2, 
-  Info, AlertTriangle, X
+  Info, AlertTriangle, X, Moon, Sun
 } from 'lucide-react';
 import { cn } from '@/utils';
 import useUIStore from '@/stores/uiStore';
@@ -11,7 +11,7 @@ import { useLocation, Link } from 'react-router-dom';
 
 export const Topbar = ({ onMobileMenuToggle }: { onMobileMenuToggle: () => void }) => {
   const { user, logout } = useAuthStore();
-  const { sidebarOpen } = useUIStore();
+  const { sidebarOpen, theme, toggleTheme } = useUIStore();
   const location = useLocation();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -72,6 +72,18 @@ export const Topbar = ({ onMobileMenuToggle }: { onMobileMenuToggle: () => void 
 
       {/* 4.1 Right: Tools */}
       <div className="flex items-center gap-4">
+        {/* Dark Mode Toggle */}
+        <button 
+          onClick={toggleTheme}
+          className="p-2.5 text-muted hover:bg-bg rounded-full transition-all relative group"
+          title={theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}
+        >
+          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} className="text-warning" />}
+          <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            {theme === 'light' ? 'Chế độ tối' : 'Chế độ sáng'}
+          </span>
+        </button>
+
         {/* Help */}
         <button className="p-2.5 text-muted hover:bg-bg rounded-full transition-all relative">
           <HelpCircle size={20} />

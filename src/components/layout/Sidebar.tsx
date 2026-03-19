@@ -68,8 +68,6 @@ export const Sidebar = () => {
   
   const isAdmin = user?.role === 'Admin';
   
-  // LOG for debugging as requested
-  console.log("Permission check (service.manage):", can("service.manage"));
   
   return (
     <aside className={cn(

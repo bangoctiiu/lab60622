@@ -12,6 +12,7 @@ import { cn, formatPercentage } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
 import { BuildingModal } from '@/components/buildings/BuildingModal';
+import { GridSkeleton } from '@/components/ui/StatusStates';
 
 const BuildingList = () => {
   const navigate = useNavigate();
@@ -50,10 +51,7 @@ const BuildingList = () => {
       </div>
 
       {isLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center gap-4">
-          <Spinner />
-          <p className="text-small text-muted font-bold animate-pulse uppercase tracking-[3px]">Loading Buildings...</p>
-        </div>
+        <GridSkeleton count={6} />
       ) : (
         /* 2.1.1 Card Grid Layout */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
