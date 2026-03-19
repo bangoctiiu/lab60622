@@ -53,8 +53,8 @@ const TicketDetail = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: (vars: { status: TicketStatus, note?: string }) => 
-      ticketService.updateStatus(id!, vars.status, vars.note),
+    mutationFn: (vars: { status: TicketStatus, resolution?: any }) => 
+      ticketService.updateStatus(id!, vars.status, vars.resolution),
     onSuccess: () => {
       setShowStatusModal(false);
       queryClient.invalidateQueries({ queryKey: ['ticket', id] });
@@ -425,7 +425,7 @@ const TicketDetail = () => {
                      newStatus === 'Resolved' ? "bg-success shadow-success/20" : "bg-danger shadow-danger/20"
                    )}
                    disabled={(newStatus === 'Resolved' && resolutionNote.length < 20) || !resolutionNote.trim() || updateStatusMutation.isPending}
-                   onClick={() => updateStatusMutation.mutate({ status: newStatus!, note: resolutionNote })}
+                   onClick={() => updateStatusMutation.mutate({ status: newStatus!, resolution: resolutionNote })}
                  >
                     {updateStatusMutation.isPending ? 'Đang cập nhật...' : 'Xác nhận thay đổi'}
                  </button>

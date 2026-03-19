@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { 
-  LogOut, User, LayoutDashboard, FileText, Settings, 
-  Building2, Bell, Home, MessageSquare, Plus, ChevronRight,
-  UserCircle
+  Bell, ChevronLeft
 } from 'lucide-react';
+import BottomNavigation from '@/components/layout/BottomNavigation';
+
 import useAuthStore from '@/stores/authStore';
 import useUIStore from '@/stores/uiStore';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -57,77 +57,59 @@ export const AdminLayout = () => {
 
 // --- 4.2 PortalLayout (Tenant) ---
 export const PortalLayout = () => {
-  const { user } = useAuthStore();
+  const navigate = useNavigate();
   const location = useLocation();
 
-  const bottomTabs = [
-    { label: "Trang chủ", route: "/portal", icon: Home },
-    { label: "Hóa đơn", route: "/portal/invoices", icon: ReceiptIcon }, // Small Receipt icon
-    { label: "Yêu cầu", route: "/portal/tickets", icon: MessageSquareIcon }, // MessageSquare icon
-    { label: "Thông báo", route: "/portal/notifications", icon: BellBadgeIcon, badge: 2 },
-    { label: "Hồ sơ", route: "/portal/profile", icon: UserCircleIcon },
-  ];
+  const getTitleFromRoute = () => {
+    switch (location.pathname) {
+      case '/portal/dashboard': return 'Dashboard';
+      case '/portal/invoices': return 'Hoá đơn';
+      case '/portal/tickets': return 'Ticket';
+      case '/portal/amenities': return 'Tiện ích';
+      case '/portal/profile': return 'Hồ sơ';
+      default: return 'SmartStay';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col">
-      {/* 4.2 AppBar (56px) */}
-      <header className="h-[56px] px-4 flex items-center justify-between sticky top-0 bg-white/80 backdrop-blur-md z-40 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center text-secondary">
-            <Building2 size={20} />
-          </div>
-          <h1 className="text-sm font-bold text-primary truncate max-w-[180px]">
-             The Manor Park
-          </h1>
+    <div className="portal-container">
+      {/* Sticky Top Bar */}
+      <header className="portal-topbar">
+        <div className="w-10">
+          {location.pathname !== '/portal' && location.pathname !== '/portal/dashboard' && (
+            <button 
+              onClick={() => navigate(-1)}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
         </div>
-        <div className="flex items-center gap-3">
-          <button className="relative p-2 text-muted hover:text-primary transition-colors">
+        
+        <h1 className="flex-1 text-center font-bold text-lg truncate uppercase tracking-wide">
+          {getTitleFromRoute()}
+        </h1>
+        
+        <div className="w-10 flex justify-end">
+          <button className="p-2 hover:bg-white/10 rounded-full transition-colors relative">
             <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full border border-white"></span>
+            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full ring-2 ring-[var(--portal-primary)]"></span>
           </button>
         </div>
       </header>
 
-      {/* 4.2 ContentArea: padding bottom: 80px */}
-      <main className="flex-1 min-h-[calc(100vh-136px)] p-4 pb-24 overflow-auto animate-in fade-in slide-in-from-bottom-6 duration-500">
-        <div className="max-w-[480px] mx-auto">
-          <Outlet />
-        </div>
+      {/* Content Area */}
+      <main className="portal-content min-h-[calc(100vh-120px)] p-4">
+        <Outlet />
       </main>
 
-      {/* 4.2 BottomNavBar (60px) */}
-      <nav className="fixed bottom-0 w-full h-[60px] bg-white border-t border-border flex items-center justify-around z-50 px-2 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-2xl">
-        <PortalTab icon={Home} label="Trang chủ" route="/portal" active={location.pathname === "/portal"} />
-        <PortalTab icon={FileText} label="Hóa đơn" route="/portal/invoices" active={location.pathname === "/portal/invoices"} />
-        
-        {/* Special Center Plus Button */}
-        <div className="relative -top-3 scale-110">
-          <button className="w-12 h-12 bg-accent rounded-full border-4 border-bg flex items-center justify-center shadow-lg shadow-accent/20">
-            <Plus size={24} className="text-white" />
-          </button>
-        </div>
-
-        <PortalTab icon={MessageSquare} label="Yêu cầu" route="/portal/tickets" active={location.pathname === "/portal/tickets"} />
-        <PortalTab icon={UserCircle} label="Hồ sơ" route="/portal/profile" active={location.pathname === "/portal/profile"} />
-      </nav>
+      {/* Sticky Bottom Nav */}
+      <BottomNavigation />
     </div>
   );
 };
 
-const PortalTab = ({ icon: Icon, label, route, active }: { icon: any, label: string, route: string, active: boolean }) => (
-  <Link to={route} className={cn(
-    "flex flex-col items-center gap-1 transition-all",
-    active ? "text-primary transform -translate-y-1" : "text-muted opacity-60 hover:opacity-100"
-  )}>
-    <div className={cn(
-      "p-1.5 rounded-xl transition-all",
-      active && "bg-primary/5 text-primary"
-    )}>
-      <Icon size={20} />
-    </div>
-    <span className="text-[9px] font-bold uppercase tracking-tighter">{label}</span>
-  </Link>
-);
+
 
 // --- 4.3 Public Layout (Hero pages / Landing) ---
 export const PublicLayout = ({ showHeader = true }: { showHeader?: boolean }) => (

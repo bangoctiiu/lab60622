@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   ArrowLeft, Home, Building2, MapPin, 
   Info, Image as ImageIcon, Users, 
@@ -12,14 +12,18 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { buildingService } from '@/services/buildingService';
+import { roomService } from '@/services/roomService';
 import { BuildingDetail as BuildingDetailType } from '@/models/Building';
+import { Room } from '@/models/Room';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
 import { BuildingModal } from '@/components/buildings/BuildingModal';
 
-// Reusable Tab Component
+// Tab Item and Component Imports
+import { OwnershipModal } from '@/components/buildings/OwnershipModal';
+
 const TabItem = ({ active, children, onClick, icon: Icon }: any) => (
   <button 
     onClick={onClick}
@@ -32,11 +36,65 @@ const TabItem = ({ active, children, onClick, icon: Icon }: any) => (
   </button>
 );
 
+const BuildingRoomsTab = ({ buildingId }: { buildingId: string }) => {
+  const navigate = useNavigate();
+  const { data: rooms, isLoading } = useQuery({
+    queryKey: ['rooms', 'building', buildingId],
+    queryFn: () => roomService.getRooms({ buildingId })
+  });
+
+  if (isLoading) return <div className="py-10 flex justify-center"><Spinner /></div>;
+
+  return (
+    <div className="space-y-6">
+       <div className="flex justify-between items-center">
+          <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Danh sách Phòng</h3>
+          <button onClick={() => navigate('/rooms')} className="btn-primary-sm flex items-center gap-2">Xem tất cả <ArrowRight size={14} /></button>
+       </div>
+       <div className="card-container overflow-hidden p-0 border-none shadow-xl shadow-primary/5">
+          <table className="w-full text-left">
+             <thead className="bg-bg/50 border-b">
+                <tr>
+                   <th className="px-6 py-4 text-label text-muted">Mã phòng</th>
+                   <th className="px-6 py-4 text-label text-muted">Tầng</th>
+                   <th className="px-6 py-4 text-label text-muted">Loại</th>
+                   <th className="px-6 py-4 text-label text-muted">Giá thuê CV</th>
+                   <th className="px-6 py-4 text-label text-muted">Trạng thái</th>
+                </tr>
+             </thead>
+             <tbody className="divide-y divide-border/20">
+                {rooms?.map((room: Room) => (
+                  <tr key={room.id} className="hover:bg-primary/[0.02] transition-colors">
+                     <td className="px-6 py-4">
+                        <button 
+                          onClick={() => navigate(`/rooms/${room.id}`)}
+                          className="text-body font-black text-primary hover:underline flex items-center gap-2"
+                        >
+                           <Home size={14} className="text-secondary" /> {room.roomCode}
+                        </button>
+                     </td>
+                     <td className="px-6 py-4 text-small font-bold text-muted">Tầng {room.floorNumber}</td>
+                     <td className="px-6 py-4 text-small font-bold text-text">{room.roomType}</td>
+                     <td className="px-6 py-4 text-small font-black text-primary">{formatVND(room.baseRentPrice)}</td>
+                     <td className="px-6 py-4">
+                        <StatusBadge status={room.status} size="sm" />
+                     </td>
+                  </tr>
+                ))}
+             </tbody>
+          </table>
+       </div>
+    </div>
+  );
+};
+
 const BuildingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('Overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOwnershipModalOpen, setIsOwnershipModalOpen] = useState(false);
 
   const { data: building, isLoading } = useQuery<BuildingDetailType>({
     queryKey: ['building', id],
@@ -48,6 +106,10 @@ const BuildingDetail = () => {
 
   // Checklist #2: Ownership sum check
   const totalOwnership = building.ownership.reduce((sum, o) => sum + o.ownershipPercent, 0);
+
+  const onOwnershipSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['building', id] });
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -99,28 +161,55 @@ const BuildingDetail = () => {
               {/* Info Column */}
               <div className="lg:col-span-8 space-y-10">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {[
-                      { label: 'Năm bàn giao', value: building.yearBuilt, icon: Calendar },
-                      { label: 'Số tầng', value: building.totalFloors, icon: Layers },
-                      { label: 'Hotline BQL', value: building.managementPhone, icon: Phone, type: 'tel' },
-                      { label: 'Email liên hệ', value: building.managementEmail, icon: Mail, type: 'email' },
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 p-5 bg-white/60 rounded-3xl border border-primary/5 group hover:border-primary/20 transition-all">
-                         <div className="w-12 h-12 bg-primary/5 text-primary rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                            <item.icon size={22} />
-                         </div>
-                         <div>
-                            <p className="text-[10px] text-muted font-black uppercase tracking-tighter">{item.label}</p>
-                            {item.type === 'tel' ? (
-                               <a href={`tel:${item.value}`} className="text-body font-black text-primary hover:underline">{item.value}</a>
-                            ) : item.type === 'email' ? (
-                               <a href={`mailto:${item.value}`} className="text-body font-black text-primary hover:underline">{item.value}</a>
-                            ) : (
-                               <p className="text-body font-black text-primary">{item.value}</p>
-                            )}
-                         </div>
-                      </div>
-                    ))}
+                    {/* Building Code with Copy (2.2.2) */}
+                    <div className="p-5 bg-white/60 rounded-3xl border border-primary/5 group hover:border-primary/20 transition-all">
+                       <p className="text-[10px] text-muted font-black uppercase tracking-tighter mb-2">Mã Toà nhà (UNIQUE)</p>
+                       <div className="flex items-center justify-between bg-bg/40 px-4 py-2 rounded-xl group-hover:bg-white transition-all">
+                          <code className="text-body font-mono font-black text-primary">{building.buildingCode}</code>
+                          <button 
+                            onClick={() => {
+                              navigator.clipboard.writeText(building.buildingCode);
+                              toast.success('Đã sao chép mã toà nhà');
+                            }}
+                            className="p-1.5 hover:bg-primary/10 rounded-lg text-primary transition-all"
+                            title="Sao chép"
+                          >
+                             <Download size={14} className="rotate-180" />
+                          </button>
+                       </div>
+                    </div>
+
+                    {/* Year & Floors (2.2.2) */}
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="p-5 bg-white/60 rounded-3xl border border-primary/5">
+                          <p className="text-[10px] text-muted font-black uppercase tracking-tighter mb-1">Năm bàn giao</p>
+                          <p className="text-body font-black text-primary flex items-center gap-2"><Calendar size={14} className="text-accent" /> {building.yearBuilt}</p>
+                       </div>
+                       <div className="p-5 bg-white/60 rounded-3xl border border-primary/5">
+                          <p className="text-[10px] text-muted font-black uppercase tracking-tighter mb-1">Số tầng</p>
+                          <p className="text-body font-black text-primary flex items-center gap-2"><Layers size={14} className="text-secondary" /> {building.totalFloors}</p>
+                       </div>
+                    </div>
+
+                    <div className="p-5 bg-white/60 rounded-3xl border border-primary/5 group hover:border-primary/20 transition-all">
+                       <p className="text-[10px] text-muted font-black uppercase tracking-tighter mb-1">Hotline Ban Quản Lý</p>
+                       <a href={`tel:${building.managementPhone}`} className="text-body font-black text-primary flex items-center gap-2 hover:underline">
+                          <div className="w-8 h-8 bg-primary/5 text-primary rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                             <Phone size={14} />
+                          </div>
+                          {building.managementPhone}
+                       </a>
+                    </div>
+
+                    <div className="p-5 bg-white/60 rounded-3xl border border-primary/5 group hover:border-primary/20 transition-all">
+                       <p className="text-[10px] text-muted font-black uppercase tracking-tighter mb-1">Email Liên hệ</p>
+                       <a href={`mailto:${building.managementEmail}`} className="text-body font-black text-primary flex items-center gap-2 hover:underline">
+                          <div className="w-8 h-8 bg-primary/5 text-primary rounded-lg flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                             <Mail size={14} />
+                          </div>
+                          {building.managementEmail}
+                       </a>
+                    </div>
                  </div>
 
                  <div className="space-y-6">
@@ -129,8 +218,8 @@ const BuildingDetail = () => {
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                        {building.amenities.map((a, i) => (
-                         <div key={i} className="flex items-center gap-3 p-4 bg-white/40 rounded-2xl border border-transparent hover:border-primary/10 transition-all">
-                            <CheckCircle2 size={16} className="text-primary" />
+                         <div key={i} className="flex items-center gap-3 p-4 bg-white/60 rounded-2xl border border-primary/5 hover:border-primary/20 transition-all shadow-sm">
+                            <div className="w-2 h-2 rounded-full bg-primary" />
                             <span className="text-[11px] font-black text-primary uppercase tracking-tighter">{a}</span>
                          </div>
                        ))}
@@ -139,7 +228,16 @@ const BuildingDetail = () => {
 
                  {/* 2.2.2 Checklist #3: Map Embed */}
                  <div className="space-y-6">
-                    <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Vị trí Toà nhà</h3>
+                    <div className="flex items-center justify-between">
+                       <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Vị trí & Địa chỉ</h3>
+                       <a 
+                         href={`https://www.google.com/maps?q=${building.latitude},${building.longitude}`} 
+                         target="_blank" rel="noreferrer"
+                         className="text-[10px] font-black text-accent uppercase flex items-center gap-1 hover:underline"
+                       >
+                          Mở Google Maps <ExternalLink size={12} />
+                       </a>
+                    </div>
                     <div className="h-96 rounded-[40px] overflow-hidden border-8 border-white/60 shadow-xl relative group">
                        <iframe 
                          src={`https://maps.google.com/maps?q=${building.latitude},${building.longitude}&z=15&output=embed`}
@@ -149,14 +247,14 @@ const BuildingDetail = () => {
                        />
                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-primary/10 group-hover:translate-y-1 transition-transform">
                           <p className="text-[9px] font-black uppercase text-muted tracking-widest mb-1">Toạ độ GPS</p>
-                          <p className="text-[11px] font-mono font-black text-primary">{building.latitude}, {building.longitude}</p>
+                          <p className="text-[11px] font-mono font-black text-primary">{building.latitude?.toFixed(4)}, {building.longitude?.toFixed(4)}</p>
                        </div>
                     </div>
                  </div>
               </div>
 
-              {/* Stats Column */}
-              <div className="lg:col-span-4 space-y-8">
+              {/* Stats Column (2.2.2 KPIs) */}
+              <div className="lg:col-span-4 space-y-8 animate-in slide-in-from-right-4 duration-700 delay-200">
                  <div className="p-8 bg-slate-900 rounded-[40px] text-white shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-all pointer-events-none">
                        <Building2 size={180} />
@@ -170,9 +268,11 @@ const BuildingDetail = () => {
                              <div className="h-full bg-success transition-all duration-1000" style={{ width: `${building.occupancyRate}%` }} />
                           </div>
                        </div>
+                       
+                       {/* RULE-02: Tong phong tu View vw_BuildingRoomCount.Total */}
                        <div className="grid grid-cols-2 gap-6 pt-8 border-t border-white/10">
                           <div>
-                             <p className="text-label text-slate-500 font-bold uppercase mb-1">Tổng phòng</p>
+                             <p className="text-label text-slate-500 font-bold uppercase mb-1">Tổng phòng (VW)</p>
                              <p className="text-h2 font-black text-white">{building.totalRooms}</p>
                           </div>
                           <div>
@@ -183,22 +283,29 @@ const BuildingDetail = () => {
                     </div>
                  </div>
 
-                 <div className="p-8 bg-white/60 rounded-[40px] border border-primary/5">
-                    <h3 className="text-label text-muted uppercase tracking-widest mb-6 border-b pb-4">Quản lý & Hỗ trợ</h3>
+                 <div className="p-8 bg-white/60 rounded-[40px] border border-primary/5 shadow-xl">
+                    <h3 className="text-label text-muted uppercase tracking-widest mb-6 border-b pb-4">Đơn vị quản lý</h3>
                     <div className="space-y-6">
                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-black">KN</div>
+                          <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center font-black">KN</div>
                           <div>
                              <p className="text-small font-black text-primary uppercase">Elite Property Group</p>
-                             <p className="text-[10px] text-muted italic">Đơn vị quản lý vận hành</p>
+                             <p className="text-[10px] text-muted italic font-medium leading-none mt-1">Quản lý trực tiếp</p>
                           </div>
                        </div>
-                       <div className="p-4 bg-bg/50 rounded-2xl border border-dashed border-border/50">
-                          <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">Thông tin bảo hiểm</p>
-                          <p className="text-small font-black text-primary">Prudential PVI-852369</p>
-                          <p className="text-[10px] text-success font-bold mt-1 uppercase tracking-tighter flex items-center gap-1">
-                             <ShieldCheck size={12} /> Còn hiệu lực đến 2026
-                          </p>
+                       <div className="p-5 bg-primary/[0.03] rounded-3xl border border-dashed border-primary/20">
+                          <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-3">Thông tin bảo hiểm</p>
+                          <div className="flex items-center gap-3">
+                             <div className="w-8 h-8 bg-success/20 text-success rounded-lg flex items-center justify-center">
+                                <ShieldCheck size={16} />
+                             </div>
+                             <div>
+                                <p className="text-small font-black text-primary">Prudential PVI-852369</p>
+                                <p className="text-[10px] text-success font-bold mt-0.5 uppercase tracking-tighter flex items-center gap-1">
+                                   Hiệu lực đến 2026
+                                </p>
+                             </div>
+                          </div>
                        </div>
                     </div>
                  </div>
@@ -214,7 +321,12 @@ const BuildingDetail = () => {
                     <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Chủ sở hữu & Cổ phần</h3>
                     <p className="text-small text-muted italic mt-1 font-medium">Danh sách các cá nhân/tổ chức tham gia góp vốn đầu tư tòa nhà.</p>
                  </div>
-                 <button className="btn-primary-sm flex items-center gap-2"><Plus size={16} /> Gán chủ mới</button>
+                 <button 
+                   onClick={() => setIsOwnershipModalOpen(true)}
+                   className="btn-primary-sm flex items-center gap-2"
+                 >
+                    <Plus size={16} /> Gán chủ mới
+                 </button>
               </div>
 
               {/* Progress bar check (2.2.3 and Checklist #2) */}
@@ -290,51 +402,7 @@ const BuildingDetail = () => {
           )}
 
           {activeTab === 'Rooms' && (
-            <div className="space-y-6">
-               <div className="flex justify-between items-center">
-                  <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Danh sách Phòng</h3>
-                  <button onClick={() => navigate('/rooms')} className="btn-primary-sm flex items-center gap-2">Xem tất cả <ArrowRight size={14} /></button>
-               </div>
-               <div className="card-container overflow-hidden p-0 border-none shadow-xl shadow-primary/5">
-                  <table className="w-full text-left">
-                     <thead className="bg-bg/50 border-b">
-                        <tr>
-                           <th className="px-6 py-4 text-label text-muted">Mã phòng</th>
-                           <th className="px-6 py-4 text-label text-muted">Tầng</th>
-                           <th className="px-6 py-4 text-label text-muted">Loại</th>
-                           <th className="px-6 py-4 text-label text-muted">Giá thuê CV</th>
-                           <th className="px-6 py-4 text-label text-muted">Trạng thái</th>
-                        </tr>
-                     </thead>
-                     <tbody className="divide-y divide-border/20">
-                        {/* Mocking rooms for this building */}
-                        {[
-                          { id: 'R1', code: 'A-101', floor: 1, type: '2BR', price: 15000000, status: 'Occupied' },
-                          { id: 'R2', code: 'B-205', floor: 2, type: 'Studio', price: 8500000, status: 'Vacant' },
-                          { id: 'R3', code: 'C-309', floor: 3, type: '3BR', price: 22000000, status: 'Maintenance' },
-                          { id: 'R4', code: 'D-501', floor: 5, type: 'Penthouse', price: 55000000, status: 'Reserved' },
-                        ].map((room) => (
-                          <tr key={room.id} className="hover:bg-primary/[0.02] transition-colors">
-                             <td className="px-6 py-4">
-                                <button 
-                                  onClick={() => navigate(`/rooms/${room.id}`)}
-                                  className="text-body font-black text-primary hover:underline flex items-center gap-2"
-                                >
-                                   <Home size={14} className="text-secondary" /> {room.code}
-                                </button>
-                             </td>
-                             <td className="px-6 py-4 text-small font-bold text-muted">Tầng {room.floor}</td>
-                             <td className="px-6 py-4 text-small font-bold text-text">{room.type}</td>
-                             <td className="px-6 py-4 text-small font-black text-primary">{formatVND(room.price)}</td>
-                             <td className="px-6 py-4">
-                                <StatusBadge status={room.status} size="sm" />
-                             </td>
-                          </tr>
-                        ))}
-                     </tbody>
-                  </table>
-               </div>
-            </div>
+            <BuildingRoomsTab buildingId={id!} />
           )}
 
           {activeTab === 'Images' && (
@@ -405,6 +473,14 @@ const BuildingDetail = () => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         building={building}
+      />
+
+      <OwnershipModal 
+        isOpen={isOwnershipModalOpen}
+        onClose={() => setIsOwnershipModalOpen(false)}
+        buildingId={id!}
+        currentOwnerships={building.ownership}
+        onSuccess={onOwnershipSuccess}
       />
     </div>
   );

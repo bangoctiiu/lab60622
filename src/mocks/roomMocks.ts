@@ -12,7 +12,8 @@ export const MOCK_ROOMS: Room[] = [
     baseRentPrice: 5000000,
     status: 'Occupied',
     tenantNames: ['Nguyễn Văn A'],
-    contractId: 'C1'
+    contractId: 'C1',
+    hasMeter: true
   },
   {
     id: 'R005',
@@ -23,7 +24,8 @@ export const MOCK_ROOMS: Room[] = [
     roomType: '1BR',
     areaSqm: 50,
     baseRentPrice: 7500000,
-    status: 'Vacant'
+    status: 'Vacant',
+    hasMeter: true
   }
 ];
 
@@ -40,7 +42,8 @@ export const generateMockRooms = (count: number): Room[] => {
       areaSqm: 30,
       baseRentPrice: 4500000,
       status: i % 3 === 0 ? 'Occupied' : 'Vacant',
-      tenantNames: i % 3 === 0 ? ['Cư dân ' + (i + 1)] : []
+      tenantNames: i % 3 === 0 ? ['Cư dân ' + (i + 1)] : [],
+      hasMeter: i % 2 === 0
     });
   }
   return rooms;

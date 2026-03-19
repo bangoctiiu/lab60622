@@ -17,3 +17,16 @@ export interface OwnerSummary extends Owner {
   }>;
   totalBuildings: number;
 }
+
+export interface OwnerDetail extends Owner {
+  buildingsOwned: Array<{
+    buildingId: string;
+    buildingName: string;
+    buildingCode: string;
+    ownershipPercent: number;
+    ownershipType: 'FullOwner' | 'CoOwner' | 'Investor';
+    startDate: string;
+  }>;
+  totalBuildings: number;
+  totalRooms: number;
+}

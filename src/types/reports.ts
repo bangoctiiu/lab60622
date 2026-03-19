@@ -6,6 +6,22 @@ export interface ReportFilter {
   consumptionType?: 'electricity' | 'water' | 'both'
 }
 
+export interface ReportMetadata {
+  id: string
+  name: string
+  category: string
+  description?: string
+}
+
+export interface ReportData {
+  reportId: string
+  title: string
+  generatedAt: string
+  columns: { key: string; label: string }[]
+  data: any[]
+  summaryData?: any
+}
+
 export interface OccupancyKPI {
   avgOccupancyRate: number
   avgOccupancyDelta: number
@@ -159,4 +175,18 @@ export interface StaffPerformance {
   slaRate: number
   avgRating: number
   ratingCount: number
+}
+
+export interface AlertTrendPoint {
+  date: string
+  count: number
+}
+
+export interface AlertAnalytics {
+  criticalCount: number
+  criticalDelta: number
+  warningCount: number
+  warningDelta: number
+  resolutionRate: number
+  trend: AlertTrendPoint[]
 }

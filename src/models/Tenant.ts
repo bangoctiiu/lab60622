@@ -61,6 +61,7 @@ export interface TenantFeedback {
   tenantId: string;
   feedbackType: 'Complaint' | 'Compliment' | 'Suggestion';
   content: string;
+  referenceId?: string;
   isResolved: boolean;
   createdAt: string;
 }
@@ -79,14 +80,11 @@ export interface TenantSummary extends Tenant {
   isRepresentative?: boolean;
 }
 
-export interface TenantBalanceTransaction {
+export interface ContactGroup {
   id: string;
-  tenantId: string;
-  amount: number;
-  type: 'Payment' | 'Refund' | 'Correction' | 'Other';
-  description: string;
-  balanceBefore: number;
-  balanceAfter: number;
-  createdAt: string;
-  referenceId?: string;
+  name: string;
+  memberCount: number;
+  description?: string;
 }
+
+export * from './TenantBalance';

@@ -22,7 +22,7 @@ import api from '@/services/apiClient';
 import { cn } from '@/utils';
 import { BottomSheet } from '@/components/portal/BottomSheet';
 import { RichTextViewer } from '@/components/shared/RichTextEditor';
-import PortalLayout from '@/components/portal/PortalLayout';
+import PortalLayout from '@/components/layout/PortalLayout';
 
 const ANNOUNCEMENT_TYPES = [
   { id: 'all', label: 'Tất cả' },

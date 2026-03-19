@@ -17,7 +17,13 @@
     --color-muted: #6B7280;
     --color-border: #E2E8F0;
 
-    /* 2.3 Spacing Tokens */
+    /* Portal Color Overrides */
+    --portal-primary: #0D8A8A;
+    --portal-primary-foreground: #FFFFFF;
+    --portal-radius: 16px;
+    --portal-input-height: 48px;
+    --portal-touch-target: 44px;
+
     --space-1: 4px;
     --space-2: 8px;
     --space-3: 12px;
@@ -107,9 +113,33 @@
     @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
   }
 
-  /* Responsive Utilities */
-  .layout-grid {
-    @apply grid gap-6;
+  /* Portal Components */
+  .portal-container {
+    @apply max-w-[430px] mx-auto min-h-screen bg-white shadow-xl relative overflow-x-hidden;
+  }
+  
+  .portal-topbar {
+    @apply h-14 flex items-center px-4 bg-[var(--portal-primary)] text-white sticky top-0 z-50;
+  }
+
+  .portal-bottom-nav {
+    @apply h-16 bg-white border-t flex items-center justify-around sticky bottom-0 z-50 pb-[env(safe-area-inset-bottom)];
+  }
+
+  .portal-content {
+    @apply pb-16 mt-0 overflow-y-auto;
+  }
+
+  .portal-btn-primary {
+    @apply bg-[var(--portal-primary)] text-white h-[var(--portal-touch-target)] px-6 rounded-[var(--portal-radius)] font-semibold active:scale-95 transition-all;
+  }
+
+  .portal-input {
+    @apply h-[var(--portal-input-height)] w-full px-4 rounded-[var(--portal-radius)] border border-slate-200 focus:border-[var(--portal-primary)] outline-none transition-all;
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 

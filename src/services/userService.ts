@@ -1,37 +1,43 @@
-import { User } from '../models/User';
-import { mockUsers } from '../mocks/userMocks';
+import apiClient from './apiClient';
+import { User } from '@/types';
+import { mockUsers } from '@/mocks/userMocks';
 
 export const userService = {
   getUsers: async (): Promise<User[]> => {
-    // simulate API delay
-    return new Promise(resolve => setTimeout(() => resolve([...mockUsers]), 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return [...mockUsers] as any[];
   },
-  getUserById: async (id: number): Promise<User | undefined> => {
-    return mockUsers.find(u => u.id === id);
+  
+  getUserById: async (id: number | string): Promise<User | undefined> => {
+    const stringId = id.toString();
+    return (mockUsers as any[]).find(u => u.id.toString() === stringId);
   },
+  
   createUser: async (user: Omit<User, 'id'>): Promise<User> => {
-    const newUser = { ...user, id: Math.max(0, ...mockUsers.map(u => u.id)) + 1 };
-    mockUsers.push(newUser);
-    return newUser;
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return { ...user, id: Date.now() } as any;
   },
-  updateUser: async (id: number, data: Partial<User>): Promise<User> => {
-    const index = mockUsers.findIndex(u => u.id === id);
-    if (index === -1) throw new Error('User not found');
-    mockUsers[index] = { ...mockUsers[index], ...data };
-    return mockUsers[index];
+  
+  updateUser: async (id: number | string, user: Partial<User>): Promise<User> => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+    return { id, ...user } as any;
   },
-  toggleUserStatus: async (id: number): Promise<User> => {
-    const index = mockUsers.findIndex(u => u.id === id);
-    if (index === -1) throw new Error('User not found');
-    mockUsers[index].isActive = !mockUsers[index].isActive;
-    return mockUsers[index];
+  
+  deleteUser: async (id: number | string): Promise<void> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
   },
-  sendResetPasswordEmail: async (id: number): Promise<void> => {
-    console.log(`Sending reset email to user ${id}`);
-    return new Promise(resolve => setTimeout(resolve, 1000));
+  
+  resetPassword: async (id: number | string, newPassword?: string): Promise<void> => {
+    await new Promise(resolve => setTimeout(resolve, 700));
   },
-  resetPassword: async (id: number, password: string): Promise<void> => {
-    console.log(`Resetting password for user ${id} to ${password}`);
-    return new Promise(resolve => setTimeout(resolve, 1000));
+  
+  toggleUserStatus: async (id: number | string): Promise<void> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+  },
+  
+  sendResetPasswordEmail: async (id: number | string): Promise<void> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 };
+
+export default userService;

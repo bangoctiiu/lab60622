@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User } from '@/models/User';
+import { User } from '@/types';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/Button';
 import { userService } from '@/services/userService';

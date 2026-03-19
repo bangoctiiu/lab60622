@@ -107,3 +107,14 @@ export interface StaffServiceRating {
   ticketCode: string;
   createdAt: string;
 }
+
+export interface TicketStatistics {
+  total: number;
+  open: number;
+  inProgress: number;
+  resolved: number;
+  cancelled: number;
+  slaBreached: number;
+  avgResolutionTimeHours: number;
+  satisfactionRate: number;
+}

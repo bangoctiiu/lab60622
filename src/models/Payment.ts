@@ -20,26 +20,8 @@ export interface PaymentTransaction {
   createdAt: string;
 }
 
-export type TransactionType = 'Overpayment' | 'Refund' | 'ManualTopUp' | 'ManualDeduct' | 'AutoOffset';
-
-export interface TenantBalanceTransaction {
-  id: string;
-  tenantId: string;
-  type: TransactionType;
-  amount: number;
-  balanceBefore: number;
-  balanceAfter: number;
-  relatedInvoiceId?: string;
-  relatedInvoiceCode?: string;
-  note?: string;
-  createdAt: string;
-}
-
-export interface TenantBalance {
-  tenantId: string;
-  currentBalance: number;
-  lastUpdatedAt: string;
-}
+export type TransactionType = 'Overpayment' | 'Refund' | 'ManualTopUp' | 'ManualDeduct' | 'AutoOffset' | 'Other';
+export * from './TenantBalance';
 
 export type WebhookStatus = 'Processed' | 'Failed' | 'Duplicate' | 'Pending';
 

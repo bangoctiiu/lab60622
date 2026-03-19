@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, UserRole } from '@/models/User';
+import { User, UserRole } from '@/types';
 import { Modal } from '@/components/shared/Modal';
 import { Button } from '@/components/ui/Button';
 import { userService } from '@/services/userService';

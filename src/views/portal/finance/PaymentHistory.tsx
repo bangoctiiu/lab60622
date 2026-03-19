@@ -12,7 +12,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import PortalLayout from '@/components/portal/PortalLayout';
+import PortalLayout from '@/components/layout/PortalLayout';
 import api from '@/services/apiClient';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';

@@ -16,6 +16,20 @@ const AmenityCheckin = () => {
     { id: 'BK-004', tenant: 'Phạm Thị C', room: 'P.1808', amenity: 'Phòng đọc sách', time: '16:00 - 17:00', status: 'Booked', isLate: false },
   ]);
 
+  // 5.4.1 Auto no-show logic for bookings delayed by 15 minutes
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setBookings(prev => prev.map(b => {
+        if (b.isLate && b.status === 'Booked') {
+           // Auto transition to Cancelled (NoShow) if not checked in
+           return { ...b, status: 'Cancelled' };
+        }
+        return b;
+      }));
+    }, 5000); // Simulate after 5 seconds for demonstration
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleAction = (id: string, action: 'CheckIn' | 'CheckOut' | 'NoShow') => {
     setBookings(prev => prev.map(b => {
       if (b.id === id) {

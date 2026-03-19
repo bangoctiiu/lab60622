@@ -11,6 +11,7 @@ const InvoiceList = lazy(() => import('@/views/admin/finance/InvoiceList'));
 const InvoiceDetail = lazy(() => import('@/views/admin/finance/InvoiceDetail'));
 const ContractList = lazy(() => import('@/views/admin/contracts/ContractList'));
 const ContractDetail = lazy(() => import('@/views/admin/contracts/ContractDetail'));
+const AddendumList = lazy(() => import('@/views/admin/contracts/AddendumListPage'));
 const CreateContractWizard = lazy(() => import('@/views/admin/contracts/CreateContractWizard'));
 const ServiceCatalog = lazy(() => import('@/views/admin/services/ServiceCatalog'));
 const PaymentList = lazy(() => import('@/views/admin/finance/PaymentList'));
@@ -41,6 +42,7 @@ const PermissionMatrix = lazy(() => import('@/views/admin/settings/PermissionMat
 const AuditLogs = lazy(() => import('@/views/admin/settings/AuditLogs'));
 const SystemSettings = lazy(() => import('@/views/admin/settings/SystemSettings'));
 const StaffDashboard = lazy(() => import('@/views/admin/staff/StaffDashboard'));
+const StaffMyTickets = lazy(() => import('@/views/admin/staff/StaffMyTickets'));
 const VisitorCheckin = lazy(() => import('@/views/admin/staff/VisitorCheckin'));
 const AmenityCheckin = lazy(() => import('@/views/admin/staff/AmenityCheckin'));
 const AnnouncementPage = lazy(() => import('@/views/admin/communications/AnnouncementPage/index'));
@@ -63,6 +65,7 @@ export const adminRoutes: RouteObject[] = [
   { path: 'invoices/:id', element: <InvoiceDetail /> },
   { path: 'contracts', element: <ContractList /> },
   { path: 'contracts/create', element: <CreateContractWizard /> },
+  { path: 'contracts/addendums', element: <AddendumList /> },
   { path: 'contracts/:id', element: <ContractDetail /> },
   { path: 'payments', element: <PaymentList /> },
   { path: 'payments/webhooks', element: <WebhookLogs /> },
@@ -81,6 +84,7 @@ export const adminRoutes: RouteObject[] = [
   { path: 'tickets', element: <TicketList /> },
   { path: 'tickets/:id', element: <TicketDetail /> },
   { path: 'staff/dashboard', element: <StaffDashboard /> },
+  { path: 'staff/my-tickets', element: <StaffMyTickets /> },
   { path: 'staff/visitor-checkin', element: <VisitorCheckin /> },
   { path: 'staff/amenity-checkin', element: <AmenityCheckin /> },
   { path: 'staff/:id/ratings', element: <StaffRatings /> },

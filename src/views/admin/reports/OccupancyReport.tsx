@@ -84,7 +84,7 @@ const OccupancyReport: React.FC = () => {
   // Heatmap Query
   const { data: heatmap, isLoading: isLoadingHeatmap, isError: isErrorHeatmap, refetch: refetchHeatmap } = useQuery({
     queryKey: ['occupancyHeatmap', filters.buildingIds?.[0], filters.from, filters.to],
-    queryFn: () => reportService.getOccupancyHeatmap(filters.buildingIds?.[0] || 0, filters.from, filters.to),
+    queryFn: () => reportService.getOccupancyHeatmap(filters),
     enabled: !!filters.from && !!filters.to && !!filters.buildingIds?.[0],
     retry: 1,
   });

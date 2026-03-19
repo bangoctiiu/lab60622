@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, Search, X, ChevronDown, ChevronUp, RotateCcw, Loader2 } from 'lucide-react';
 import { cn } from '@/utils';
 
-export type FilterType = 'text' | 'select' | 'multiSelect' | 'dateRange' | 'numberRange' | 'toggle' | 'selectAsync';
+export type FilterType = 'text' | 'select' | 'multiSelect' | 'dateRange' | 'date' | 'numberRange' | 'toggle' | 'selectAsync';
 
 export interface FilterConfig {
   key: string;
@@ -241,6 +241,15 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                       className="w-full h-10 px-2 py-2 text-xs bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     />
                   </div>
+                )}
+
+                {filter.type === 'date' && (
+                  <input
+                    type="date"
+                    value={values[filter.key] || ''}
+                    onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                    className="w-full h-10 px-3 py-2 text-sm bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
                 )}
 
                 {filter.type === 'toggle' && (

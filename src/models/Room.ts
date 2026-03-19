@@ -6,7 +6,7 @@ export type DirectionFacing = 'N' | 'S' | 'E' | 'W' | 'NE' | 'NW' | 'SE' | 'SW';
 export interface Room {
   id: string;
   roomCode: string;
-  buildingId: number;
+  buildingId: string;
   buildingName: string;
   floorNumber: number;
   roomType: RoomType;
@@ -16,6 +16,7 @@ export interface Room {
   thumbnailUrl?: string;
   tenantNames?: string[]; // For avatar stack
   contractId?: string; // If occupied
+  hasMeter: boolean;
 }
 
 export interface RoomDetail extends Room {
@@ -44,7 +45,7 @@ export interface RoomMeter {
   id: string;
   meterCode: string;
   meterType: 'Electricity' | 'Water';
-  lastReading: number;
+  currentIndex: number; // RULE-01: Use CurrentIndex
   lastReadingDate: string;
   history?: { month: string; value: number }[];
 }

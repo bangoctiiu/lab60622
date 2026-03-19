@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProviders } from './components/layout/AppProviders';
 import ProtectedRoute from './routes/ProtectedRoute';
+import PortalAuthGuard from './components/auth/PortalAuthGuard';
 import { AdminLayout, PortalLayout, PublicLayout } from './views/layouts/Layouts';
 import { Spinner } from './components/ui/Feedback';
 
@@ -15,40 +16,40 @@ const OTPVerifyPage = lazy(() => import('@/views/auth/OTPVerifyPage'));
 
 // Admin Views
 const Dashboard = lazy(() => import('./views/admin/Dashboard'));
-const InvoiceList = lazy(() => import('./views/admin/InvoiceList'));
-const InvoiceDetail = lazy(() => import('./views/admin/InvoiceDetail'));
-const ContractList = lazy(() => import('./views/admin/ContractList'));
-const ContractDetail = lazy(() => import('./views/admin/ContractDetail'));
-const CreateContractWizard = lazy(() => import('./views/admin/CreateContractWizard'));
+const InvoiceList = lazy(() => import('./views/admin/finance/InvoiceList'));
+const InvoiceDetail = lazy(() => import('./views/admin/finance/InvoiceDetail'));
+const ContractList = lazy(() => import('./views/admin/contracts/ContractList'));
+const ContractDetail = lazy(() => import('./views/admin/contracts/ContractDetail'));
+const CreateContractWizard = lazy(() => import('./views/admin/contracts/CreateContractWizard'));
 const ServiceCatalog = lazy(() => import('./views/admin/services/ServiceCatalog'));
 
 // Payment Views
-const PaymentList = lazy(() => import('./views/admin/PaymentList'));
-const WebhookLogs = lazy(() => import('./views/admin/WebhookLogs'));
-const TenantList = lazy(() => import('./views/admin/TenantList'));
-const TenantDetail = lazy(() => import('./views/admin/TenantDetail'));
-const TenantBalance = lazy(() => import('./views/admin/TenantBalance'));
+const PaymentList = lazy(() => import('./views/admin/finance/PaymentList'));
+const WebhookLogs = lazy(() => import('./views/admin/finance/WebhookLogs'));
+const TenantList = lazy(() => import('./views/admin/tenants/TenantList'));
+const TenantDetail = lazy(() => import('./views/admin/tenants/TenantDetail'));
+const TenantBalance = lazy(() => import('./views/admin/tenants/TenantBalance'));
 
 // Room & Asset Views
-const RoomList = lazy(() => import('./views/admin/RoomList'));
-const RoomDetail = lazy(() => import('./views/admin/RoomDetail'));
-const HandoverChecklist = lazy(() => import('./views/admin/HandoverChecklist'));
-const AssetCatalog = lazy(() => import('./views/admin/AssetCatalog'));
+const RoomList = lazy(() => import('./views/admin/rooms/RoomList'));
+const RoomDetail = lazy(() => import('./views/admin/rooms/RoomDetail'));
+const HandoverChecklist = lazy(() => import('./views/admin/rooms/HandoverChecklist'));
+const AssetCatalog = lazy(() => import('./views/admin/assets/AssetCatalog'));
 
 // Building & Owner Views
-const BuildingList = lazy(() => import('./views/admin/BuildingList'));
-const BuildingDetail = lazy(() => import('./views/admin/BuildingDetail'));
-const OwnerList = lazy(() => import('./views/admin/OwnerList'));
+const BuildingList = lazy(() => import('./views/admin/buildings/BuildingList'));
+const BuildingDetail = lazy(() => import('./views/admin/buildings/BuildingDetail'));
+const OwnerList = lazy(() => import('./views/admin/owners/OwnerList'));
 
 // Ticket & Support Views
-const TicketList = lazy(() => import('@/views/admin/TicketList'));
-const TicketDetail = lazy(() => import('./views/admin/TicketDetail'));
-const StaffRatings = lazy(() => import('./views/admin/StaffRatings'));
+const TicketList = lazy(() => import('./views/admin/tickets/TicketList'));
+const TicketDetail = lazy(() => import('./views/admin/tickets/TicketDetail'));
+const StaffRatings = lazy(() => import('./views/admin/tickets/StaffRatings'));
 
 // Meter & Utilities Views
-const MeterList = lazy(() => import('./views/admin/MeterList'));
-const BulkMeterEntry = lazy(() => import('./views/admin/BulkMeterEntry'));
-const MeterReadingHistory = lazy(() => import('./views/admin/MeterReadingHistory'));
+const MeterList = lazy(() => import('./views/admin/meters/MeterList'));
+const BulkMeterEntry = lazy(() => import('./views/admin/meters/BulkMeterEntry'));
+const MeterReadingHistory = lazy(() => import('./views/admin/meters/MeterReadingHistory'));
 
 // Settings Views
 const ElectricityPolicyPage = lazy(() => import('@/views/admin/settings/ElectricityPolicyPage'));
@@ -58,8 +59,8 @@ const WaterPolicyPage = lazy(() => import('@/views/admin/settings/WaterPolicyPag
 const PortalHome = lazy(() => import('@/views/portal/PortalHome'));
 
 // Staff Specific Views
-const VisitorCheckin = lazy(() => import('@/views/admin/VisitorCheckin'));
-const AmenityCheckin = lazy(() => import('@/views/admin/AmenityCheckin'));
+const VisitorCheckin = lazy(() => import('./views/admin/staff/VisitorCheckin'));
+const AmenityCheckin = lazy(() => import('./views/admin/staff/AmenityCheckin'));
 
 // Reports Views
 const ReportsHub = lazy(() => import('@/views/admin/reports/ReportsHub'))
@@ -197,7 +198,7 @@ const App = () => {
                </Route>
 
               {/* 2. Tenant Portal Namespace (Protected, Mobile-first) */}
-              <Route path="/portal" element={<ProtectedRoute requiredRole="Tenant" />}>
+              <Route path="/portal" element={<PortalAuthGuard />}>
                 <Route element={<PortalLayout />}>
                   <Route index element={<PortalHome />} />
                   <Route path="invoices" element={<InvoiceList />} />

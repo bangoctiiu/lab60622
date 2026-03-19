@@ -1,4 +1,4 @@
-import { SystemConfig } from "@/types/system";
+import { SystemConfig } from "../types/system";
 
 export const MOCK_SYSTEM_CONFIGS: SystemConfig[] = [
   {

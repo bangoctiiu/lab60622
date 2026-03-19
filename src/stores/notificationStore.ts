@@ -1,13 +1,6 @@
 import { create } from 'zustand'
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: "info" | "success" | "warning" | "error";
-  isRead: boolean;
-  createdAt: string;
-}
+import { Notification } from '@/types/notification'
 
 interface NotificationState {
   // State

@@ -88,7 +88,7 @@ const StaffMyTickets = () => {
   });
 
   const updateStatusMutation = useMutation({
-    mutationFn: ({ id, status, resolution }: { id: string, status: TicketStatus, resolution?: { resolutionNote?: string, rootCause?: string } }) => 
+    mutationFn: ({ id, status, resolution }: { id: string, status: TicketStatus, resolution?: any }) => 
       ticketService.updateStatus(id, status, resolution),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-tickets'] });

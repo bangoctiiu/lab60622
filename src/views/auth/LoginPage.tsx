@@ -27,7 +27,9 @@ const LoginPage = () => {
         fullName: isPortal ? 'Nguyễn Văn Cư Dân' : 'Administrator',
         email: form.username.includes('@') ? form.username : (isPortal ? 'tenant@smartstay.vn' : 'admin@smartstay.vn'),
         role: (isPortal ? 'Tenant' : 'Admin') as any,
-        avatar: ''
+        avatar: '',
+        isActive: true,
+        isTwoFactorEnabled: false
       };
       login(mockUser, 'mock_token_123');
       toast.success(`Chào mừng trở lại, ${mockUser.username}!`);

@@ -2,6 +2,8 @@ import { Room, RoomDetail } from '@/models/Room';
 import { Asset } from '@/models/Asset';
 import { BuildingSummary, BuildingDetail } from '@/models/Building';
 import { User, RolePermissionMatrix } from '@/types';
+import { TenantBalance, TenantBalanceTransaction } from '@/models/TenantBalance';
+import { ContractDetail } from '@/models/Contract';
 
 export const MOCK_USERS: User[] = [
   { 
@@ -160,6 +162,7 @@ export const MOCK_ROOMS: Room[] = [
     status: 'Occupied',
     tenantNames: ['Nguyễn Văn A', 'Trần Thị B'],
     contractId: 'C001',
+    hasMeter: true,
     thumbnailUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'
   },
   {
@@ -172,6 +175,7 @@ export const MOCK_ROOMS: Room[] = [
     areaSqm: 35.0,
     baseRentPrice: 8500000,
     status: 'Vacant',
+    hasMeter: true,
     thumbnailUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop'
   },
   {
@@ -184,6 +188,7 @@ export const MOCK_ROOMS: Room[] = [
     areaSqm: 110.0,
     baseRentPrice: 22000000,
     status: 'Maintenance',
+    hasMeter: false,
     thumbnailUrl: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop'
   },
   {
@@ -196,6 +201,7 @@ export const MOCK_ROOMS: Room[] = [
     areaSqm: 250.0,
     baseRentPrice: 55000000,
     status: 'Reserved',
+    hasMeter: true,
     thumbnailUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop'
   }
 ];

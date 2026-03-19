@@ -13,7 +13,7 @@ import {
 import { DataTable, RowAction } from '@/components/shared/DataTable';
 import { FilterPanel, FilterConfig } from '@/components/shared/FilterPanel';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { User, UserRole } from '@/models/User';
+import { User, UserRole } from '@/types';
 import { userService } from '@/services/userService';
 import { formatRelativeTime, cn } from '@/utils';
 import UserModal from './UserModal';

@@ -93,7 +93,7 @@ const OwnerList = () => {
                             <div>
                                <p 
                                     className="text-body font-black text-primary hover:underline cursor-pointer leading-tight"
-                                    onClick={() => navigate('/owners')} // Simplified for MVP
+                                    onClick={() => navigate(`/owners/${owner.id}`)}
                                   >
                                     {owner.fullName}
                                </p>

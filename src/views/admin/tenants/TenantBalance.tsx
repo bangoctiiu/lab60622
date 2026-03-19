@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { 
   DollarSign, ArrowUpRight, ArrowDownRight, 
   History, ShieldCheck, ChevronRight, FileText,
-  AlertTriangle, CheckCircle2, TrendingUp, Info,
-  ArrowUpRight, ArrowDownRight, X
+  AlertTriangle, CheckCircle2, TrendingUp, Info, X
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { paymentService } from '@/services/paymentService';
 import { invoiceService } from '@/services/invoiceService';
-import { TenantBalanceTransaction, TransactionType } from '@/models/Payment';
+import { TenantBalanceTransaction, TransactionType } from '@/models/TenantBalance';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';

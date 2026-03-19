@@ -4,59 +4,7 @@ import {
 } from '@/models/Room';
 import { Asset } from '@/models/Asset';
 import { format, subMonths } from 'date-fns';
-
-const MOCK_ROOMS: Room[] = [
-  {
-    id: 'R001',
-    roomCode: 'A-101',
-    buildingId: 1,
-    buildingName: 'Keangnam Landmark',
-    floorNumber: 1,
-    roomType: '2BR',
-    areaSqm: 75.5,
-    baseRentPrice: 15000000,
-    status: 'Occupied',
-    tenantNames: ['Nguyễn Văn A', 'Trần Thị B'],
-    contractId: 'C001',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'R002',
-    roomCode: 'B-205',
-    buildingId: 1,
-    buildingName: 'Keangnam Landmark',
-    floorNumber: 2,
-    roomType: 'Studio',
-    areaSqm: 35.0,
-    baseRentPrice: 8500000,
-    status: 'Vacant',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'R003',
-    roomCode: 'C-309',
-    buildingId: 1,
-    buildingName: 'Keangnam Landmark',
-    floorNumber: 3,
-    roomType: '3BR',
-    areaSqm: 110.0,
-    baseRentPrice: 22000000,
-    status: 'Maintenance',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop'
-  },
-  {
-    id: 'R004',
-    roomCode: 'D-501',
-    buildingId: 2,
-    buildingName: 'Lotte Center',
-    floorNumber: 5,
-    roomType: 'Penthouse',
-    areaSqm: 250.0,
-    baseRentPrice: 55000000,
-    status: 'Reserved',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop'
-  }
-];
+import { MOCK_ROOMS, getMockRoomDetail } from '@/mocks/roomMocks';
 
 export const roomService = {
   getRooms: async (filters?: any): Promise<Room[]> => {
@@ -101,6 +49,10 @@ export const roomService = {
       result = result.filter(r => r.baseRentPrice <= filters.maxPrice);
     }
 
+    if (filters?.hasMeter !== undefined) {
+      result = result.filter(r => r.hasMeter === filters.hasMeter);
+    }
+
     return result;
   },
 
@@ -142,67 +94,7 @@ export const roomService = {
 
   getRoomDetail: async (id: string): Promise<RoomDetail> => {
     await new Promise(r => setTimeout(r, 500));
-    const base = MOCK_ROOMS.find(r => r.id === id) || MOCK_ROOMS[0];
-    
-    return {
-      ...base,
-      description: 'Căn hộ cao cấp đầy đủ tiện nghi, view thành phố tuyệt đẹp.',
-      maxOccupancy: 4,
-      furnishing: 'FullyFurnished',
-      directionFacing: 'SE',
-      hasBalcony: true,
-      conditionScore: 9,
-      lastMaintenanceDate: '2025-01-15',
-      images: [
-        { id: 'IMG1', url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800', isMain: true, sortOrder: 0 },
-        { id: 'IMG2', url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800', isMain: false, sortOrder: 1 },
-        { id: 'IMG3', url: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800', isMain: false, sortOrder: 2 },
-      ],
-      amenities: ['WiFi', 'AirConditioner', 'HotWater', 'Fridge', 'Washer', 'Balcony', 'Furniture'],
-      meters: [
-        { 
-          id: 'M1', 
-          meterCode: 'E-LG72-001', 
-          meterType: 'Electricity', 
-          lastReading: 1250, 
-          lastReadingDate: '2025-03-01',
-          history: [
-            { month: '09/2024', value: 950 },
-            { month: '10/2024', value: 1020 },
-            { month: '11/2024', value: 1080 },
-            { month: '12/2024', value: 1150 },
-            { month: '01/2025', value: 1210 },
-            { month: '02/2025', value: 1250 },
-          ]
-        },
-        { 
-          id: 'M2', 
-          meterCode: 'W-LG72-001', 
-          meterType: 'Water', 
-          lastReading: 450, 
-          lastReadingDate: '2025-03-01',
-          history: [
-             { month: '09/2024', value: 380 },
-             { month: '10/2024', value: 395 },
-             { month: '11/2024', value: 410 },
-             { month: '12/2024', value: 425 },
-             { month: '01/2025', value: 440 },
-             { month: '02/2025', value: 450 },
-          ]
-        }
-      ],
-      assets: [
-        { id: 'A1', assetName: 'Điều hòa Daikin 12000 BTU', assetCode: 'AC-001', type: 'Appliance', condition: 'New', assignedAt: '2024-12-01' },
-        { id: 'A2', assetName: 'Sofa da thật Ý', assetCode: 'SF-001', type: 'Furniture', condition: 'Good', assignedAt: '2024-12-05' },
-        { id: 'A3', assetName: 'Tủ lạnh Samsung Inverter 400L', assetCode: 'RF-001', type: 'Appliance', condition: 'New', assignedAt: '2024-12-10' },
-      ],
-      // RULE-10: Backend auto-logs this.
-      statusHistory: [
-        { id: 'H1', fromStatus: 'Vacant', toStatus: 'Occupied', changedAt: '2024-12-20 09:00', changedBy: 'Admin', reason: 'Ký hợp đồng C001', contractId: 'C001' },
-        { id: 'H2', fromStatus: 'Maintenance', toStatus: 'Vacant', changedAt: '2024-12-15 15:30', changedBy: 'Staff A', reason: 'Hoàn thành sơn sửa' },
-        { id: 'H3', fromStatus: 'Vacant', toStatus: 'Maintenance', changedAt: '2024-12-10 08:00', changedBy: 'Admin', reason: 'Định kỳ bảo trì trang thiết bị' },
-      ]
-    };
+    return getMockRoomDetail(id);
   },
 
   checkRoomCodeUnique: async (code: string, buildingId: number): Promise<boolean> => {

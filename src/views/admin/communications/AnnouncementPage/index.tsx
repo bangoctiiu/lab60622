@@ -10,7 +10,7 @@ import {
   ShieldCheck, ArrowRight
 } from 'lucide-react';
 import { announcementService } from '@/services/announcementService';
-import { Announcement, AnnouncementStatus, AnnouncementType } from '@/models/Announcement';
+import { Announcement, AnnouncementType, AnnouncementStatus } from '@/types/announcement';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';

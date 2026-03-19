@@ -16,7 +16,16 @@ import {
   NPSTrendPoint,
   NPSResponse,
   StaffPerformance,
+  ReportMetadata,
+  AlertAnalytics,
 } from '@/types/reports';
+
+export const MOCK_REPORTS: ReportMetadata[] = [
+  { id: 'occupancy', name: 'Tỷ lệ lấp đầy', category: 'Operational', description: 'Phân tích hiệu suất khai thác phòng' },
+  { id: 'financial', name: 'Doanh thu & Thu nợ', category: 'Finance', description: 'Báo cáo dòng tiền và công nợ' },
+  { id: 'consumption', name: 'Tiêu thụ Điện / Nước', category: 'Utilities', description: 'Theo dõi chỉ số và chi phí điện nước' },
+  { id: 'lifecycle', name: 'Vòng đời phòng', category: 'Operational', description: 'Lịch sử trạng thái của từng phòng' }
+];
 
 export const MOCK_OCCUPANCY_KPI: OccupancyKPI = {
   avgOccupancyRate: 88.5,
@@ -35,7 +44,7 @@ export const MOCK_OCCUPANCY_TREND = (months: string[], buildings: string[]): Occ
     buildings.forEach(b => {
       data.push({
         month: m,
-        buildingId: String(Math.random()),
+        buildingId: Math.floor(Math.random() * 100),
         buildingName: b,
         rate: Math.floor(Math.random() * 40) + 60
       });
@@ -171,3 +180,45 @@ export const MOCK_STAFF_PERFORMANCE = (names: string[]): StaffPerformance[] => {
     ratingCount: Math.floor(Math.random() * 30) + 10
   }));
 };
+
+export const MOCK_ALERTS_ANALYTICS: AlertAnalytics = {
+  criticalCount: 15,
+  criticalDelta: 2.5,
+  warningCount: 42,
+  warningDelta: -5.2,
+  resolutionRate: 85,
+  trend: Array.from({ length: 15 }, (_, i) => ({
+    date: `2024-03-${String(i + 1).padStart(2, '0')}`,
+    count: Math.floor(Math.random() * 20) + 5
+  }))
+};
+
+export const MOCK_CONSUMPTION_CHART = (months: string[], buildings: string[]): ConsumptionChartPoint[] => {
+  const data: ConsumptionChartPoint[] = [];
+  months.forEach(m => {
+    buildings.forEach(b => {
+      data.push({
+        month: m,
+        buildingName: b,
+        electricity: Math.floor(Math.random() * 1000) + 500,
+        water: Math.floor(Math.random() * 50) + 20
+      });
+    });
+  });
+  return data;
+};
+
+export const MOCK_NPS_TREND = (months: string[]): NPSTrendPoint[] => {
+  return months.map(m => ({
+    month: m,
+    score: Math.floor(Math.random() * 40) + 50
+  }));
+};
+
+export const MOCK_NPS_RESPONSES: NPSResponse[] = Array.from({ length: 6 }, (_, i) => ({
+  tenantName: `Cư dân ${String.fromCharCode(65 + i)}`,
+  score: Math.floor(Math.random() * 10) + 1,
+  comment: i % 2 === 0 ? "Dịch vụ rất tốt, nhân viên nhiệt tình." : "Cần cải thiện thời gian xử lý sự cố.",
+  triggerType: (i % 3 === 0 ? "Monthly" : i % 3 === 1 ? "PostCheckOut" : "PostMaintenance") as any,
+  createdAt: "2024-03-10T10:00:00Z"
+}));

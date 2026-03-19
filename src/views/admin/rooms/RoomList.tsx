@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Building2, Home, Search, Filter, 
   LayoutGrid, List, Plus, MoreVertical,
-  Eye, Edit, Key, ClipboardList, Trash2,
+  Edit, Key, ClipboardList, Trash2,
   ChevronRight, ArrowUpDown, Smartphone,
   Zap, Droplets, MapPin, Maximize
 } from 'lucide-react';
@@ -12,15 +12,16 @@ import { roomService } from '@/services/roomService';
 import { Room, RoomStatus } from '@/models/Room';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn, formatVND } from '@/utils';
-import { Spinner } from '@/components/ui/Feedback';
 import useUIStore from '@/stores/uiStore';
 import { usePermission } from '@/hooks/usePermission';
 import { RoomModal } from '@/components/rooms/RoomModal';
+import { SelectAsync } from '@/components/ui/SelectAsync';
+import { buildingService } from '@/services/buildingService';
 
 const RoomList = () => {
   const navigate = useNavigate();
   const { hasPermission } = usePermission();
-  const { activeBuildingId } = useUIStore();
+  const { activeBuildingId, setBuilding } = useUIStore();
   
   const canManage = hasPermission('room.manage');
   const [viewMode, setViewMode] = useState<'List' | 'Grid'>(
@@ -41,13 +42,11 @@ const RoomList = () => {
   const [maxArea, setMaxArea] = useState<number | undefined>();
   const [hasMeter, setHasMeter] = useState<boolean | undefined>();
 
-  // 1.1.1 Handle view toggle persistence
   const toggleView = (mode: 'List' | 'Grid') => {
     setViewMode(mode);
     localStorage.setItem('roomViewMode', mode);
   };
 
-  // Queries
   const { data: rooms, isLoading } = useQuery<Room[]>({
     queryKey: ['rooms', activeBuildingId, search, statusFilter, typeFilter, minPrice, maxPrice, minFloor, maxFloor, minArea, maxArea, hasMeter],
     queryFn: () => roomService.getRooms({
@@ -77,15 +76,14 @@ const RoomList = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      {/* 1.1.1 Page Header & Toggle */}
+    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-display text-primary">Danh sách Phòng</h1>
-          <p className="text-body text-muted">Quản lý kho phòng, hiện trạng và cư dân đang lưu trú.</p>
+          <h1 className="text-display text-primary leading-tight">Danh sách Phòng</h1>
+          <p className="text-body text-muted font-medium italic">Quản lý kho phòng, hiện trạng và cư dân đang lưu trú.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-bg/50 p-1 rounded-xl border border-border/50">
+          <div className="flex items-center bg-bg/50 p-1 rounded-xl border border-border/10">
             <button
               onClick={() => toggleView('Grid')}
               className={cn(
@@ -110,7 +108,7 @@ const RoomList = () => {
           {canManage && (
             <button
               onClick={handleCreateRoom}
-              className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20"
+              className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20 h-11 px-6 rounded-xl font-black uppercase tracking-widest text-[11px]"
             >
               <Plus size={18} /> Tạo phòng mới
             </button>
@@ -118,108 +116,144 @@ const RoomList = () => {
         </div>
       </div>
 
-      {/* 1.1.2 Filter Panel */}
-      <div className="card-container p-6 bg-white/60 backdrop-blur-md space-y-6 shadow-xl shadow-primary/5 border-none">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-           {/* Search */}
-           <div className="relative">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-             <input
-               type="text"
-               placeholder="Tìm mã phòng, tầng..."
-               className="input-base w-full pl-10 h-11"
-               value={search}
-               onChange={(e) => setSearch(e.target.value)}
-             />
+      <div className="card-container p-8 bg-white/60 backdrop-blur-md space-y-8 shadow-2xl shadow-primary/5 border-none">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-6">
+           <SelectAsync 
+             label="Tòa nhà"
+             placeholder="Tất cả tòa nhà"
+             value={activeBuildingId?.toString()}
+             onChange={(val) => setBuilding(val ? (isNaN(Number(val)) ? val : Number(val)) : null)}
+             loadOptions={async () => {
+               const b = await buildingService.getBuildings();
+               return b.map(item => ({ label: item.buildingName, value: item.id.toString() }));
+             }}
+             icon={Building2}
+           />
+
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted uppercase tracking-[2px] ml-1 flex items-center gap-2"><Home size={12} /> Loại phòng</label>
+              <select
+                className="input-base h-12 w-full font-bold"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+              >
+                <option value="">Tất cả loại phòng</option>
+                <option value="Studio">Studio</option>
+                <option value="1BR">1 Phòng ngủ</option>
+                <option value="2BR">2 Phòng ngủ</option>
+                <option value="3BR">3 Phòng ngủ</option>
+                <option value="Penthouse">Penthouse</option>
+                <option value="Commercial">Kinh doanh</option>
+              </select>
            </div>
 
-           {/* RoomType */}
-           <select
-             className="input-base h-11"
-             value={typeFilter}
-             onChange={(e) => setTypeFilter(e.target.value)}
-           >
-             <option value="">Tất cả loại phòng</option>
-             <option value="Studio">Studio</option>
-             <option value="1BR">1 Phòng ngủ</option>
-             <option value="2BR">2 Phòng ngủ</option>
-             <option value="3BR">3 Phòng ngủ</option>
-             <option value="Penthouse">Penthouse</option>
-             <option value="Commercial">Kinh doanh</option>
-           </select>
-
-           {/* Price Range */}
-           <div className="flex items-center gap-2">
-             <input
-               type="number" placeholder="Giá Min" className="input-base w-full h-11"
-               onChange={(e) => setMinPrice(e.target.value ? Number(e.target.value) : undefined)}
-             />
-             <span className="text-muted">-</span>
-             <input
-               type="number" placeholder="Giá Max" className="input-base w-full h-11"
-               onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : undefined)}
-             />
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted uppercase tracking-[2px] ml-1">Giá thuê (VND)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number" placeholder="Min" className="input-base w-full h-12 font-mono"
+                  value={minPrice || ''}
+                  onChange={(e) => setMinPrice(e.target.value ? Number(e.target.value) : undefined)}
+                />
+                <span className="text-muted">-</span>
+                <input
+                  type="number" placeholder="Max" className="input-base w-full h-12 font-mono"
+                  value={maxPrice || ''}
+                  onChange={(e) => setMaxPrice(e.target.value ? Number(e.target.value) : undefined)}
+                />
+              </div>
            </div>
 
-           {/* Floor Range */}
-           <div className="flex items-center gap-2">
-             <input
-               type="number" placeholder="Tầng Min" className="input-base w-full h-11"
-               onChange={(e) => setMinFloor(e.target.value ? Number(e.target.value) : undefined)}
-             />
-             <span className="text-muted">-</span>
-             <input
-               type="number" placeholder="Tầng Max" className="input-base w-full h-11"
-               onChange={(e) => setMaxFloor(e.target.value ? Number(e.target.value) : undefined)}
-             />
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted uppercase tracking-[2px] ml-1">Diện tích (m2)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number" placeholder="Min" className="input-base w-full h-12 font-mono"
+                  value={minArea || ''}
+                  onChange={(e) => setMinArea(e.target.value ? Number(e.target.value) : undefined)}
+                />
+                <span className="text-muted">-</span>
+                <input
+                  type="number" placeholder="Max" className="input-base w-full h-12 font-mono"
+                  value={maxArea || ''}
+                  onChange={(e) => setMaxArea(e.target.value ? Number(e.target.value) : undefined)}
+                />
+              </div>
            </div>
 
-            {/* Area Range */}
-            <div className="flex items-center gap-2">
-              <input
-                type="number" placeholder="DT Min (m2)" className="input-base w-full h-11"
-                onChange={(e) => setMinArea(e.target.value ? Number(e.target.value) : undefined)}
-              />
-              <span className="text-muted">-</span>
-              <input
-                type="number" placeholder="DT Max (m2)" className="input-base w-full h-11"
-                onChange={(e) => setMaxArea(e.target.value ? Number(e.target.value) : undefined)}
-              />
-            </div>
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted uppercase tracking-[2px] ml-1">Tầng (Floor)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number" placeholder="Min" className="input-base w-full h-12 font-mono"
+                  value={minFloor || ''}
+                  onChange={(e) => setMinFloor(e.target.value ? Number(e.target.value) : undefined)}
+                />
+                <span className="text-muted">-</span>
+                <input
+                  type="number" placeholder="Max" className="input-base w-full h-12 font-mono"
+                  value={maxFloor || ''}
+                  onChange={(e) => setMaxFloor(e.target.value ? Number(e.target.value) : undefined)}
+                />
+              </div>
+           </div>
         </div>
 
-        {/* Status MultiSelect Simulation */}
-        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-dashed">
-           <span className="text-[10px] font-black text-muted uppercase tracking-widest mr-2">Trạng thái:</span>
-           {['Vacant', 'Occupied', 'Maintenance', 'Reserved'].map((status) => (
-             <button
-               key={status}
-               onClick={() => {
-                 setStatusFilter(prev =>
-                   prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
-                 );
-               }}
-               className={cn(
-                 "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
-                 statusFilter.includes(status)
-                   ? "bg-primary text-white border-primary shadow-lg"
-                   : "bg-white text-muted border-border hover:border-primary/30"
-               )}
-             >
-               {status === 'Vacant' ? 'Trống' : status === 'Occupied' ? 'Đang ở' : status === 'Maintenance' ? 'Bảo trì' : 'Đã đặt'}
-             </button>
-           ))}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pt-6 border-t border-dashed border-border/20">
+           <div className="flex flex-wrap items-center gap-4">
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" size={18} />
+                <input
+                  type="text"
+                  placeholder="Tìm mã phòng..."
+                  className="input-base w-64 pl-12 h-12 bg-white/50 focus:bg-white font-bold"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
 
-           <div className="ml-auto flex items-center gap-4">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                 <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                  checked={hasMeter === true}
-                  onChange={(e) => setHasMeter(e.target.checked ? true : undefined)}
-                 />
-                 <span className="text-[10px] font-black uppercase text-muted group-hover:text-primary transition-colors">Có đồng hồ</span>
+              <div className="flex items-center gap-2 bg-bg/30 p-1.5 rounded-2xl border border-border/10">
+                {['Vacant', 'Occupied', 'Maintenance', 'Reserved'].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => {
+                      setStatusFilter(prev =>
+                        prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
+                      );
+                    }}
+                    className={cn(
+                      "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                      statusFilter.includes(status)
+                        ? "bg-primary text-white shadow-lg shadow-primary/20 scale-105"
+                        : "text-muted hover:text-primary hover:bg-white/50"
+                    )}
+                  >
+                    {status === 'Vacant' ? 'Trống' : status === 'Occupied' ? 'Đang ở' : status === 'Maintenance' ? 'Bảo trì' : 'Đã đặt'}
+                  </button>
+                ))}
+              </div>
+           </div>
+
+           <div className="flex items-center gap-6">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                 <div className={cn(
+                   "w-12 h-6 rounded-full transition-all relative p-1",
+                   hasMeter ? "bg-primary" : "bg-slate-300"
+                 )}>
+                    <div className={cn(
+                      "w-4 h-4 bg-white rounded-full transition-all shadow-sm",
+                      hasMeter ? "ml-6" : "ml-0"
+                    )}></div>
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={hasMeter === true}
+                      onChange={(e) => setHasMeter(e.target.checked ? true : undefined)}
+                    />
+                 </div>
+                 <span className="text-[10px] font-black uppercase text-muted group-hover:text-primary transition-colors tracking-widest">Có đồng hồ</span>
               </label>
+
               <button
                 onClick={() => {
                   setSearch('');
@@ -233,82 +267,83 @@ const RoomList = () => {
                   setMaxArea(undefined);
                   setHasMeter(undefined);
                 }}
-                className="text-[10px] font-black text-danger uppercase tracking-widest hover:underline"
+                className="text-[10px] font-black text-danger uppercase tracking-widest hover:underline flex items-center gap-2"
               >
-                Xoá bộ lọc
+                <Trash2 size={14} /> Xoá bộ lọc
               </button>
            </div>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="py-20 flex flex-col items-center justify-center gap-4">
-          <Spinner />
-          <p className="text-small text-muted font-bold animate-pulse uppercase tracking-[3px]">Carregando Salas...</p>
+        <div className="py-32 flex flex-col items-center justify-center gap-6">
+          <div className="w-16 h-16 border-4 border-primary/10 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-small text-muted font-black uppercase tracking-[4px] animate-pulse">Đang tải kho phòng...</p>
         </div>
       ) : viewMode === 'Grid' ? (
-        /* 1.1.1 Grid View */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {rooms?.map((room) => (
             <div 
               key={room.id}
               onClick={() => navigate(`/rooms/${room.id}`)}
-              className="group card-container p-0 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-none shadow-xl shadow-primary/5"
+              className="group card-container p-0 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer border-none shadow-xl shadow-primary/5 bg-white/40 backdrop-blur-md"
             >
-              {/* Thumbnail */}
-              <div className="relative h-48 overflow-hidden bg-bg">
+              <div className="relative h-56 overflow-hidden bg-slate-100">
                 <img 
                   src={room.thumbnailUrl || 'https://images.unsplash.com/photo-1513584684374-8bdb7489fe92?w=500'} 
                   alt={room.roomCode}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                 />
-                <div className="absolute top-3 right-3">
-                  <StatusBadge status={room.status} size="sm" className="shadow-lg" />
+                <div className="absolute top-4 right-4">
+                  <StatusBadge status={room.status} size="sm" className="shadow-2xl backdrop-blur-md" />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-white font-black text-h3 tracking-tight">{room.roomCode}</p>
+                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+                  <p className="text-white font-black text-[24px] tracking-tighter leading-none mb-1 font-mono uppercase">{room.roomCode}</p>
+                  <p className="text-white/60 text-[10px] font-bold uppercase tracking-[2px]">{room.buildingName}</p>
                 </div>
               </div>
 
-              {/* Content */}
-              <div className="p-5 space-y-4 bg-white/40 backdrop-blur-md">
-                <div className="flex items-center justify-between text-[11px] font-bold text-muted uppercase tracking-widest">
-                   <span className="flex items-center gap-1"><MapPin size={12} className="text-primary" /> Tang {room.floorNumber}</span>
-                   <span className="flex items-center gap-1"><Maximize size={12} className="text-primary" /> {room.areaSqm} m2</span>
+              <div className="p-6 space-y-5">
+                <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-4 text-[11px] font-black text-muted uppercase tracking-widest">
+                      <span className="flex items-center gap-1.5 bg-bg/50 px-3 py-1.5 rounded-lg border border-border/5 text-primary font-bold"><MapPin size={12} /> Tầng {room.floorNumber}</span>
+                      <span className="flex items-center gap-1.5 bg-bg/50 px-3 py-1.5 rounded-lg border border-border/5 text-primary font-bold"><Maximize size={12} /> {room.areaSqm} m2</span>
+                   </div>
+                   <span className="px-2.5 py-1 bg-primary/5 text-primary text-[9px] font-black rounded-lg uppercase tracking-widest border border-primary/10">{room.roomType}</span>
                 </div>
                 
-                <div className="flex items-center justify-between border-t border-dashed pt-4">
+                <div className="flex items-center justify-between border-t border-dashed border-border/20 pt-5">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] text-muted font-black uppercase">Gia thue CB</p>
-                    <p className="text-body font-black text-primary">{formatVND(room.baseRentPrice)}</p>
+                    <p className="text-[10px] text-muted font-black uppercase tracking-widest">Giá thuê cơ bản</p>
+                    <p className="text-h3 font-black text-primary tracking-tight">{formatVND(room.baseRentPrice)}</p>
                   </div>
-                  <div className="flex -space-x-2">
+                  <div className="flex -space-x-2.5">
                     {room.tenantNames?.map((name, i) => (
-                      <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary shadow-sm" title={name}>
+                      <div key={i} className="w-9 h-9 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[11px] font-black text-white shadow-xl">
                         {name.charAt(0)}
                       </div>
                     ))}
                     {!room.tenantNames && (
-                       <div className="w-8 h-8 rounded-full border-2 border-white bg-bg flex items-center justify-center text-muted">
+                       <div className="w-9 h-9 rounded-full border-2 border-white bg-bg flex items-center justify-center text-muted border-dashed">
                          <Home size={14} />
                        </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 pt-2">
+                <div className="flex items-center justify-between gap-3 pt-2">
                     <button 
                       onClick={(e) => { e.stopPropagation(); navigate(`/rooms/${room.id}`); }}
-                      className="flex-1 btn-outline-sm group-hover:bg-primary group-hover:text-white transition-all py-2 rounded-xl text-[10px] font-black uppercase tracking-widest"
+                      className="flex-1 h-12 bg-bg text-muted group-hover:bg-primary group-hover:text-white transition-all rounded-xl text-[10px] font-black uppercase tracking-[3px] shadow-sm active:scale-95"
                     >
-                       Chi tiết
+                       Chi tiết phòng
                     </button>
                     {canManage && (
                       <button 
                         onClick={(e) => handleEditRoom(room, e)}
-                        className="p-2 hover:bg-bg rounded-xl text-muted hover:text-primary transition-all"
+                        className="w-12 h-12 bg-white border border-border/10 flex items-center justify-center rounded-xl text-muted hover:text-primary hover:shadow-xl hover:border-primary/20 transition-all active:scale-90"
                       >
-                         <Edit size={16} />
+                         <Edit size={18} />
                       </button>
                     )}
                 </div>
@@ -317,70 +352,76 @@ const RoomList = () => {
           ))}
         </div>
       ) : (
-        /* 1.1.3 List View (DataTable) */
-        <div className="card-container overflow-hidden p-0 border-none shadow-xl shadow-primary/5">
+        <div className="card-container overflow-hidden p-0 border-none shadow-2xl shadow-primary/5 bg-white/40 backdrop-blur-md">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-bg/50 border-b">
-                <tr>
-                  <th className="px-6 py-4 text-label text-muted">Thumbnail</th>
-                  <th className="px-6 py-4 text-label text-muted">Mã Phòng</th>
-                  <th className="px-6 py-4 text-label text-muted">Tầng</th>
-                  <th className="px-6 py-4 text-label text-muted">Dien tich</th>
-                  <th className="px-6 py-4 text-label text-muted">Loại phong</th>
-                  <th className="px-6 py-4 text-label text-muted text-center">Trạng thái</th>
-                  <th className="px-6 py-4 text-label text-muted">Giá thuê CB</th>
-                  <th className="px-6 py-4 text-label text-muted">Cu dan</th>
-                  <th className="px-6 py-4 text-label text-muted text-right">Hành động</th>
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-900 text-white font-black uppercase tracking-[3px] text-[10px]">
+                  <th className="px-8 py-6 w-[80px]">Thumb</th>
+                  <th className="px-6 py-6 border-l border-white/5 min-w-[120px]">Mã Phòng</th>
+                  <th className="px-6 py-6 border-l border-white/5">Tầng</th>
+                  <th className="px-6 py-6 border-l border-white/5">Diện tích</th>
+                  <th className="px-6 py-6 border-l border-white/5">Loại</th>
+                  <th className="px-6 py-6 border-l border-white/5 text-center">Trạng thái</th>
+                  <th className="px-6 py-6 border-l border-white/5 text-right">Giá thuê CB</th>
+                  <th className="px-6 py-6 border-l border-white/5 text-center">Cư dân</th>
+                  <th className="px-8 py-6 border-l border-white/5 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/20">
+              <tbody className="divide-y divide-border/10">
                 {rooms?.map((room) => (
                   <tr 
                     key={room.id} 
-                    className="group hover:bg-primary/[0.02] cursor-pointer transition-all"
+                    className="group hover:bg-white/80 cursor-pointer transition-all"
                     onClick={() => navigate(`/rooms/${room.id}`)}
                   >
-                    <td className="px-6 py-3">
-                      <img 
-                        src={room.thumbnailUrl || 'https://via.placeholder.com/48'} 
-                        className="w-12 h-12 rounded-xl object-cover shadow-sm border border-border/50" 
-                        alt=""
-                      />
+                    <td className="px-8 py-4">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden shadow-md border-2 border-white group-hover:scale-110 transition-transform bg-slate-100">
+                        <img 
+                          src={room.thumbnailUrl || 'https://via.placeholder.com/48'} 
+                          className="w-full h-full object-cover" 
+                          alt=""
+                        />
+                      </div>
                     </td>
-                    <td className="px-6 py-3">
-                      <span className="text-body font-black text-primary font-mono tracking-tighter">{room.roomCode}</span>
+                    <td className="px-6 py-4">
+                      <span className="text-[15px] font-black text-primary font-mono tracking-tighter uppercase">{room.roomCode}</span>
                     </td>
-                    <td className="px-6 py-3 text-body font-medium text-muted">Tầng {room.floorNumber}</td>
-                    <td className="px-6 py-3 text-body font-black text-text">{room.areaSqm} m2</td>
-                    <td className="px-6 py-3">
-                      <span className="px-2 py-1 bg-primary/5 text-primary text-[10px] font-black rounded-lg uppercase">{room.roomType}</span>
+                    <td className="px-6 py-4">
+                      <p className="text-[11px] font-black text-slate-800 uppercase tracking-tighter truncate max-w-[120px]">{room.buildingName}</p>
                     </td>
-                    <td className="px-6 py-3 text-center">
+                    <td className="px-6 py-4 text-[13px] font-bold text-muted">Tầng {room.floorNumber}</td>
+                    <td className="px-6 py-4 text-[13px] font-black text-slate-700">{room.areaSqm} m2</td>
+                    <td className="px-6 py-4">
+                      <span className="px-3 py-1.5 bg-primary/5 text-primary text-[9px] font-black rounded-lg uppercase tracking-widest border border-primary/5">{room.roomType}</span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
                       <StatusBadge status={room.status} size="sm" />
                     </td>
-                    <td className="px-6 py-3 font-display font-black text-secondary">{formatVND(room.baseRentPrice)}</td>
-                    <td className="px-6 py-3">
-                       <div className="flex -space-x-1.5">
-                          {room.tenantNames?.map((n, i) => (
-                            <div key={i} className="w-7 h-7 rounded-full border border-white bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
-                              {n.charAt(0)}
-                            </div>
+                    <td className="px-6 py-4 text-right">
+                       <span className="text-[14px] font-black text-secondary tracking-tight">{formatVND(room.baseRentPrice)}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex -space-x-2 justify-center">
+                          {room.tenantNames?.map((name, i) => (
+                             <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-900 flex items-center justify-center text-[10px] font-black text-white shadow-md" title={name}>
+                                {name.charAt(0)}
+                             </div>
                           ))}
                        </div>
                     </td>
-                    <td className="px-6 py-3 text-right">
+                    <td className="px-8 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         {canManage && (
                           <button 
                             onClick={(e) => handleEditRoom(room, e)}
-                            className="p-2 hover:bg-white hover:shadow-lg rounded-xl text-muted hover:text-primary transition-all"
+                            className="w-10 h-10 bg-bg text-muted hover:bg-white hover:text-primary hover:shadow-lg rounded-xl flex items-center justify-center transition-all"
                           >
-                            <Edit size={18} />
+                            <Edit size={16} />
                           </button>
                         )}
-                        <button className="p-2 hover:bg-white hover:shadow-lg rounded-xl text-muted transition-all">
-                          <MoreVertical size={18} />
+                        <button className="w-10 h-10 bg-bg text-muted hover:bg-white hover:shadow-lg rounded-xl flex items-center justify-center transition-all" onClick={(e) => e.stopPropagation()}>
+                          <MoreVertical size={16} />
                         </button>
                       </div>
                     </td>

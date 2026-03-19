@@ -25,6 +25,8 @@ const StaffRatings = () => {
     queryFn: () => ticketService.getStaffRatings(id!)
   });
 
+
+
   if (isLoading || !ratingsData) {
     return (
       <div className="py-40 flex flex-col items-center justify-center gap-4">
@@ -167,7 +169,7 @@ const StaffRatings = () => {
               </h3>
               
               <div className="space-y-4">
-                 {list.map((rating) => (
+                 {list.map((rating: any) => (
                     <div key={rating.id} className="card-container p-8 bg-white shadow-xl shadow-primary/5 border-border/10 hover:shadow-2xl transition-all group">
                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                           <div className="flex gap-6">

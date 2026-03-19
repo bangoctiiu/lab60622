@@ -28,7 +28,7 @@ import { toast } from 'sonner';
 import reportService from '@/services/reportService';
 import { buildingService } from '@/services/buildingService';
 import { FilterPanel, FilterConfig } from '@/components/shared/FilterPanel';
-import { DebtAgingRow, DebtAgeGroup } from '@/types/reports';
+import { DebtAgingRow, DebtAgeGroup, ReportFilter } from '@/types/reports';
 import { formatVND, cn } from '@/utils';
 import { EmptyState, ErrorBanner } from '@/components/ui/StatusStates';
 
@@ -44,10 +44,17 @@ const DebtReport: React.FC = () => {
   const buildingId = searchParams.get('buildingId') ? Number(searchParams.get('buildingId')) : undefined;
   const asOf = searchParams.get('asOf') || format(new Date(), 'yyyy-MM-dd');
 
+  const filters: ReportFilter = useMemo(() => ({
+    buildingIds: buildingId ? [buildingId] : undefined,
+    from: asOf,
+    to: asOf,
+    period: 'custom'
+  }), [buildingId, asOf]);
+
   // Queries
   const { data: agingData, isLoading: isLoadingAging, isError: isErrorAging, refetch: refetchAging } = useQuery({
-    queryKey: ['debtAging', buildingId, asOf],
-    queryFn: () => reportService.getDebtAging(buildingId || 0, asOf),
+    queryKey: ['debtAging', filters],
+    queryFn: () => reportService.getDebtAging(filters),
     retry: 1,
   });
 
@@ -64,14 +71,11 @@ const DebtReport: React.FC = () => {
     }
 
     return {
-      buildingIds: buildingId ? [buildingId] : undefined,
-      from: asOf,
-      to: asOf,
-      period: 'custom' as const,
+      ...filters,
       minDays,
       maxDays,
     };
-  }, [buildingId, asOf, selectedAgeGroup]);
+  }, [filters, selectedAgeGroup]);
 
   const { data: detailData, isLoading: isLoadingDetail, isError: isErrorDetail, refetch: refetchDetail } = useQuery({
     queryKey: ['debtDetail', detailFilter],
@@ -136,7 +140,7 @@ const DebtReport: React.FC = () => {
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked && detailData) {
-      setSelectedRows(detailData.map(r => r.invoiceId));
+      setSelectedRows(detailData.map((r: any) => r.invoiceId));
     } else {
       setSelectedRows([]);
     }
@@ -184,7 +188,7 @@ const DebtReport: React.FC = () => {
             <tbody className="divide-y">
               {isLoadingAging ? (
                 [1, 2, 3, 4, 5].map(i => <tr key={i} className="h-14 animate-pulse bg-slate-50/50" />)
-              ) : agingData?.map((row) => (
+              ) : agingData?.map((row: any) => (
                 <tr 
                   key={row.ageGroup} 
                   onClick={() => setSelectedAgeGroup(row.ageGroup === selectedAgeGroup ? null : row.ageGroup)}
@@ -231,7 +235,7 @@ const DebtReport: React.FC = () => {
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
                 <Bar dataKey="totalDebt" radius={[8, 8, 8, 8]}>
-                  {agingData?.map((entry, index) => (
+                  {agingData?.map((entry: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={getAgingColor(entry.ageGroup, 'chart')} />
                   ))}
                 </Bar>
@@ -239,7 +243,7 @@ const DebtReport: React.FC = () => {
             </ResponsiveContainer>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2 w-full">
-             {agingData?.map(row => (
+             {agingData?.map((row: any) => (
                <div key={row.ageGroup} className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 truncate">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: getAgingColor(row.ageGroup, 'chart') }}></div>
                   {row.label}
@@ -297,7 +301,7 @@ const DebtReport: React.FC = () => {
                       <EmptyState title="Không có dữ liệu công nợ" message="Chúc mừng! Hiện tại không có công nợ nào trong nhóm này." />
                     </td>
                   </tr>
-                ) : detailData?.map((row) => (
+                ) : detailData?.map((row: any) => (
                   <tr 
                     key={row.invoiceId} 
                     className={cn(

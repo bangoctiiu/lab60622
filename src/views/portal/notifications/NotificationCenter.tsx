@@ -24,7 +24,7 @@ import { toast } from 'sonner';
 
 import api from '@/services/apiClient';
 import { cn } from '@/utils';
-import PortalLayout from '@/components/portal/PortalLayout';
+import PortalLayout from '@/components/layout/PortalLayout';
 
 const NOTIFICATION_ICONS: Record<string, any> = {
   'Invoice': { icon: Receipt, color: 'bg-orange-50 text-orange-600 border-orange-100', route: '/portal/invoices' },

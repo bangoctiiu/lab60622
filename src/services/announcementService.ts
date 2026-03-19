@@ -1,21 +1,31 @@
-import { Announcement } from '@/models/Announcement';
+import { Announcement, AnnouncementType, AnnouncementStatus } from '@/types/announcement';
 import { MOCK_ANNOUNCEMENTS } from '@/mocks/announcementMocks';
 
 export const announcementService = {
-  getAnnouncements: async (): Promise<Announcement[]> => {
+  getAnnouncements: async (filters?: any): Promise<Announcement[]> => {
     await new Promise(r => setTimeout(r, 600));
     return MOCK_ANNOUNCEMENTS as any[];
   },
 
-  createAnnouncement: async (data: Partial<Announcement>) => {
-    await new Promise(r => setTimeout(r, 800));
-    console.log(`Created announcement: ${data.title}`);
-    return true;
+  getAnnouncementDetail: async (id: string | number): Promise<Announcement | undefined> => {
+    await new Promise(r => setTimeout(r, 400));
+    const stringId = id.toString();
+    return (MOCK_ANNOUNCEMENTS as any[]).find(a => a.id.toString() === stringId);
   },
 
-  deleteAnnouncement: async (id: number) => {
+  createAnnouncement: async (announcement: Omit<Announcement, 'id' | 'createdAt'>): Promise<Announcement> => {
     await new Promise(r => setTimeout(r, 800));
-    console.log(`Deleted announcement: ${id}`);
+    return {
+      ...announcement,
+      id: Date.now(),
+      createdAt: new Date().toISOString()
+    } as any;
+  },
+
+  deleteAnnouncement: async (id: number | string): Promise<boolean> => {
+    await new Promise(r => setTimeout(r, 500));
     return true;
   }
 };
+
+export default announcementService;

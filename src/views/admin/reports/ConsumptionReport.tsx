@@ -116,10 +116,10 @@ const ConsumptionReport: React.FC = () => {
   // Process chart data for multi-building grouping
   const processedChartData = useMemo(() => {
     if (!chartData) return [];
-    const months = Array.from(new Set(chartData.map(d => d.month))).sort();
+    const months = Array.from(new Set(chartData.map((d: any) => d.month))).sort();
     return months.map(m => {
       const point: any = { month: m };
-      chartData.filter(d => d.month === m).forEach(d => {
+      chartData.filter((d: any) => d.month === m).forEach((d: any) => {
         const value = filters.consumptionType === 'water' ? d.water : d.electricity;
         point[d.buildingName] = value;
       });
@@ -129,7 +129,7 @@ const ConsumptionReport: React.FC = () => {
 
   const buildingNames = useMemo(() => {
     if (!chartData) return [];
-    return Array.from(new Set(chartData.map(d => d.buildingName)));
+    return Array.from(new Set(chartData.map((d: any) => d.buildingName)));
   }, [chartData]);
 
   const handleRefetch = () => {
@@ -275,7 +275,7 @@ const ConsumptionReport: React.FC = () => {
                 {buildingNames.map((name, i) => (
                   <Bar 
                     key={name}
-                    dataKey={name}
+                    dataKey={name as any}
                     fill={['#2563eb', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'][i % 5]} 
                     radius={[4, 4, 0, 0]}
                     barSize={buildingNames.length > 2 ? 15 : 30}
@@ -312,7 +312,7 @@ const ConsumptionReport: React.FC = () => {
                     <EmptyState title="Không có dữ liệu chi tiết" message="Không tìm thấy bản ghi tiêu thụ nào khớp với bộ lọc." />
                   </td>
                 </tr>
-              ) : details?.map((row, i) => (
+              ) : details?.map((row: any, i: number) => (
                 <tr key={i} className="hover:bg-slate-50 transition-colors group">
                   <td className="py-4 px-4 font-bold text-primary">
                     <Link to={`/admin/rooms/${row.roomId}`} className="hover:underline flex items-center gap-1">

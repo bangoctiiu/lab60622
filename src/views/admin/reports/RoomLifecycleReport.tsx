@@ -225,14 +225,14 @@ const RoomLifecycleReport: React.FC = () => {
           <EmptyState title="Không tìm thấy phòng" message="Vui lòng kiểm tra lại tòa nhà hoặc tầng đã chọn." />
         ) : (
           <div className="space-y-8 overflow-y-auto max-h-[600px] pr-4 custom-scrollbar">
-            {lifecycle.slice(0, 20).map((room) => (
+            {lifecycle.slice(0, 20).map((room: any) => (
               <div key={room.roomId} className="relative group/row">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-black text-primary group-hover/row:text-blue-600 transition-colors uppercase tracking-widest bg-blue-50 px-3 py-1 rounded-full">{room.roomCode}</span>
                   <span className="text-[10px] text-slate-400 font-mono font-bold tracking-tighter italic">{totalRangeDays} ngày lịch sử</span>
                 </div>
                 <div className="flex h-8 w-full rounded-2xl overflow-hidden bg-slate-100 shadow-inner border border-slate-200">
-                  {room.segments.map((seg, idx) => (
+                  {room.segments.map((seg: any, idx: number) => (
                     <div
                       key={idx}
                       className={cn(

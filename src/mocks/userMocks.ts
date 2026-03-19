@@ -1,4 +1,4 @@
-import { User } from '../models/User';
+import { User } from '@/types';
 import { Role } from '../models/Role';
 import { Permission, RolePermission } from '../models/Permission';
 

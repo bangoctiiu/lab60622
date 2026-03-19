@@ -1,180 +1,185 @@
 import React, { useState } from 'react';
 import { 
-  Plus, Search, Filter, MoreVertical, 
-  Package, Star, History as HistoryIcon, Wrench, 
-  ExternalLink, ShieldAlert, Cpu, 
-  Tv, Monitor, Sofa, Lamp, Box, Home
+  Package, Search, Filter, Plus, 
+  MoreVertical, Edit, Trash2, 
+  Zap, Layout, Printer, Download,
+  Home, Building2, ShieldCheck, Star
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { roomService } from '@/services/roomService';
-import { Asset, AssetType } from '@/models/Asset';
+import { assetService } from '@/services/assetService';
+import { Asset } from '@/models/Asset';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
-import { isBefore, parseISO } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
 
-const AssetCatalog = () => {
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('All');
+const AssetList = () => {
+  const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
 
   const { data: assets, isLoading } = useQuery<Asset[]>({
-    queryKey: ['assets', activeTab],
-    queryFn: () => roomService.getAssets({ type: activeTab })
+    queryKey: ['assets', search, typeFilter],
+    queryFn: () => assetService.getAssets({ search, type: typeFilter })
   });
 
   const renderStars = (condition: string) => {
-    const starCount = condition === 'New' ? 5 : condition === 'Good' ? 4 : condition === 'Fair' ? 3 : 2;
+    const score = condition === 'New' ? 5 : condition === 'Good' ? 4 : condition === 'Fair' ? 3 : 2;
     return Array.from({ length: 5 }).map((_, i) => (
       <Star 
         key={i} 
         size={12} 
         className={cn(
           "fill-current",
-          i < starCount ? "text-warning" : "text-bg"
+          i < score ? "text-warning" : "text-bg"
         )} 
       />
     ));
   };
 
-  const getAssetIcon = (type: AssetType) => {
-     switch (type) {
-        case 'Appliance': return <Cpu size={18} />;
-        case 'Electronics': return <Monitor size={18} />;
-        case 'Furniture': return <Sofa size={18} />;
-        case 'Fixture': return <Lamp size={18} />;
-        default: return <Box size={18} />;
-     }
-  };
-
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header */}
+    <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-display text-primary">Danh mục Tài sản</h1>
-          <p className="text-body text-muted">Quản lý vòng đời tài sản, bảo hành và cấp phát trang thiết bị.</p>
+          <h1 className="text-display text-primary leading-tight">Danh mục Tài sản</h1>
+          <p className="text-body text-muted font-medium italic">Quản lý toàn bộ trang thiết bị, nội thất và tình trạng khấu hao.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="btn-outline flex items-center gap-2"><HistoryIcon size={18} /> Lịch sử bảo trì</button>
-          <button className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20">
-            <Plus size={18} /> Nhập tài sản
-          </button>
+           <button className="btn-outline h-11 px-6 rounded-xl flex items-center gap-2 font-black uppercase tracking-widest text-[11px]"><Printer size={18} /> In danh sách</button>
+           <button className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20 h-11 px-6 rounded-xl font-black uppercase tracking-widest text-[11px]">
+              <Plus size={18} /> Thêm tài sản mới
+           </button>
         </div>
       </div>
 
-      {/* 1.5 Filters & Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
-         <div className="col-span-1 md:col-span-2 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-            <input type="text" placeholder="Tìm theo tên, mã máy, seri..." className="input-base w-full pl-10" />
+      <div className="card-container p-8 bg-white/60 backdrop-blur-md space-y-6 shadow-2xl shadow-primary/5 border-none">
+         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="flex flex-wrap items-center gap-4">
+               <div className="relative group">
+                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" size={18} />
+                 <input
+                   type="text"
+                   placeholder="Tìm tên hoặc mã tài sản..."
+                   className="input-base w-80 pl-12 h-12 bg-white/50 focus:bg-white font-bold"
+                   value={search}
+                   onChange={(e) => setSearch(e.target.value)}
+                 />
+               </div>
+
+               <select
+                 className="input-base h-12 w-48 font-bold"
+                 value={typeFilter}
+                 onChange={(e) => setTypeFilter(e.target.value)}
+               >
+                 <option value="">Tất cả loại tài sản</option>
+                 <option value="Furniture">Nội thất</option>
+                 <option value="Appliance">Thiết bị điện</option>
+                 <option value="Safety">An ninh</option>
+                 <option value="Other">Khác</option>
+               </select>
+            </div>
+
+            <div className="flex items-center gap-4 text-muted font-black uppercase tracking-widest text-[10px]">
+               <span className="flex items-center gap-2"><div className="w-3 h-3 bg-primary rounded-full"></div> Tổng số: {assets?.length || 0}</span>
+               <span className="flex items-center gap-2"><div className="w-3 h-3 bg-warning rounded-full"></div> Cần bảo trì: 0</span>
+            </div>
          </div>
-         <select className="input-base">
-            <option>Tất cả loại</option>
-            <option>Furniture</option>
-            <option>Appliance</option>
-            <option>Electronics</option>
-         </select>
-         <select className="input-base">
-            <option>Tất cả tình trạng</option>
-            <option>New</option>
-            <option>Good</option>
-            <option>Fair</option>
-            <option>Poor</option>
-         </select>
-         <button className="btn-outline flex items-center justify-center gap-2"><Filter size={16} /> Filter</button>
       </div>
 
-      {/* Asset Grid / Table */}
-      <div className="card-container overflow-hidden p-0 border-none shadow-xl shadow-primary/5">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-bg/50 border-b">
-              <tr>
-                <th className="px-6 py-4 text-label text-muted">Tên tài sản (Asset)</th>
-                <th className="px-6 py-4 text-label text-muted">Loại</th>
-                <th className="px-6 py-4 text-label text-muted">Tình trạng</th>
-                <th className="px-6 py-4 text-label text-muted">Vị trí (Phòng)</th>
-                <th className="px-6 py-4 text-label text-muted">Ngày mua (VND)</th>
-                <th className="px-6 py-4 text-label text-muted">Hết bảo hành</th>
-                <th className="px-6 py-4 text-label text-muted text-right">Hành động</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/20">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={7} className="py-20 text-center"><Spinner /></td>
-                </tr>
-              ) : assets?.map((asset) => {
-                const isWarrantyExpired = asset.warrantyExpiry ? isBefore(parseISO(asset.warrantyExpiry), new Date()) : false;
-                
-                return (
-                  <tr key={asset.id} className="group hover:bg-primary/[0.02] cursor-pointer transition-all">
-                    <td className="px-6 py-4">
-                       <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-primary/5 text-primary rounded-xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
-                             {getAssetIcon(asset.type)}
-                          </div>
-                          <div>
-                            <p className="text-body font-black text-primary">{asset.assetName}</p>
-                            <p className="text-[10px] font-mono font-bold text-muted uppercase">{asset.assetCode}</p>
-                          </div>
-                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-2 py-1 bg-primary/5 text-primary text-[10px] font-black rounded uppercase tracking-tighter">{asset.type}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                       <div className="flex gap-1">
-                          {renderStars(asset.condition)}
-                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                       {asset.roomCode ? (
-                         <div 
-                          className="flex items-center gap-1.5 text-small font-black text-accent hover:underline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/admin/rooms/${asset.roomId}`);
-                          }}
-                         >
-                           <Home size={14} /> {asset.roomCode}
-                         </div>
-                       ) : <span className="text-small text-muted italic">Trong kho</span>}
-                    </td>
-                    <td className="px-6 py-4">
-                       <div className="flex flex-col">
-                          <span className="text-small font-bold text-text">{formatDate(asset.purchaseDate || '--')}</span>
-                          <span className="text-[10px] text-muted font-black">{formatVND(asset.purchasePrice || 0)}</span>
-                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                       <div className={cn(
-                         "flex items-center gap-1.5 text-[11px] font-black uppercase tracking-tighter",
-                         isWarrantyExpired ? "text-danger animate-pulse" : "text-primary"
-                       )}>
-                          {isWarrantyExpired && <ShieldAlert size={14} />}
-                          {formatDate(asset.warrantyExpiry || '--')}
-                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                       <div className="flex items-center justify-end gap-1">
-                          <button className="p-2 hover:bg-white rounded-xl text-muted hover:text-primary transition-all shadow-sm">
-                             <Wrench size={18} />
-                          </button>
-                          <button className="p-2 hover:bg-white rounded-xl text-muted transition-all shadow-sm">
-                             <MoreVertical size={18} />
-                          </button>
-                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {isLoading ? (
+        <div className="py-32 flex flex-col items-center justify-center">
+           <Spinner />
         </div>
+      ) : (
+        <div className="card-container overflow-hidden p-0 border-none shadow-2xl shadow-primary/5 bg-white/40">
+           <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                 <thead>
+                    <tr className="bg-slate-900 text-white font-black uppercase tracking-[3px] text-[10px]">
+                       <th className="px-8 py-6">Tài sản (Asset)</th>
+                       <th className="px-6 py-6 border-l border-white/5">Loại</th>
+                       <th className="px-6 py-6 border-l border-white/5">Phòng / Toà nhà</th>
+                       <th className="px-6 py-6 border-l border-white/5">Tình trạng</th>
+                       <th className="px-6 py-6 border-l border-white/5 text-right">Giá trị gốc</th>
+                       <th className="px-6 py-6 border-l border-white/5">Ngày gán</th>
+                       <th className="px-8 py-6 border-l border-white/5 text-right">Thao tác</th>
+                    </tr>
+                 </thead>
+                 <tbody className="divide-y divide-border/10">
+                    {assets?.map((asset) => (
+                      <tr key={asset.id} className="group hover:bg-white/80 transition-all">
+                         <td className="px-8 py-6">
+                            <div className="flex items-center gap-4">
+                               <div className="w-12 h-12 bg-bg rounded-2xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                  {asset.type === 'Appliance' ? <Zap size={22} /> : <Package size={22} />}
+                               </div>
+                               <div>
+                                  <p className="text-[15px] font-black text-primary uppercase tracking-tighter">{asset.assetName}</p>
+                                  <p className="text-[10px] font-mono text-muted font-bold tracking-widest">{asset.assetCode}</p>
+                               </div>
+                            </div>
+                         </td>
+                         <td className="px-6 py-6">
+                            <span className="px-3 py-1 bg-bg rounded-lg border border-border/10 text-[10px] font-black uppercase tracking-widest text-muted">{asset.type}</span>
+                         </td>
+                         <td className="px-6 py-6">
+                            <div className="flex flex-col">
+                               <span className="text-[13px] font-black text-primary flex items-center gap-1.5"><Home size={12} /> {asset.roomCode}</span>
+                               <span className="text-[10px] text-muted italic flex items-center gap-1.5"><Building2 size={10} /> Keangnam</span>
+                            </div>
+                         </td>
+                         <td className="px-6 py-6">
+                            <div className="flex flex-col gap-1">
+                               <span className={cn(
+                                 "w-fit px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-tighter",
+                                 asset.condition === 'New' ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
+                               )}>{asset.condition}</span>
+                               <div className="flex gap-0.5">{renderStars(asset.condition)}</div>
+                            </div>
+                         </td>
+                         <td className="px-6 py-6 text-right">
+                             <span className="text-[14px] font-black text-secondary font-mono">{formatVND(asset.purchasePrice || 0)}</span>
+                         </td>
+                         <td className="px-6 py-6 text-[12px] font-bold text-muted font-mono">{asset.purchaseDate ? formatDate(asset.purchaseDate) : '-'}</td>
+                         <td className="px-8 py-6 text-right">
+                           <div className="flex items-center justify-end gap-2">
+                             <button className="w-10 h-10 bg-bg text-muted hover:bg-white hover:text-primary rounded-xl flex items-center justify-center transition-all shadow-sm">
+                                <Edit size={16} />
+                             </button>
+                             <button className="w-10 h-10 bg-bg text-muted hover:bg-white rounded-xl flex items-center justify-center transition-all shadow-sm">
+                                <MoreVertical size={16} />
+                             </button>
+                           </div>
+                         </td>
+                      </tr>
+                    ))}
+                 </tbody>
+              </table>
+           </div>
+        </div>
+      )}
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+         {[
+           { label: 'Tổng giá trị tài sản', value: formatVND(40500000), icon: ShieldCheck, color: 'primary' },
+           { label: 'Thiết bị bảo hành', value: '12 máy', icon: Zap, color: 'warning' },
+           { label: 'Yêu cầu thanh lý', value: '2 món', icon: Trash2, color: 'danger' },
+         ].map((stat, i) => (
+           <div key={i} className="card-container p-8 flex items-center gap-6 bg-white/60 border-none shadow-xl shadow-primary/5">
+              <div className={cn(
+                "w-16 h-16 rounded-[24px] flex items-center justify-center shadow-lg",
+                stat.color === 'primary' ? "bg-primary text-white" : 
+                stat.color === 'warning' ? "bg-warning text-white" : "bg-danger text-white"
+              )}>
+                 <stat.icon size={28} />
+              </div>
+              <div>
+                 <p className="text-[10px] text-muted font-black uppercase tracking-[3px] mb-1">{stat.label}</p>
+                 <p className="text-[20px] font-black text-primary font-mono">{stat.value}</p>
+              </div>
+           </div>
+         ))}
       </div>
     </div>
   );
 };
 
-export default AssetCatalog;
+export default AssetList;

@@ -33,7 +33,7 @@ export const MOCK_LEDGER: TenantBalanceTransaction[] = [
     balanceBefore: 0,
     balanceAfter: -5000000,
     type: 'Overpayment',
-    note: 'Thanh toán hóa đơn tháng 3',
+    description: 'Thanh toán hóa đơn tháng 3',
     createdAt: '2024-03-01T10:00:00Z'
   }
 ];

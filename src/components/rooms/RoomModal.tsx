@@ -3,7 +3,7 @@ import {
   Building2, Home, Maximize, DollarSign, 
   MapPin, Package, Users, Compass, 
   Layout, Wind, Droplets, Refrigerator, 
-  Disc, Check, X, AlertCircle, Monitor
+  Disc, Check, X, AlertCircle, Monitor, User
 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { roomService } from '@/services/roomService';
@@ -201,19 +201,7 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
                  </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted uppercase">Tình trạng nội thất</label>
-                    <select 
-                      className="input-base w-full"
-                      value={formData.furnishing}
-                      onChange={(e) => setFormData({ ...formData, furnishing: e.target.value as Furnishing })}
-                    >
-                       <option value="Unfurnished">Nhà trống</option>
-                       <option value="SemiFurnished">Bán nội thất</option>
-                       <option value="FullyFurnished">Đầy đủ nội thất</option>
-                    </select>
-                 </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-muted uppercase">Hướng cửa/ban công</label>
                     <select 
@@ -229,16 +217,60 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
                     </select>
                  </div>
                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-muted uppercase">Điểm trạng thái (1-10)</label>
-                    <div className="flex items-center gap-4 py-2 px-1">
+                    <label className="text-[10px] font-black text-muted uppercase">Tình trạng nội thất</label>
+                    <select 
+                      className="input-base w-full"
+                      value={formData.furnishing}
+                      onChange={(e) => setFormData({ ...formData, furnishing: e.target.value as Furnishing })}
+                    >
+                       <option value="Unfurnished">Nhà trống</option>
+                       <option value="SemiFurnished">Bán nội thất</option>
+                       <option value="FullyFurnished">Đầy đủ nội thất</option>
+                    </select>
+                 </div>
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted uppercase">Số người tối đa</label>
+                    <div className="flex items-center gap-3">
+                       <User size={16} className="text-muted" />
                        <input 
-                         type="range" min="1" max="10" 
-                         className="flex-1 h-1.5 bg-bg rounded-lg appearance-none cursor-pointer accent-primary"
-                         value={formData.conditionScore}
-                         onChange={(e) => setFormData({ ...formData, conditionScore: Number(e.target.value) })}
+                         type="number" 
+                         className="input-base w-full"
+                         value={formData.maxOccupancy}
+                         onChange={(e) => setFormData({ ...formData, maxOccupancy: Number(e.target.value) })}
                        />
-                       <span className="text-body font-black text-primary">{formData.conditionScore}/10</span>
                     </div>
+                 </div>
+                 <div className="space-y-4 flex flex-col justify-end">
+                    <label className="flex items-center gap-3 cursor-pointer group pb-2">
+                       <div className={cn(
+                         "w-12 h-6 rounded-full transition-all relative p-1",
+                         formData.hasBalcony ? "bg-primary" : "bg-slate-300"
+                       )}>
+                          <div className={cn(
+                            "w-4 h-4 bg-white rounded-full transition-all shadow-sm",
+                            formData.hasBalcony ? "ml-6" : "ml-0"
+                          )}></div>
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            checked={formData.hasBalcony}
+                            onChange={(e) => setFormData({ ...formData, hasBalcony: e.target.checked })}
+                          />
+                       </div>
+                       <span className="text-[10px] font-black uppercase text-muted group-hover:text-primary transition-colors">Có ban công</span>
+                    </label>
+                 </div>
+              </div>
+
+              <div className="space-y-2 max-w-md">
+                 <label className="text-[10px] font-black text-muted uppercase">Điểm trạng thái phòng (Condition: {formData.conditionScore}/10)</label>
+                 <div className="flex items-center gap-4 py-2">
+                    <input 
+                      type="range" min="1" max="10" step="1"
+                      className="flex-1 h-2 bg-bg rounded-lg appearance-none cursor-pointer accent-primary shadow-inner"
+                      value={formData.conditionScore}
+                      onChange={(e) => setFormData({ ...formData, conditionScore: Number(e.target.value) })}
+                    />
                  </div>
               </div>
            </div>
@@ -274,8 +306,8 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
               <div className="space-y-2">
                  <label className="text-[10px] font-black text-muted uppercase">Mô tả/Ghi chú</label>
                  <textarea 
-                   className="input-base w-full min-h-[100px] py-4"
-                   placeholder="Nhập mô tả chi tiết về đặc điểm phòng..."
+                   className="input-base w-full min-h-[120px] py-4"
+                   placeholder="Nhập mô tả chi tiết về đặc điểm phòng, quy định riêng..."
                    value={formData.description}
                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                  />

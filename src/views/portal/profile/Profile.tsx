@@ -40,7 +40,7 @@ import useAuthStore from '@/stores/authStore';
 import { useConfirm } from '@/hooks/useConfirm';
 import { BottomSheet } from '@/components/portal/BottomSheet';
 import { PasswordStrengthMeter } from '@/components/shared';
-import PortalLayout from '@/components/portal/PortalLayout';
+import PortalLayout from '@/components/layout/PortalLayout';
 
 const Profile = () => {
   const navigate = useNavigate();
