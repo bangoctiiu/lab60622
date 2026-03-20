@@ -94,7 +94,7 @@ const TicketDetail = () => {
       {/* 4.2.1 Header & Breadcrumb */}
       <div className="flex items-center justify-between">
         <button 
-          onClick={() => navigate('/tickets')}
+          onClick={() => navigate('/admin/tickets')}
           className="flex items-center gap-2 text-muted hover:text-primary transition-all group"
         >
           <div className="p-2 group-hover:bg-primary/5 rounded-xl transition-all">

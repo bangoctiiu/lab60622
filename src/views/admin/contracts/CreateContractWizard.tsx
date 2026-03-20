@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useForm, FormProvider, useFormContext, useFieldArray } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext, useFieldArray, FieldPath } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { contractSchema, ContractFormData } from '@/schemas/contractSchema';
 import { buildingService } from '@/services/buildingService';
@@ -12,7 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/Button';
 import {
   Home, FileText, Zap, ShieldCheck, Building2, Users, AlertCircle, Wallet, Check,
-  ChevronRight, ChevronLeft, Plus, Trash2, Calendar, DoorOpen, CheckCircle2, DollarSign, Clock, ArrowRight
+  ChevronRight, ChevronLeft, Plus, Trash2, Calendar, DoorOpen, CheckCircle2, DollarSign, Clock, ArrowRight, Smartphone, Upload, Search
 } from 'lucide-react';
 import { cn, formatVND } from '@/utils';
 
@@ -28,7 +28,7 @@ const CreateContractWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
   const methods = useForm<ContractFormData>({
-    resolver: zodResolver(contractSchema) as any,
+    resolver: zodResolver(contractSchema) as any, // Cast necessary due to Zod default values causing type mismatch in resolver types
     mode: 'onChange',
     defaultValues: {
       buildingId: '',
@@ -53,10 +53,14 @@ const CreateContractWizard = () => {
   const { trigger, handleSubmit, watch } = methods;
 
   const nextStep = async () => {
-    let fieldsToValidate: any[] = [];
-    if (currentStep === 1) fieldsToValidate = ['buildingId', 'roomId', 'representativeId', 'tenants'];
-    else if (currentStep === 2) fieldsToValidate = ['type', 'startDate', 'endDate', 'rentPrice', 'depositAmount'];
-    else if (currentStep === 3) fieldsToValidate = ['ownerRep.fullName', 'ownerRep.cccd'];
+    let fieldsToValidate: FieldPath<ContractFormData>[] = [];
+    if (currentStep === 1) {
+      fieldsToValidate = ['buildingId', 'roomId', 'representativeId', 'tenants'];
+    } else if (currentStep === 2) {
+      fieldsToValidate = ['type', 'startDate', 'endDate', 'rentPrice', 'depositAmount'];
+    } else if (currentStep === 3) {
+      fieldsToValidate = ['ownerRep.fullName', 'ownerRep.cccd'];
+    }
 
     const isValid = await trigger(fieldsToValidate);
     if (isValid) {
@@ -138,7 +142,7 @@ const CreateContractWizard = () => {
                ) : (
                  <>
                    <Button variant="outline" onClick={handleSaveDraft}>Lưu nháp</Button>
-                   <Button onClick={handleSubmit(onSubmit)} leftIcon={<Check size={18} />}>
+                   <Button onClick={handleSubmit(onSubmit as any)} leftIcon={<Check size={18} />}>
                       Kích hoạt ngay
                    </Button>
                  </>
@@ -291,6 +295,36 @@ const Step1 = () => {
           >
             Thêm cư dân mới
           </Button>
+
+          {/* Docs Placeholder */}
+          <div className="p-6 bg-primary/[0.02] border border-dashed border-primary/20 rounded-[32px] space-y-4">
+             <div className="flex items-center justify-between">
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
+                   <ShieldCheck size={14} /> Hồ sơ pháp lý (CCCD/Hộ chiếu)
+                </p>
+                <span className="text-[9px] text-muted italic font-medium">Max 5MB per file</span>
+             </div>
+             <div className="grid grid-cols-2 gap-4">
+                <div className="border border-border/40 bg-card rounded-2xl p-4 flex items-center gap-4 hover:border-primary/30 cursor-pointer transition-all group">
+                   <div className="w-10 h-10 bg-background rounded-xl flex items-center justify-center text-muted group-hover:text-primary transition-colors text-small">
+                      <Smartphone size={20} />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-bold text-primary text-left">Mặt trước</p>
+                      <p className="text-[9px] text-muted italic">Chưa tải lên</p>
+                   </div>
+                </div>
+                <div className="border border-border/40 bg-card rounded-2xl p-4 flex items-center gap-4 hover:border-primary/30 cursor-pointer transition-all group">
+                   <div className="w-10 h-10 bg-background rounded-xl flex items-center justify-center text-muted group-hover:text-primary transition-colors text-small">
+                      <Smartphone size={20} />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-bold text-primary text-left">Mặt sau</p>
+                      <p className="text-[9px] text-muted italic">Chưa tải lên</p>
+                   </div>
+                </div>
+             </div>
+          </div>
           {errors.representativeId && <p className="text-[10px] text-destructive font-black text-center uppercase tracking-widest">{errors.representativeId.message}</p>}
         </div>
       </div>
@@ -302,18 +336,26 @@ const Step2 = () => {
   const { register, watch, setValue, formState: { errors } } = useFormContext<ContractFormData>();
   const rentPrice = watch('rentPrice');
   const selectedRoomId = watch('roomId');
+  const [actualBasePrice, setActualBasePrice] = useState(0);
 
   useEffect(() => {
     if (selectedRoomId) {
-      roomService.getRoomDetail(selectedRoomId).then((room: any) => {
-        setValue('rentPrice', room.baseRentPrice);
-      });
+      roomService.getRoomDetail(selectedRoomId)
+        .then((room) => {
+          if (room) {
+            setValue('rentPrice', room.baseRentPrice);
+            setActualBasePrice(room.baseRentPrice);
+          }
+        })
+        .catch((err) => {
+          console.error('Error fetching room detail:', err, selectedRoomId);
+          toast.error('Không thể lấy thông tin giá thuê niêm yết của phòng');
+        });
     }
   }, [selectedRoomId, setValue]);
 
-  // Rule #3 Simulation
-  const baseRentPrice = 12000000;
-  const deviation = baseRentPrice > 0 ? (Math.abs(rentPrice - baseRentPrice) / baseRentPrice) * 100 : 0;
+  // Rule #3 Simulation - Dynamic calculation based on actual room price
+  const deviation = actualBasePrice > 0 ? (Math.abs(rentPrice - actualBasePrice) / actualBasePrice) * 100 : 0;
   const isHighDeviation = deviation > 20 && rentPrice > 0;
 
   return (

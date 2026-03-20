@@ -257,7 +257,7 @@ const UserListPage: React.FC = () => {
            </div>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => navigate('/settings/users/permissions')} className="rounded-2xl border-indigo-100 hover:bg-indigo-50 font-bold">
+          <Button variant="outline" onClick={() => navigate('/admin/settings/users/permissions')} className="rounded-2xl border-indigo-100 hover:bg-indigo-50 font-bold">
             <Shield className="mr-2 h-4 w-4 text-indigo-600" /> Phân quyền (RBAC)
           </Button>
           <Button onClick={() => { setSelectedUser(null); setIsModalOpen(true); }} className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-600/20">

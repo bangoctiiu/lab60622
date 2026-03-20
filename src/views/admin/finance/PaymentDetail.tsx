@@ -126,7 +126,7 @@ const PaymentDetail = () => {
                      <div className="flex items-center justify-between">
                         <span className="text-small text-muted">Hóa đơn</span>
                         <span 
-                          onClick={() => navigate(`/admin/invoices/${payment.invoiceId}`)}
+                          onClick={() => navigate(`/invoices/${payment.invoiceId}`)}
                           className="text-small font-bold text-primary hover:underline cursor-pointer flex items-center gap-1"
                         >
                            <FileText size={14} /> {payment.invoiceCode}
@@ -165,7 +165,7 @@ const PaymentDetail = () => {
                     <h3 className="text-h3 text-primary">Hóa đơn liên quan</h3>
                     <p className="text-small text-muted">Kỳ thanh toán: {invoice.period}</p>
                   </div>
-                  <button className="btn-outline px-4 py-2 text-[10px]" onClick={() => navigate(`/admin/invoices/${invoice.id}`)}>
+                  <button className="btn-outline px-4 py-2 text-[10px]" onClick={() => navigate(`/invoices/${invoice.id}`)}>
                     Xem chi tiết
                   </button>
                </div>

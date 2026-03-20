@@ -4,7 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   ArrowLeft, FileText, Edit, History, Printer, 
   LogOut, Plus, User, Zap, ShieldCheck, 
-  Clock, Receipt, FilePlus, ExternalLink, Home
+  Clock, Receipt, FilePlus, ExternalLink, Home,
+  Calendar, Wallet, Users, Download, Edit2, 
+  ChevronRight, MoreVertical
 } from 'lucide-react';
 import { contractService } from '@/services/contractService';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -39,8 +41,8 @@ const ContractDetail = () => {
   );
 
   if (!contract) return (
-    <div className="p-12 text-center card-container">
-      <p className="text-h3 text-danger">Không tìm thấy hợp đồng</p>
+    <div className="p-20 text-center">
+      <h2 className="text-h2 mb-4 text-primary font-black">Contract not found</h2>
       <button onClick={() => navigate('/admin/contracts')} className="btn-outline mt-4">Quay lại</button>
     </div>
   );
@@ -59,10 +61,12 @@ const ContractDetail = () => {
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
       {/* 2.2.1 PageHeader */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-border/50">
-        <div className="flex items-center gap-2 text-small text-muted mb-4">
+        <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[3px] text-muted mb-4 overflow-hidden">
+          <Link to="/admin/dashboard" className="hover:text-primary transition-colors flex items-center gap-1"><Home size={12} /> Dashboard</Link>
+          <ChevronRight size={14} className="text-muted/30" />
           <Link to="/admin/contracts" className="hover:text-primary transition-colors">Hợp đồng</Link>
-          <span>/</span>
-          <span className="font-bold text-primary">{contract.contractCode}</span>
+          <ChevronRight size={14} className="text-muted/30" />
+          <Link to={`/admin/contracts/${id}`} className="font-bold text-primary truncate max-w-[200px]">{id}</Link>
         </div>
         
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -179,17 +183,14 @@ const OverviewTab = ({ contract }: { contract: any }) => (
           <InfoItem label="Trạng thái cọc" value={contract.depositStatus} isBadge />
         </div>
       </div>
-      
-      <div className="bg-primary/5 rounded-2xl p-6 flex items-start gap-4 border border-primary/10">
-        <Home className="text-primary mt-1" size={24} />
-        <div>
-          <h5 className="font-bold text-primary">Thông tin phòng {contract.roomCode}</h5>
-          <p className="text-small text-muted mb-3">{contract.buildingName}</p>
+            <div className="p-8 bg-white/60 rounded-[40px] border border-primary/5 hover:border-primary/10 transition-all group flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-primary/5 text-primary rounded-[24px] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"><Home size={32} /></div>
+          <p className="text-[10px] text-muted font-black uppercase tracking-widest mb-1">Căn hộ / Phòng</p>
+          <p className="text-xl font-display font-black text-primary mb-4 uppercase">{contract.roomName}</p>
           <Link to={`/admin/rooms/${contract.roomId}`} className="text-small font-bold text-secondary flex items-center gap-1 hover:underline">
-            Xem hồ sơ phòng <ExternalLink size={12} />
+            Chi tiết phòng <ExternalLink size={14} />
           </Link>
         </div>
-      </div>
     </div>
   </div>
 );

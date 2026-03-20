@@ -17,7 +17,7 @@ export const AdminLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex bg-bg min-h-screen overflow-x-hidden">
+    <div className="flex bg-background text-foreground min-h-screen overflow-x-hidden transition-colors duration-300">
       {/* 4.1 Sidebar logic for Desktop & Mobile */}
       <div className={cn(
         "hidden lg:block", 
@@ -62,7 +62,7 @@ export const AdminLayout = () => {
 
 // --- 4.3 Public Layout (Hero pages / Landing) ---
 export const PublicLayout = ({ showHeader = true }: { showHeader?: boolean }) => (
-  <div className="min-h-screen bg-bg flex flex-col">
+  <div className="min-h-screen bg-background text-foreground flex flex-col transition-colors duration-300">
     {showHeader && <PublicTopbar />}
     <main className="flex-1 animate-in fade-in duration-700">
       <Outlet />

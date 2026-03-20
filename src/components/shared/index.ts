@@ -12,3 +12,4 @@ export * from './Modal';
 export * from './TierTableInput';
 export * from './PolicyPreview';
 export * from './PasswordStrengthMeter';
+export { StatusBadge } from '../ui/StatusBadge';

@@ -48,8 +48,8 @@ const BuildingRoomsTab = ({ buildingId }: { buildingId: string }) => {
   return (
     <div className="space-y-6">
        <div className="flex justify-between items-center">
-          <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Danh sách Phòng</h3>
-          <button onClick={() => navigate('/rooms')} className="btn-primary-sm flex items-center gap-2">Xem tất cả <ArrowRight size={14} /></button>
+          <h2 className="text-h2 text-primary font-bold">Danh sách phòng</h2>
+          <button onClick={() => navigate('/admin/rooms')} className="btn-primary-sm flex items-center gap-2">Xem tất cả <ArrowRight size={14} /></button>
        </div>
        <div className="card-container overflow-hidden p-0 border-none shadow-xl shadow-primary/5">
           <table className="w-full text-left">
@@ -373,7 +373,7 @@ const BuildingDetail = () => {
                                   <img src={o.ownerAvatar} className="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="" />
                                   <p 
                                     className="text-body font-black text-primary hover:underline cursor-pointer"
-                                    onClick={() => navigate('/owners')} // Simplified for MVP
+                                    onClick={() => navigate('/admin/owners')} // Simplified for MVP
                                   >
                                     {o.ownerName}
                                   </p>

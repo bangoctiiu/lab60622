@@ -25,9 +25,9 @@ export const Topbar = ({ onMobileMenuToggle }: { onMobileMenuToggle: () => void 
 
   return (
     <header className={cn(
-      "h-16 bg-white border-b border-border px-8 flex items-center justify-between sticky top-0 z-40 transition-all duration-300 backdrop-blur-md bg-white/80",
+      "h-16 bg-card/80 border-b border-border px-8 flex items-center justify-between sticky top-0 z-40 transition-all duration-300 backdrop-blur-md",
       sidebarOpen ? "ml-[260px]" : "ml-[72px]",
-      "lg:ml-auto" // On mobile it's different but here we handle desktop margin
+      "lg:ml-auto" 
     )}>
       {/* 4.1 Left: Hamburger + Breadcrumb */}
       <div className="flex items-center gap-6">
@@ -63,9 +63,9 @@ export const Topbar = ({ onMobileMenuToggle }: { onMobileMenuToggle: () => void 
         <input 
           type="text" 
           placeholder="Tìm kiếm nhanh [Ctrl+K]..." 
-          className="w-full pl-12 pr-12 py-2.5 bg-bg border-none rounded-xl text-body focus:ring-2 focus:ring-primary/10 focus:bg-white outline-none transition-all placeholder:text-muted/60"
+          className="w-full pl-12 pr-12 py-2.5 bg-background border-none rounded-xl text-body focus:ring-2 focus:ring-primary/10 focus:bg-card outline-none transition-all placeholder:text-muted/60"
         />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-white border border-border px-1.5 py-0.5 rounded text-[10px] font-bold text-muted shadow-sm">
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-card border border-border px-1.5 py-0.5 rounded text-[10px] font-bold text-muted shadow-sm">
           ⌘ K
         </div>
       </div>
@@ -103,7 +103,7 @@ export const Topbar = ({ onMobileMenuToggle }: { onMobileMenuToggle: () => void 
           </button>
 
           {notificationsOpen && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-white shadow-2xl rounded-2xl border border-border overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
+            <div className="absolute right-0 top-full mt-2 w-80 bg-card shadow-2xl rounded-2xl border border-border overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
               <header className="p-4 border-b flex justify-between items-center bg-bg/30">
                 <h3 className="text-h3 text-primary">Thông báo</h3>
                 <span className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-full uppercase italic">3 Mới</span>
@@ -153,7 +153,7 @@ export const Topbar = ({ onMobileMenuToggle }: { onMobileMenuToggle: () => void 
           </button>
 
           {userMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-white shadow-2xl rounded-2xl border border-border overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
+            <div className="absolute right-0 top-full mt-2 w-56 bg-card shadow-2xl rounded-2xl border border-border overflow-hidden animate-in fade-in zoom-in slide-in-from-top-4 duration-300">
               <header className="p-4 bg-primary/5 border-b">
                 <p className="text-sm font-bold text-primary truncate leading-none">{user?.fullName || 'Administrator'}</p>
                 <p className="text-[10px] text-muted mt-1 truncate">{user?.email || 'admin@smartstay.vn'}</p>

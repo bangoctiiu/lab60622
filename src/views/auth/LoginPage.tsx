@@ -15,14 +15,24 @@ const LoginPage = () => {
   // Detect context
   const isPortal = window.location.pathname.includes('/portal');
 
+  const setQuickLogin = (user: string, pass: string) => {
+    setForm({ ...form, username: user, password: pass });
+    toast.info('Đã chọn tài khoản mẫu');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.password.length < 6) {
+      toast.error('Mật khẩu mẫu yêu cầu tối thiểu 6 ký tự');
+      return;
+    }
+    
     setLoading(true);
     
-    // Simulate API delay
+    // Snappier Prototype Delay
     setTimeout(() => {
       const mockUser = { 
-        id: 1, 
+        id: Math.floor(Math.random() * 1000), 
         username: form.username || (isPortal ? 'tenant_demo' : 'admin_demo'), 
         fullName: isPortal ? 'Nguyễn Văn Cư Dân' : 'Administrator',
         email: form.username.includes('@') ? form.username : (isPortal ? 'tenant@smartstay.vn' : 'admin@smartstay.vn'),
@@ -31,11 +41,12 @@ const LoginPage = () => {
         isActive: true,
         isTwoFactorEnabled: false
       };
+      
       login(mockUser, 'mock_token_123');
       toast.success(`Chào mừng trở lại, ${mockUser.username}!`);
       navigate(isPortal ? '/portal' : '/dashboard');
       setLoading(false);
-    }, 1500);
+    }, 800);
   };
 
   return (
@@ -188,6 +199,30 @@ const LoginPage = () => {
                 )}
               </button>
             </form>
+
+            {/* Quick Access Section - Tùy biến cho Prototype */}
+            <div className="mt-10 pt-8 border-t border-slate-100 animate-in fade-in duration-1000">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-center mb-5 italic">Truy cập nhanh (Demo Mode)</p>
+               <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    type="button"
+                    onClick={() => setQuickLogin('admin@smartstay.vn', '123456')}
+                    className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-primary hover:bg-primary/5 transition-all group"
+                  >
+                     <span className="text-xs font-black text-primary uppercase tracking-tighter">System Admin</span>
+                     <span className="text-[9px] text-muted font-bold uppercase tracking-widest mt-1">Quản trị viên</span>
+                  </button>
+
+                  <button 
+                    type="button"
+                    onClick={() => setQuickLogin('0912345678', '123456')}
+                    className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-secondary hover:bg-secondary/5 transition-all group"
+                  >
+                     <span className="text-xs font-black text-secondary uppercase tracking-tighter">Tenant VIP</span>
+                     <span className="text-[9px] text-muted font-bold uppercase tracking-widest mt-1">Cư dân mẫu</span>
+                  </button>
+               </div>
+            </div>
 
             {/* Spec 3.2.1 SSO Option */}
             {!isPortal && (

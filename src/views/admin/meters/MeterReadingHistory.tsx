@@ -66,7 +66,7 @@ const MeterReadingHistory = () => {
       {/* 5.4.1 Meter Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
          <div className="flex items-center gap-6">
-            <button onClick={() => navigate('/meters')} className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-muted hover:text-primary transition-all active:scale-90">
+            <button onClick={() => navigate('/admin/meters')} className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-muted hover:text-primary transition-all active:scale-90">
                <ArrowLeft size={28} />
             </button>
             <div className="space-y-1">

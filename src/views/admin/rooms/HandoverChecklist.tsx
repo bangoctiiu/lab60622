@@ -173,23 +173,23 @@ const HandoverChecklist = () => {
                      </thead>
                      <tbody className="divide-y divide-border/20">
                         {room.assets.map((asset: any) => (
-                          <tr key={asset.id}>
-                             <td className="px-6 py-4">
-                                <p className="text-small font-black text-primary uppercase">{asset.assetName}</p>
-                                <p className="text-[10px] font-mono font-bold text-muted">{asset.assetCode}</p>
-                             </td>
-                             <td className="px-6 py-4 text-center">
-                                <span className="px-2 py-1 bg-bg text-muted rounded text-[10px] font-black uppercase tracking-tighter">{asset.condition}</span>
-                             </td>
-                             <td className="px-6 py-4 text-center">
-                                <select className="input-base text-[10px] font-black h-8 py-0 min-w-[120px]">
-                                   <option>New</option>
-                                   <option selected>Good</option>
-                                   <option>Fair</option>
-                                   <option>Poor</option>
-                                </select>
-                             </td>
-                          </tr>
+                           <tr key={asset.id}>
+                              <td className="px-6 py-4">
+                                 <p className="text-small font-black text-primary uppercase">{asset.assetName}</p>
+                                 <p className="text-[10px] font-mono font-bold text-muted">{asset.assetCode}</p>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                 <span className="px-2 py-1 bg-bg text-muted rounded text-[10px] font-black uppercase tracking-tighter">{asset.condition}</span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                 <select defaultValue="Good" className="input-base text-[10px] font-black h-8 py-0 min-w-[120px]">
+                                    <option value="New">New</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                    <option value="Poor">Poor</option>
+                                 </select>
+                              </td>
+                           </tr>
                         ))}
                      </tbody>
                   </table>

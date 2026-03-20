@@ -11,6 +11,8 @@ import { cn } from '@/utils';
 import useUIStore from '@/stores/uiStore';
 import useAuthStore from '@/stores/authStore';
 import { usePermission } from '@/hooks/usePermission';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface NavItem {
   label: string;
@@ -25,38 +27,38 @@ const navItems: { group: string; items: NavItem[] }[] = [
   {
     group: "CORE SYSTEM",
     items: [
-      { label: "Tổng quan", route: "/dashboard", icon: LayoutDashboard },
-      { label: "Vé của tôi", route: "/tickets?assignedTo=me", icon: AlertCircle, permission: "ticket.view" },
-      { label: "Hợp đồng", route: "/contracts", icon: FileText, permission: "contract.view" },
-      { label: "Hóa đơn", route: "/invoices", icon: Receipt, permission: "invoice.view" },
-      { label: "Thanh toán", route: "/payments", icon: CreditCard, permission: "payment.view" },
-      { label: "Cư dân", route: "/tenants", icon: Users, permission: "tenant.view" },
-      { label: "Phòng", route: "/rooms", icon: DoorOpen, permission: "room.view" },
-      { label: "Tòa nhà", route: "/buildings", icon: Building, permission: "building.view" },
+      { label: "Tổng quan", route: "/admin/dashboard", icon: LayoutDashboard },
+      { label: "Vé của tôi", route: "/admin/tickets?assignedTo=me", icon: AlertCircle, permission: "ticket.view" },
+      { label: "Hợp đồng", route: "/admin/contracts", icon: FileText, permission: "contract.view" },
+      { label: "Hóa đơn", route: "/admin/invoices", icon: Receipt, permission: "invoice.view" },
+      { label: "Thanh toán", route: "/admin/payments", icon: CreditCard, permission: "payment.view" },
+      { label: "Cư dân", route: "/admin/tenants", icon: Users, permission: "tenant.view" },
+      { label: "Phòng", route: "/admin/rooms", icon: DoorOpen, permission: "room.view" },
+      { label: "Tòa nhà", route: "/admin/buildings", icon: Building, permission: "building.view" },
     ]
   },
   {
     group: "OPERATIONS",
     items: [
-      { label: "Nhập số điện/nước", route: "/meters/bulk-entry", icon: Gauge, permission: "meter.entry" },
-      { label: "Kiểm tra Khách", route: "/staff/visitor-checkin", icon: Users, permission: "visitor.checkin" },
-      { label: "Kiểm tra Tiện ích", route: "/staff/amenity-checkin", icon: Zap, permission: "amenity.checkin" },
-      { label: "Tài sản", route: "/assets", icon: Package, permission: "asset.view" },
-      { label: "Tất cả Vé yêu cầu", route: "/tickets", icon: AlertCircle, permission: "ticket.view.all", badge: 3 },
-      { label: "Báo cáo", route: "/reports", icon: BarChart2, permission: "report.view" },
-      { label: "Thông báo", route: "/announcements", icon: Megaphone, permission: "announcement.manage" },
-      { label: "Chủ sở hữu", route: "/owners", icon: Briefcase, adminOnly: true },
+      { label: "Nhập số điện/nước", route: "/admin/meters/bulk", icon: Gauge, permission: "meter.entry" },
+      { label: "Kiểm tra Khách", route: "/admin/staff/visitor-checkin", icon: Users, permission: "visitor.checkin" },
+      { label: "Kiểm tra Tiện ích", route: "/admin/staff/amenity-checkin", icon: Zap, permission: "amenity.checkin" },
+      { label: "Tài sản", route: "/admin/assets", icon: Package, permission: "asset.view" },
+      { label: "Tất cả Vé yêu cầu", route: "/admin/tickets", icon: AlertCircle, permission: "ticket.view.all", badge: 3 },
+      { label: "Báo cáo", route: "/admin/reports", icon: BarChart2, permission: "report.view" },
+      { label: "Thông báo", route: "/admin/announcements", icon: Megaphone, permission: "announcement.manage" },
+      { label: "Chủ sở hữu", route: "/admin/owners", icon: Briefcase, adminOnly: true },
     ]
   },
   {
     group: "SETTINGS",
     items: [
-      { label: "Dịch vụ & Giá", route: "/services", icon: Wrench, permission: "service.manage" },
-      { label: "Chính sách Điện", route: "/settings/electricity-policy", icon: Zap, adminOnly: true },
-      { label: "Chính sách Nước", route: "/settings/water-policy", icon: Droplets, adminOnly: true },
-      { label: "Người dùng", route: "/settings/users", icon: UserCog, adminOnly: true },
-      { label: "Cấu hình hệ thống", route: "/settings/system", icon: Settings, adminOnly: true },
-      { label: "Nhật ký hoạt động", route: "/settings/audit-logs", icon: ScrollText, adminOnly: true },
+      { label: "Dịch vụ & Giá", route: "/admin/services", icon: Wrench, permission: "service.manage" },
+      { label: "Chính sách Điện", route: "/admin/settings/electricity-policy", icon: Zap, adminOnly: true },
+      { label: "Chính sách Nước", route: "/admin/settings/water-policy", icon: Droplets, adminOnly: true },
+      { label: "Người dùng", route: "/admin/settings/users", icon: UserCog, adminOnly: true },
+      { label: "Cấu hình hệ thống", route: "/admin/settings/system", icon: Settings, adminOnly: true },
+      { label: "Nhật ký hoạt động", route: "/admin/settings/audit-logs", icon: ScrollText, adminOnly: true },
     ]
   }
 ];
@@ -65,6 +67,13 @@ export const Sidebar = () => {
   const { sidebarOpen, toggleSidebar, activeBuildingId, setBuilding } = useUIStore();
   const { user, logout } = useAuthStore();
   const { can } = usePermission();
+  const navigate = useNavigate();
+  
+  const handleLogout = () => {
+    logout();
+    toast.success('Đã đăng xuất thành công');
+    navigate('/public/login', { replace: true });
+  };
   
   const isAdmin = user?.role === 'Admin';
   
@@ -179,7 +188,7 @@ export const Sidebar = () => {
             </div>
           )}
           <button 
-            onClick={logout} 
+            onClick={handleLogout} 
             className={cn("p-1.5 hover:bg-danger/20 hover:text-danger rounded-lg transition-colors shrink-0", !sidebarOpen && "mx-auto")}
           >
             <LogOut size={16} />

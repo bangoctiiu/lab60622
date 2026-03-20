@@ -59,7 +59,7 @@ const MeterList = () => {
 
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => navigate('/meters/bulk')}
+            onClick={() => navigate('/admin/meters/bulk')}
             className="btn-primary h-14"
           >
             <History size={18} />
@@ -212,13 +212,13 @@ const MeterList = () => {
                     meters?.data?.map((meter: Meter) => (
                        <tr key={meter.id} className="group border-b border-border/5 hover:bg-white/50 transition-all">
                           <td className="px-8 py-6">
-                             <Link to={`/meters/${meter.id}/readings`} className="font-mono text-[13px] font-black text-primary hover:underline flex items-center gap-2">
+                             <Link to={`/admin/meters/${meter.id}/readings`} className="font-mono text-[13px] font-black text-primary hover:underline flex items-center gap-2">
                                {meter.meterCode}
                                <ChevronRight size={14} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
                              </Link>
                           </td>
                           <td className="px-6 py-6">
-                             <Link to={`/rooms/${meter.roomId}`} className="text-small font-black text-slate-700 hover:text-primary transition-colors">
+                             <Link to={`/admin/rooms/${meter.roomId}`} className="text-small font-black text-slate-700 hover:text-primary transition-colors">
                                 Phòng {meter.roomCode}
                              </Link>
                           </td>
@@ -255,7 +255,7 @@ const MeterList = () => {
                                    <History size={18} />
                                 </button>
                                 <button 
-                                  onClick={() => navigate(`/meters/${meter.id}/readings`)}
+                                  onClick={() => navigate(`/admin/meters/${meter.id}/readings`)}
                                   className="h-11 w-11 flex items-center justify-center rounded-xl bg-bg border border-border/50 text-muted hover:text-primary transition-all active:scale-90"
                                   title="Lịch sử tiêu thụ"
                                 >

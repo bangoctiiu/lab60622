@@ -205,7 +205,8 @@ const Profile = () => {
            <div className="pt-6">
               <button 
                 onClick={handleLogout}
-                className="w-full h-18 bg-white border-2 border-red-100 text-red-600 rounded-[32px] font-black shadow-2xl shadow-red-500/5 flex items-center justify-center gap-4 active:scale-[0.98] active:bg-red-50 transition-all uppercase tracking-[0.3em] text-[11px]"
+                className="w-full h-[72px] bg-white border-2 border-red-100 text-red-600 rounded-[32px] font-black shadow-2xl shadow-red-500/5 flex items-center justify-center gap-4 active:scale-[0.98] active:bg-red-50 transition-all uppercase tracking-[0.3em] text-[11px]"
+
               >
                 <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center">
                    <LogOut size={22} strokeWidth={3} />
@@ -351,7 +352,7 @@ const PersonalInfoForm = ({ profile, onClose }: any) => {
        <button 
         onClick={() => mutation.mutate(formData)}
         disabled={mutation.isPending}
-        className="w-full h-18 bg-[var(--portal-primary)] text-white rounded-[32px] font-black shadow-2xl shadow-[var(--portal-primary)]/30 flex items-center justify-center gap-4 active:scale-95 transition-all uppercase tracking-[0.3em] text-sm border-none"
+         className="w-full h-[72px] bg-[var(--portal-primary)] text-white rounded-[32px] font-black shadow-2xl shadow-[var(--portal-primary)]/30 flex items-center justify-center gap-4 active:scale-95 transition-all uppercase tracking-[0.3em] text-sm border-none"
        >
          <ShieldCheck size={24} strokeWidth={2.5} />
          {mutation.isPending ? 'Đang đồng bộ...' : 'CẬP NHẬT HỒ SƠ'}
@@ -442,7 +443,7 @@ const ChangePasswordForm = ({ onBack, onComplete }: any) => {
        <button 
         disabled={mutation.isPending || !isValid}
         onClick={() => mutation.mutate({ currentPassword: data.old, newPassword: data.new })}
-        className="w-full h-18 bg-[#0D8A8A] text-white rounded-[32px] font-black shadow-2xl shadow-teal-500/30 flex items-center justify-center gap-4 active:scale-[0.98] transition-all uppercase tracking-[0.3em] text-sm disabled:opacity-30 disabled:grayscale disabled:scale-100"
+         className="w-full h-[72px] bg-[#0D8A8A] text-white rounded-[32px] font-black shadow-2xl shadow-teal-500/30 flex items-center justify-center gap-4 active:scale-[0.98] transition-all uppercase tracking-[0.3em] text-sm disabled:opacity-30 disabled:grayscale disabled:scale-100"
        >
          {mutation.isPending ? <Loader2 size={24} className="animate-spin" /> : <ShieldCheck size={24} strokeWidth={2.5} />}
          TÁI THIẾT LẬP MẬT MÃ
@@ -484,7 +485,7 @@ const FeedbackForm = ({ onClose }: any) => {
        <button 
         onClick={() => mutation.mutate(content)}
         disabled={!content || mutation.isPending}
-        className="w-full h-18 bg-[#0D8A8A] text-white rounded-[32px] font-black shadow-2xl shadow-teal-500/30 active:scale-95 transition-all uppercase tracking-[0.4em] text-xs"
+         className="w-full h-[72px] bg-[#0D8A8A] text-white rounded-[32px] font-black shadow-2xl shadow-teal-500/30 active:scale-95 transition-all uppercase tracking-[0.4em] text-xs"
        >
          {mutation.isPending ? <Loader2 size={24} className="animate-spin" /> : 'GỬI PHẢN HỒI THẦN TỐC'}
        </button>
@@ -502,7 +503,7 @@ const InputGroup = ({ label, value, onChange, placeholder, type = "text", icon: 
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full h-18 px-10 bg-slate-50 rounded-[32px] border-2 border-slate-100 focus:bg-white focus:ring-8 focus:ring-[var(--portal-primary)]/5 focus:border-[var(--portal-primary)] text-sm transition-all shadow-sm font-black text-slate-800 uppercase tracking-tight placeholder:opacity-30 placeholder:font-normal"
+       className="w-full h-[72px] px-10 bg-slate-50 rounded-[32px] border-2 border-slate-100 focus:bg-white focus:ring-8 focus:ring-[var(--portal-primary)]/5 focus:border-[var(--portal-primary)] text-sm transition-all shadow-sm font-black text-slate-800 uppercase tracking-tight placeholder:opacity-30 placeholder:font-normal"
      />
   </div>
 );

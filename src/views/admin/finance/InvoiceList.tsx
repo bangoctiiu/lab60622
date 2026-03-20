@@ -17,11 +17,11 @@ import { differenceInDays, parseISO } from 'date-fns';
 import { toast } from 'sonner';
 import { CreateInvoiceModal } from '@/components/invoices/modals/CreateInvoiceModal';
 import { BulkInvoiceModal } from '@/components/invoices/modals/BulkInvoiceModal';
-import { RecordPaymentModal } from '@/components/payments/modals/RecordPaymentModal';
+import { RecordPaymentModal } from '@/components/shared/modals/RecordPaymentModal';
 
 const InvoiceList = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('All');
+  const [activeTab, setActiveTab] = useState<InvoiceStatus | 'All'>('All');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [copiedInvoiceId, setCopiedInvoiceId] = useState<string | null>(null);
@@ -31,7 +31,9 @@ const InvoiceList = () => {
   // Queries
   const { data: invoices, isLoading } = useQuery<Invoice[]>({
     queryKey: ['invoices', activeTab],
-    queryFn: () => invoiceService.getInvoices({ status: activeTab })
+    queryFn: () => invoiceService.getInvoices({ 
+      status: activeTab === 'All' ? undefined : activeTab 
+    })
   });
 
   const { data: counts } = useQuery<Record<InvoiceStatus | 'All', number>>({
@@ -42,7 +44,7 @@ const InvoiceList = () => {
   const overdueInvoices = invoices?.filter(i => i.status === 'Overdue') || [];
   const totalOverdueAmount = overdueInvoices.reduce((sum: number, i: Invoice) => sum + (i.totalAmount - i.paidAmount), 0);
 
-  const tabs = [
+  const tabs: { id: InvoiceStatus | 'All'; label: string; color: string }[] = [
     { id: 'All', label: 'Tất cả', color: 'primary' },
     { id: 'Unpaid', label: 'Chưa trả', color: 'warning' },
     { id: 'Overdue', label: 'Quá hạn', color: 'danger' },
@@ -85,7 +87,7 @@ const InvoiceList = () => {
 
       {/* 3.1.2 Sticky Overdue Alert Bar */}
       {overdueInvoices.length > 0 && (
-        <div className="sticky top-4 z-10 bg-[#FEF2F2] border border-danger/20 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in slide-in-from-top duration-500">
+        <div className="sticky top-4 z-10 bg-destructive/10 border border-destructive/20 p-4 rounded-2xl flex items-center justify-between shadow-sm animate-in slide-in-from-top duration-500 backdrop-blur-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-danger/10 text-danger rounded-full flex items-center justify-center">
               <AlertTriangle size={20} />
@@ -99,7 +101,7 @@ const InvoiceList = () => {
           </div>
           <button 
             onClick={() => setActiveTab('Overdue')}
-            className="text-small font-bold text-danger hover:underline px-4 py-2 bg-white rounded-xl shadow-sm border border-danger/10 transition-all"
+            className="text-small font-bold text-destructive hover:underline px-4 py-2 bg-card rounded-xl shadow-sm border border-destructive/10 transition-all"
           >
             Lọc quá hạn
           </button>
@@ -115,8 +117,8 @@ const InvoiceList = () => {
             className={cn(
               "relative px-6 py-3 text-small font-bold transition-all rounded-t-xl",
               activeTab === tab.id 
-                ? "text-primary bg-white border-b-2 border-primary shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]" 
-                : "text-muted hover:text-text hover:bg-bg/50"
+                ? "text-primary bg-card border-b-2 border-primary shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.1)]" 
+                : "text-muted hover:text-foreground hover:bg-muted/10"
             )}
           >
             {tab.label}
@@ -133,7 +135,7 @@ const InvoiceList = () => {
       </div>
 
       {/* 3.1.3 Filter Panel */}
-      <div className="card-container p-4 bg-white/60 backdrop-blur-md">
+      <div className="card-container p-4 bg-card/60 backdrop-blur-md">
          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <div className="col-span-1 md:col-span-2 relative">
                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
@@ -154,7 +156,7 @@ const InvoiceList = () => {
       <div className="card-container overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-bg/50 border-b border-border/50">
+            <thead className="bg-muted/10 border-b border-border/50">
               <tr>
                 <th className="px-6 py-4 text-label text-muted">Mã Hóa Đơn</th>
                 <th className="px-6 py-4 text-label text-muted">Hợp đồng / Phòng</th>
@@ -179,7 +181,7 @@ const InvoiceList = () => {
                       <div className="flex items-center gap-2 group/code">
                         <span 
                           className="font-mono font-bold text-primary group-hover/code:underline cursor-pointer" 
-                          onClick={() => navigate(`/admin/invoices/${invoice.id}`)}
+                          onClick={() => navigate(`/invoices/${invoice.id}`)}
                         >
                           {invoice.invoiceCode}
                         </span>
@@ -188,7 +190,7 @@ const InvoiceList = () => {
                             e.stopPropagation();
                             handleCopyInvoiceCode(invoice.id, invoice.invoiceCode);
                           }}
-                          className="opacity-0 group-hover/code:opacity-100 p-1 hover:bg-bg rounded transition-all"
+                          className="opacity-0 group-hover/code:opacity-100 p-1 hover:bg-muted/20 rounded transition-all"
                           title="Copy"
                         >
                           {copiedInvoiceId === invoice.id ? (
@@ -246,7 +248,7 @@ const InvoiceList = () => {
                    </td>
                    <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <button className="p-2 hover:bg-bg rounded-lg text-muted hover:text-primary transition-all" title="Xem chi tiết" onClick={() => navigate(`/admin/invoices/${invoice.id}`)}>
+                        <button className="p-2 hover:bg-bg rounded-lg text-muted hover:text-primary transition-all" title="Xem chi tiết" onClick={() => navigate(`/invoices/${invoice.id}`)}>
                           <Eye size={18} />
                         </button>
                         <button 

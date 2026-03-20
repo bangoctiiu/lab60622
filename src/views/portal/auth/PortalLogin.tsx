@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Building2 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Lock, User, RefreshCcw, Smartphone, ShieldCheck, ArrowLeft, ArrowRight } from 'lucide-react';
+import { cn } from '@/utils';
 import { toast } from 'sonner';
 import useAuthStore from '@/stores/authStore';
+import api from '@/services/apiClient';
+import { API_ENDPOINTS } from '@/constants/api';
 
 const PortalLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -11,7 +14,6 @@ const PortalLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [failCount, setFailCount] = useState(0);
   const [lockoutTimer, setLockoutTimer] = useState(0);
 
   const loginAuth = useAuthStore(state => state.login);
@@ -32,135 +34,218 @@ const PortalLogin: React.FC = () => {
       toast.error(`Tài khoản bị khoá ${Math.ceil(lockoutTimer / 60)} phút`);
       return;
     }
+
+    if (password.length < 6) {
+      toast.error('Mật khẩu mẫu yêu cầu tối thiểu 6 ký tự');
+      return;
+    }
     
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      const response = await api.post(`${API_ENDPOINTS.PORTAL_AUTH}/login`, { 
+        identifier, 
+        password,
+        rememberMe
+      });
       
-      if (password === '123456') {
-        const mockTenant: any = {
-          id: 'tenant_1',
-          name: 'Nguyễn Văn An',
-          email: isEmail(identifier) ? identifier : 'an.nguyen@example.com',
-          phone: isPhone(identifier) ? identifier : '0912345678',
-          role: 'Tenant',
-          status: 'ACTIVE',
-        };
-        loginAuth(mockTenant, 'mock_token_tenant_123');
-        setFailCount(0);
-        
-        // Check if onboarding is complete (Mock behavior)
-        navigate('/portal/dashboard');
-      } else {
-        const newFailCount = failCount + 1;
-        setFailCount(newFailCount);
-        if (newFailCount >= 5) {
-          setLockoutTimer(15 * 60); // 15 minutes
-          toast.error('Tài khoản bị khoá 15 phút');
-        } else {
-          toast.error('Sai thông tin đăng nhập');
-        }
+      const { user, accessToken } = response.data;
+      
+      loginAuth(user, accessToken);
+      toast.success(`Chào mừng trở lại, ${user.fullName}!`);
+      navigate('/portal/dashboard');
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Tài khoản hoặc mật khẩu không chính xác';
+      toast.error(message);
+      
+      // Handle lockout if returned by backend
+      if (error.response?.data?.lockoutSeconds) {
+        setLockoutTimer(error.response.data.lockoutSeconds);
       }
-    } catch (error) {
-      toast.error('Lỗi hệ thống');
     } finally {
       setLoading(false);
     }
+
+  };
+
+  const setQuickLogin = (id: string, pass: string) => {
+    setIdentifier(id);
+    setPassword(pass);
+    toast.info('Đã chọn tài khoản mẫu');
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-[#0D8A8A] to-[#1B3A6B] p-4 text-[#1E293B]">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-white overflow-hidden">
       
-      <div className="max-w-[390px] w-full bg-white rounded-2xl shadow-2xl p-8">
+      {/* LEFT SIDE: BRANDING & VISUALS (Match Admin Layout) */}
+      <div className="hidden lg:flex lg:w-1/2 p-20 flex-col justify-between text-white relative transition-colors duration-700 bg-gradient-to-br from-secondary to-[#0F766E]">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ 
+          backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+          backgroundSize: '32px 32px' 
+        }}></div>
+
         
-        {/* Brand */}
-        <div className="flex flex-col items-center text-center space-y-4 mb-8">
-          <div className="w-[80px] h-[80px] bg-[#0D8A8A]/10 rounded-2xl flex items-center justify-center">
-            <Building2 size={40} className="text-[#0D8A8A]" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Chào mừng cư dân</h2>
-            <p className="text-sm text-slate-500 mt-1">Đăng nhập để quản lý phòng và tiện ích của bạn</p>
-          </div>
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-4">
+        <div className="relative z-10">
+          <Link to="/" className="text-3xl font-display font-bold tracking-tighter hover:opacity-80 transition-opacity">
+            SmartStay <span className="text-accent underline decoration-accent/40 decoration-4 underline-offset-8">PORTAL</span>
+          </Link>
           
-          <div className="space-y-1">
-            <input 
-              type="text" 
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="Số điện thoại hoặc Email"
-              className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#0D8A8A] focus:ring-2 focus:ring-[#0D8A8A]/20 outline-none transition-all text-[16px] placeholder:text-slate-400"
-              required
-            />
-          </div>
-
-          <div className="space-y-1 relative">
-            <input 
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Mật khẩu"
-              className="w-full h-12 px-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-[#0D8A8A] focus:ring-2 focus:ring-[#0D8A8A]/20 outline-none transition-all text-[16px] placeholder:text-slate-400 pr-12"
-              required
-            />
-            <button 
-              type="button" 
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#0D8A8A] p-1"
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input 
-                type="checkbox" 
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-300 text-[#0D8A8A] focus:ring-[#0D8A8A]/20 cursor-pointer"
-              />
-              <span className="text-sm text-slate-600 group-hover:text-slate-800">Ghi nhớ đăng nhập 30 ngày</span>
-            </label>
-            <button 
-              type="button" 
-              onClick={() => navigate('/portal/forgot-password')} 
-              className="text-sm font-semibold text-[#0D8A8A] hover:underline"
-            >
-              Quên mật khẩu?
-            </button>
-          </div>
-
-          <button 
-            type="submit"
-            disabled={loading || lockoutTimer > 0}
-            className="w-full h-[48px] bg-[#0D8A8A] text-white rounded-xl font-bold text-[16px] flex items-center justify-center hover:bg-[#0A6B6B] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-          >
-            {lockoutTimer > 0 ? (
-               `Mở khoá sau ${Math.ceil(lockoutTimer / 60)} phút`
-            ) : loading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              'Đăng nhập'
-            )}
-          </button>
-          
-        </form>
-
-        <div className="mt-6 text-center">
-            <p className="text-sm text-slate-500">
-               Chưa có tài khoản?{' '}
-               <button className="font-semibold text-[#0D8A8A]" onClick={() => alert("Vui lòng liên hệ ban quản lý để được cấp tài khoản.")}>
-                 Liên hệ quản lý
-               </button>
+          <div className="mt-20 space-y-10">
+            <h1 className="text-[64px] font-display font-black leading-tight animate-in slide-in-from-left-6 duration-700 uppercase italic">
+              KẾT NỐI <br /> 
+              <span className="text-accent not-italic">CƯ DÂN</span>
+            </h1>
+            <p className="text-xl text-white/70 max-w-md leading-relaxed animate-in slide-in-from-left-8 duration-700 delay-100 italic">
+              Nâng tầm trải nghiệm sống với nền tảng quản lý căn hộ thông minh. Thanh toán - Phản ánh - Thông báo chỉ trong một lần chạm.
             </p>
+          </div>
         </div>
 
+        <div className="relative z-10 flex items-center gap-4 text-small font-black text-white/50 animate-in fade-in duration-1000 delay-300 uppercase tracking-[0.3em]">
+          <Smartphone size={24} className="text-accent" />
+          <span>Multilingual Smart Gateway v2.8</span>
+        </div>
       </div>
-      
+
+      {/* RIGHT SIDE: LOGIN FORM */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-20 bg-bg transition-colors duration-500">
+        <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-6 duration-500">
+          
+          {/* Logo mobile-only */}
+          <div className="lg:hidden text-center mb-10">
+            <Link to="/" className="text-3xl font-display font-bold tracking-tighter text-secondary">
+              SmartStay <span className="text-accent">Portal</span>
+            </Link>
+          </div>
+
+          <div className="card-container p-10 bg-white shadow-modal border-none rounded-[40px]">
+            <header className="mb-10 text-center lg:text-left">
+              <h2 className="text-h1 text-secondary uppercase tracking-tight italic">Cổng Cư Dân</h2>
+              <p className="text-body text-muted mt-2">Dành cho cư dân và người thuê căn hộ</p>
+            </header>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Identifier */}
+              <div className="space-y-2 text-left">
+                <label className="text-label text-text-secondary block uppercase tracking-widest font-black ml-1">Số điện thoại / Email</label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-secondary transition-colors transition-all duration-300">
+                    <User size={18} />
+                  </div>
+                  <input 
+                    type="text" 
+                    required
+                    autoFocus
+                    placeholder="Nhập SĐT hoặc Email..."
+                    className="w-full pl-12 pr-4 py-4 border rounded-2xl outline-none transition-all text-body focus:ring-secondary/20 focus:border-secondary font-bold"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2 text-left">
+                <div className="flex items-center justify-between">
+                  <label className="text-label text-text-secondary block uppercase tracking-widest font-black ml-1">Mật khẩu</label>
+                  <Link to="/portal/forgot-password" title="Quên mật khẩu?" className="text-small font-bold text-secondary hover:underline uppercase tracking-widest decoration-2 underline-offset-4">
+                    Quên mật khẩu?
+                  </Link>
+                </div>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-secondary transition-colors transition-all duration-300">
+                    <Lock size={18} />
+                  </div>
+                  <input 
+                    type={showPassword ? "text" : "password"} 
+                    required
+                    placeholder="••••••••"
+                    className="w-full pl-12 pr-12 py-4 border rounded-2xl outline-none transition-all text-body focus:ring-secondary/20 focus:border-secondary font-bold"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted hover:text-text p-1"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember */}
+              <div className="flex items-center px-1">
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <input 
+                    type="checkbox" 
+                    className="w-5 h-5 rounded-lg border-gray-300 text-secondary focus:ring-secondary"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  <span className="text-body font-bold text-muted uppercase tracking-widest text-[11px]">Ghi nhớ đăng nhập</span>
+                </label>
+              </div>
+
+              {/* Submit */}
+              <button 
+                type="submit" 
+                disabled={loading || lockoutTimer > 0}
+                className="w-full py-5 bg-secondary hover:bg-secondary-light text-white rounded-[24px] font-black text-lg transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed group uppercase tracking-[0.2em] italic"
+              >
+                {loading ? (
+                  <RefreshCcw className="animate-spin" size={20} />
+                ) : lockoutTimer > 0 ? (
+                  `BỊ KHOÁ (${lockoutTimer}s)`
+                ) : (
+                  <>ĐĂNG NHẬP NGAY <ArrowRight className="group-hover:translate-x-2 transition-transform shadow-accent" size={20} /></>
+                )}
+              </button>
+            </form>
+
+            {/* Quick Access Section - Helper for development/testing only */}
+            <div className="mt-10 pt-10 border-t border-slate-100 animate-in fade-in duration-1000">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] text-center mb-6 italic">Gợi ý truy cập (Dev Only)</p>
+
+               <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    type="button"
+                    onClick={() => setQuickLogin('0912345678', '123456')}
+                    className="flex flex-col items-center p-4 rounded-2xl bg-bg border-none hover:bg-secondary hover:text-white transition-all group shadow-sm active:scale-95"
+                  >
+                     <span className="text-[11px] font-black uppercase tracking-tighter">Cư dân VIP</span>
+                     <span className="text-[9px] font-bold uppercase tracking-widest mt-1 opacity-60">P.1203</span>
+                  </button>
+
+                  <button 
+                    type="button"
+                    onClick={() => setQuickLogin('an.nguyen@example.com', '123456')}
+                    className="flex flex-col items-center p-4 rounded-2xl bg-bg border-none hover:bg-secondary hover:text-white transition-all group shadow-sm active:scale-95"
+                  >
+                     <span className="text-[11px] font-black uppercase tracking-tighter">Cư dân Mới</span>
+                     <span className="text-[9px] font-bold uppercase tracking-widest mt-1 opacity-60">P.405</span>
+                  </button>
+               </div>
+            </div>
+
+            <div className="mt-10 pt-10 border-t text-center space-y-4">
+              <p className="text-small text-muted font-bold uppercase tracking-widest">
+                Bạn là Quản trị viên? <br />
+                <Link to="/public/login" className="inline-flex items-center gap-2 text-primary hover:text-primary-light transition-colors mt-2 font-black border-b-2 border-primary/20 hover:border-primary">
+                  <ArrowLeft size={16} /> Quay lại trang Quản trị
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <footer className="mt-8 text-center text-small text-muted flex items-center justify-center gap-8 opacity-40 font-black tracking-widest">
+            <span className="hover:text-text cursor-pointer">PRIVACY</span>
+            <span className="w-1.5 h-1.5 bg-slate-300 rounded-full" />
+            <span className="hover:text-text cursor-pointer">COMPLIANCE</span>
+            <span className="w-1.5 h-1.5 bg-slate-300 rounded-full" />
+            <span className="hover:text-text cursor-pointer">SUPPORT</span>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 };

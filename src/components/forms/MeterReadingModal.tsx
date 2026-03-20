@@ -255,7 +255,7 @@ export const MeterReadingModal = ({ isOpen, onClose, meter, onSuccess }: Reading
                     type="submit" 
                     disabled={isSubmitting || isError || isLoadingLatest}
                     className={cn(
-                      "btn-primary w-full h-18 rounded-[32px] flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 transition-all text-[18px]",
+                      "btn-primary w-full h-[72px] rounded-[32px] flex items-center justify-center gap-4 shadow-2xl shadow-primary/20 transition-all text-[18px]",
                       (isError || isSubmitting) ? "opacity-50 grayscale cursor-not-allowed" : "active:scale-[0.98] hover:shadow-primary/30"
                     )}
                   >

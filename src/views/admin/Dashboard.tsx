@@ -121,10 +121,10 @@ const AdminDashboard = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey) {
         switch (e.key) {
-          case '1': navigate('/invoices'); break;
-          case '2': navigate('/payments'); break;
-          case '3': navigate('/tickets'); break;
-          case '4': navigate('/contracts'); break;
+          case '1': navigate('/admin/invoices'); break;
+          case '2': navigate('/admin/payments'); break;
+          case '3': navigate('/admin/tickets'); break;
+          case '4': navigate('/admin/contracts'); break;
         }
       }
     };
@@ -199,7 +199,7 @@ const AdminDashboard = () => {
           icon={Building2} 
           delta={kpis?.deltas.totalBuildings} 
           loading={kpisLoading}
-          onClick={() => navigate('/buildings')}
+          onClick={() => navigate('/admin/buildings')}
         />
         <KPICard 
           title="Tổng số phòng" 
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
           icon={FileText} 
           loading={kpisLoading}
           color="accent"
-          onClick={() => navigate('/contracts?status=Active')}
+          onClick={() => navigate('/admin/contracts?status=Active')}
         />
         <KPICard 
           title="Doanh thu tháng" 
@@ -242,7 +242,7 @@ const AdminDashboard = () => {
           delta={kpis?.deltas.totalOverdueBalance}
           loading={kpisLoading}
           color="danger"
-          onClick={() => navigate('/invoices?status=Overdue')}
+          onClick={() => navigate('/admin/invoices?status=Overdue')}
         />
         <KPICard 
           title="Ticket đang mở" 
@@ -250,7 +250,7 @@ const AdminDashboard = () => {
           icon={MessageSquare} 
           loading={kpisLoading}
           color={Number(kpis?.openTickets) > 5 ? 'warning' : 'primary'}
-          onClick={() => navigate('/tickets')}
+          onClick={() => navigate('/admin/tickets')}
         />
         <KPICard 
           title="Phòng đang thuê" 
@@ -287,7 +287,7 @@ const AdminDashboard = () => {
         <div className="card-container p-8 bg-white/40 backdrop-blur-md">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Thanh toán mới</h3>
-            <button onClick={() => navigate('/payments')} className="text-[10px] font-black text-primary hover:text-secondary tracking-widest uppercase transition-colors">Tất cả</button>
+            <button onClick={() => navigate('/admin/payments')} className="text-[10px] font-black text-primary hover:text-secondary tracking-widest uppercase transition-colors">Tất cả</button>
           </div>
           <div className="space-y-4">
             {payments?.map((payment) => (
@@ -300,7 +300,7 @@ const AdminDashboard = () => {
                     {payment.tenantName.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="text-small font-black text-primary hover:underline cursor-pointer" onClick={() => navigate(`/tenants/${payment.id}`)}>{payment.tenantName}</h4>
+                    <h4 className="text-small font-black text-primary hover:underline cursor-pointer" onClick={() => navigate(`/admin/tenants/${payment.id}`)}>{payment.tenantName}</h4>
                     <div className="flex items-center gap-2">
                        <span className="text-[10px] text-muted font-mono font-bold">{payment.transactionCode}</span>
                        <button 
@@ -333,7 +333,7 @@ const AdminDashboard = () => {
         <div className="card-container p-8 bg-white/40 backdrop-blur-md">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-h3 text-primary font-black uppercase tracking-widest">Xử lý kỹ thuật</h3>
-            <button onClick={() => navigate('/tickets')} className="text-[10px] font-black text-primary hover:text-secondary tracking-widest uppercase transition-colors">Tất cả</button>
+            <button onClick={() => navigate('/admin/tickets')} className="text-[10px] font-black text-primary hover:text-secondary tracking-widest uppercase transition-colors">Tất cả</button>
           </div>
           <div className="space-y-4">
             {tickets?.map((ticket) => {
@@ -342,7 +342,7 @@ const AdminDashboard = () => {
                 <div 
                   key={ticket.id} 
                   className="flex flex-col gap-3 p-4 hover:bg-white rounded-[20px] border border-transparent hover:border-primary/5 hover:shadow-xl transition-all cursor-pointer group"
-                  onClick={() => navigate(`/tickets/${ticket.id}`)}
+                  onClick={() => navigate(`/admin/tickets/${ticket.id}`)}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ const AdminDashboard = () => {
             ].map((btn, i) => (
               <button 
                 key={i} 
-                onClick={() => navigate(btn.link.replace('/admin', ''))}
+                onClick={() => navigate(btn.link)}
                 className="flex flex-col items-center justify-center p-6 bg-white/5 rounded-[32px] hover:bg-white/10 hover:shadow-2xl border border-white/5 transition-all group relative overflow-hidden active:scale-95"
               >
                 <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white mb-4 transition-transform group-hover:scale-110 shadow-xl ring-4 ring-white/5", btn.color)}>

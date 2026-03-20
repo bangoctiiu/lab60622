@@ -19,7 +19,7 @@ const ContractList = () => {
   const [filters, setFilters] = useState({
     buildingId: '',
     roomCode: '',
-    status: ['Active'],
+    status: 'Active',
     type: '',
     expiringSoon: false
   });

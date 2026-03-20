@@ -23,7 +23,7 @@ export const Modal = ({ isOpen, onClose, title, children, className }: ModalProp
       
       {/* Content */}
       <div className={cn(
-        "relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl shadow-slate-900/20 overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 border border-white/20",
+        "relative w-[calc(100%-32px)] md:w-full max-w-lg bg-white rounded-[32px] shadow-2xl shadow-slate-900/20 flex flex-col overflow-hidden animate-in zoom-in-95 slide-in-from-bottom-5 duration-300 border border-white/20",
         className
       )}>
         <div className="px-8 py-6 border-b border-border/10 flex justify-between items-center bg-bg/50">
@@ -36,7 +36,7 @@ export const Modal = ({ isOpen, onClose, title, children, className }: ModalProp
            </button>
         </div>
         
-        <div className="p-8">
+        <div className="p-8 max-h-[calc(100vh-160px)] overflow-y-auto custom-scrollbar">
            {children}
         </div>
       </div>

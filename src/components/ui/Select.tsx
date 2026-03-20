@@ -56,6 +56,7 @@ export const Select = ({
         <button
           type="button"
           disabled={disabled}
+          onClick={() => setIsOpen(!isOpen)}
           className={cn(
             "input-base h-14 flex items-center justify-between transition-all w-full",
             isOpen && "border-blue-700/40 ring-4 ring-blue-900/5 shadow-xl shadow-blue-900/5",

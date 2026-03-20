@@ -5,19 +5,46 @@ import {
   Zap, Layout, Printer, Download,
   Home, Building2, ShieldCheck, Star
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { assetService } from '@/services/assetService';
 import { Asset } from '@/models/Asset';
 import { cn, formatVND, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
+import { AssetModal } from './AssetModal';
+import { toast } from 'sonner';
 
 const AssetList = () => {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
 
   const { data: assets, isLoading } = useQuery<Asset[]>({
     queryKey: ['assets', search, typeFilter],
     queryFn: () => assetService.getAssets({ search, type: typeFilter })
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => assetService.deleteAsset(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      toast.success('Đã xóa tài sản thành công');
+    }
+  });
+
+  const submitMutation = useMutation({
+    mutationFn: (data: any) => {
+      if (selectedAsset) return assetService.updateAsset(selectedAsset.id, data);
+      return assetService.createAsset(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
+      toast.success(selectedAsset ? 'Cập nhật tài sản thành công!' : 'Đã thêm tài sản mới thành công!');
+      setIsModalOpen(false);
+    }
   });
 
   const renderStars = (condition: string) => {
@@ -43,7 +70,10 @@ const AssetList = () => {
         </div>
         <div className="flex items-center gap-3">
            <button className="btn-outline h-11 px-6 rounded-xl flex items-center gap-2 font-black uppercase tracking-widest text-[11px]"><Printer size={18} /> In danh sách</button>
-           <button className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20 h-11 px-6 rounded-xl font-black uppercase tracking-widest text-[11px]">
+           <button 
+             onClick={() => { setSelectedAsset(null); setIsModalOpen(true); }}
+             className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20 h-11 px-6 rounded-xl font-black uppercase tracking-widest text-[11px]"
+           >
               <Plus size={18} /> Thêm tài sản mới
            </button>
         </div>
@@ -70,8 +100,9 @@ const AssetList = () => {
                >
                  <option value="">Tất cả loại tài sản</option>
                  <option value="Furniture">Nội thất</option>
-                 <option value="Appliance">Thiết bị điện</option>
-                 <option value="Safety">An ninh</option>
+                 <option value="Appliance">Gia dụng</option>
+                 <option value="Electronics">Điện tử</option>
+                 <option value="Fixture">Cố định</option>
                  <option value="Other">Khác</option>
                </select>
             </div>
@@ -140,12 +171,31 @@ const AssetList = () => {
                          <td className="px-6 py-6 text-[12px] font-bold text-muted font-mono">{asset.purchaseDate ? formatDate(asset.purchaseDate) : '-'}</td>
                          <td className="px-8 py-6 text-right">
                            <div className="flex items-center justify-end gap-2">
-                             <button className="w-10 h-10 bg-bg text-muted hover:bg-white hover:text-primary rounded-xl flex items-center justify-center transition-all shadow-sm">
-                                <Edit size={16} />
-                             </button>
-                             <button className="w-10 h-10 bg-bg text-muted hover:bg-white rounded-xl flex items-center justify-center transition-all shadow-sm">
-                                <MoreVertical size={16} />
-                             </button>
+                              <button 
+                                onClick={() => { setSelectedAsset(asset); setIsModalOpen(true); }}
+                                className="w-10 h-10 bg-bg text-muted hover:bg-primary/10 hover:text-primary rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-90"
+                                title="Sửa thông tin"
+                              >
+                                 <Edit size={16} />
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  if (confirm(`Bạn có chắc muốn xóa tài sản ${asset.assetName}?`)) {
+                                    deleteMutation.mutate(asset.id);
+                                  }
+                                }}
+                                className="w-10 h-10 bg-bg text-muted hover:bg-danger/10 hover:text-danger rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-90 disabled:opacity-50"
+                                title="Xóa tài sản"
+                                disabled={deleteMutation.isPending}
+                              >
+                                 <Trash2 size={16} />
+                              </button>
+                              <button 
+                                className="w-10 h-10 bg-bg text-muted hover:bg-white rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-90"
+                                title="Thêm..."
+                              >
+                                 <MoreVertical size={16} />
+                              </button>
                            </div>
                          </td>
                       </tr>
@@ -178,6 +228,14 @@ const AssetList = () => {
            </div>
          ))}
       </div>
+
+      <AssetModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialData={selectedAsset}
+        onSubmit={(data) => submitMutation.mutate(data)}
+        isSubmitting={submitMutation.isPending}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Bell, Plus, Search, Filter, 
   MoreVertical, Edit, Trash2, 
@@ -15,19 +15,84 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { cn, formatDate } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
+import { AnnouncementModal } from './components/AnnouncementModal';
 
 /**
  * 6.1.1 Announcement management hub
  * Design focus: High-impact communications display and efficient broadcasting
  */
 const AnnouncementPage = () => {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<AnnouncementStatus | 'All'>('All');
+  
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
 
   const { data: announcements, isLoading } = useQuery<Announcement[]>({
     queryKey: ['announcements', activeTab],
     queryFn: () => announcementService.getAnnouncements()
   });
+
+  // Mutations
+  const createMutation = useMutation({
+    mutationFn: (data: any) => announcementService.createAnnouncement(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['announcements'] });
+      toast.success('Đã tạo thông báo thành công');
+      handleCloseModal();
+    },
+    onError: () => toast.error('Lỗi khi tạo thông báo')
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => announcementService.createAnnouncement(data), // Re-using for mock purposes, usually updateAnnouncement
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['announcements'] });
+      toast.success('Đã cập nhật thông báo thành công');
+      handleCloseModal();
+    },
+    onError: () => toast.error('Lỗi khi cập nhật thông báo')
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number | string) => announcementService.deleteAnnouncement(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['announcements'] });
+      toast.success('Đã xóa thông báo');
+    },
+    onError: () => toast.error('Lỗi khi xóa thông báo')
+  });
+
+  const handleOpenCreate = () => {
+    setEditingAnnouncement(null);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (a: Announcement) => {
+    setEditingAnnouncement(a);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingAnnouncement(null);
+  };
+
+  const handleSubmit = (data: any) => {
+     if (editingAnnouncement) {
+       updateMutation.mutate({ ...editingAnnouncement, ...data });
+     } else {
+       createMutation.mutate(data);
+     }
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm('Bạn có chắc chắn muốn xóa thông báo này?')) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   const getTypeIcon = (type: AnnouncementType) => {
     switch (type) {
@@ -35,13 +100,15 @@ const AnnouncementPage = () => {
       case 'Maintenance': return <Layers className="text-warning" size={16} />;
       case 'Event': return <Megaphone className="text-primary" size={16} />;
       case 'Holiday': return <Globe className="text-success" size={16} />;
+      case 'Security': return <ShieldCheck className="text-slate-700" size={16} />;
       default: return <Bell className="text-muted" size={16} />;
     }
   };
 
   const filteredAnnouncements = announcements?.filter(a => {
     const matchesTab = activeTab === 'All' || a.status === activeTab;
-    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase()) || 
+                          a.content.toLowerCase().includes(search.toLowerCase());
     return matchesTab && matchesSearch;
   });
 
@@ -67,7 +134,10 @@ const AnnouncementPage = () => {
            <button className="btn-outline flex items-center gap-2">
               <Smartphone size={18} /> Gửi SMS/Zalo
            </button>
-           <button className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20 bg-primary px-8">
+           <button 
+             onClick={handleOpenCreate}
+             className="btn-primary flex items-center gap-2 shadow-lg shadow-primary/20 bg-primary px-8"
+           >
               <Plus size={18} /> Tạo thông báo
            </button>
         </div>
@@ -147,7 +217,12 @@ const AnnouncementPage = () => {
                    <div className="flex-1 space-y-2">
                        <div className="flex flex-col md:flex-row md:items-center gap-3">
                           <StatusBadge status={a.status} size="sm" />
-                          <h3 className="text-h3 text-primary group-hover:underline cursor-pointer">{a.title}</h3>
+                          <h3 
+                            className="text-h3 text-primary group-hover:underline cursor-pointer"
+                            onClick={() => handleOpenEdit(a)}
+                          >
+                            {a.title}
+                          </h3>
                        </div>
                        <p className="text-body text-slate-500 line-clamp-2 pr-12">{a.content}</p>
                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-2 text-[11px] font-medium text-muted">
@@ -164,8 +239,18 @@ const AnnouncementPage = () => {
                       </div>
                       <div className="flex items-center gap-1 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500">
                          <button className="p-2 hover:bg-bg rounded-xl text-muted hover:text-primary"><Eye size={18} /></button>
-                         <button className="p-2 hover:bg-bg rounded-xl text-muted hover:text-secondary"><Edit size={18} /></button>
-                         <button className="p-2 hover:bg-bg rounded-xl text-muted hover:text-danger"><Trash2 size={18} /></button>
+                         <button 
+                           onClick={() => handleOpenEdit(a)}
+                           className="p-2 hover:bg-bg rounded-xl text-muted hover:text-secondary"
+                         >
+                            <Edit size={18} />
+                         </button>
+                         <button 
+                           onClick={() => handleDelete(a.id)}
+                           className="p-2 hover:bg-bg rounded-xl text-muted hover:text-danger"
+                         >
+                            <Trash2 size={18} />
+                         </button>
                       </div>
                    </div>
                 </div>
@@ -197,6 +282,15 @@ const AnnouncementPage = () => {
             Xem tài liệu <ArrowRight size={16} />
          </button>
       </div>
+
+      {/* Announcement Creation/Edit Modal */}
+      <AnnouncementModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        initialData={editingAnnouncement}
+        onSubmit={handleSubmit}
+        isSubmitting={createMutation.isPending || updateMutation.isPending}
+      />
     </div>
   );
 };

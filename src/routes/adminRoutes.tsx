@@ -91,7 +91,7 @@ export const adminRoutes: RouteObject[] = [
   { path: 'announcements', element: <AnnouncementPage /> },
   { path: 'notifications', element: <NotificationPage /> },
   { path: 'meters', element: <MeterList /> },
-  { path: 'meters/bulk-entry', element: <BulkMeterEntry /> },
+  { path: 'meters/bulk', element: <BulkMeterEntry /> },
   { path: 'meters/confirm', element: <MeterReadingConfirm /> },
   { path: 'meters/:id/readings', element: <MeterReadingHistory /> },
   { path: 'services', element: <ServiceCatalog /> },

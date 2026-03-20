@@ -1,5 +1,5 @@
 import { BuildingSummary, BuildingDetail, Building } from '@/models/Building';
-import { OwnerSummary, OwnerDetail } from '@/models/Owner';
+import { OwnerSummary, OwnerDetail, Owner } from '@/models/Owner';
 import { MOCK_BUILDING_SUMMARIES, MOCK_BUILDINGS } from '@/mocks/buildingMocks';
 import { MOCK_OWNERS } from '@/mocks/ownerMocks';
 import { MOCK_PROVINCES, MOCK_DISTRICTS, MOCK_WARDS } from '@/mocks/systemMocks';
@@ -87,6 +87,20 @@ export const buildingService = {
   },
 
   updateBuilding: async (id: string, data: any): Promise<Building> => {
+    await new Promise(r => setTimeout(r, 800));
+    return { ...data, id };
+  },
+
+  createOwner: async (data: any): Promise<Owner> => {
+    await new Promise(r => setTimeout(r, 800));
+    return {
+      ...data,
+      id: `O${Date.now()}`,
+      isDeleted: false
+    };
+  },
+
+  updateOwner: async (id: string, data: any): Promise<Owner> => {
     await new Promise(r => setTimeout(r, 800));
     return { ...data, id };
   }

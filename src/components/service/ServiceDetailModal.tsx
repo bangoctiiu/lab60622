@@ -151,7 +151,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
   const handleCheckCodeUnique = async (code: string) => {
     if (!code || mode === "edit") return;
-    const isUnique = await checkServiceCodeUnique(code, serviceId || undefined);
+    const isUnique = await checkServiceCodeUnique(code, serviceId ?? undefined);
     if (!isUnique) {
       setError("serviceCode", { message: "Mã dịch vụ đã tồn tại, vui lòng chọn mã khác" });
     } else {
@@ -161,7 +161,7 @@ const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
   const handleCheckNameUnique = async (name: string) => {
     if (!name || mode === "edit") return;
-    const isUnique = await checkServiceNameUnique(name, serviceId || undefined);
+    const isUnique = await checkServiceNameUnique(name, serviceId ?? undefined);
     if (!isUnique) {
       setError("serviceName", { message: "Tên dịch vụ đã tồn tại, vui lòng chọn tên khác" });
     } else {

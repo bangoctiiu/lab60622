@@ -15,13 +15,17 @@ import { Select } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
 
+import useUIStore from '@/stores/uiStore';
+
 const BulkMeterEntry = () => {
   const navigate = useNavigate();
+  const { activeBuildingId } = useUIStore();
   const [step, setStep] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
 
-  const [buildingId, setBuildingId] = useState('B1');
+  const [buildingId, setBuildingId] = useState(activeBuildingId ? String(activeBuildingId) : 'B1');
+
   const [meterType, setMeterType] = useState<MeterType>('Electricity');
 
   // Reset page when filters change
@@ -126,7 +130,7 @@ const BulkMeterEntry = () => {
        {/* Breadcrumbs & Header */}
        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-             <button onClick={() => navigate('/meters')} className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-muted hover:text-primary transition-all">
+             <button onClick={() => navigate('/admin/meters')} className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-muted hover:text-primary transition-all">
                 <ChevronLeft size={24} />
              </button>
              <div>
@@ -419,7 +423,7 @@ const BulkMeterEntry = () => {
                        success: 'Ghi nhận thành công tất cả chỉ số!',
                        error: 'Lỗi khi gửi dữ liệu.'
                    });
-                   setTimeout(() => navigate('/meters'), 2200);
+                   setTimeout(() => navigate('/admin/meters'), 2200);
                  }}
                  className="btn-primary w-full h-20 rounded-[36px] flex items-center justify-center gap-4 text-[20px] font-black uppercase tracking-[6px] shadow-2xl active:scale-[0.98] transition-all"
                >

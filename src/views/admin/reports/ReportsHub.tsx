@@ -18,7 +18,7 @@ const reportCards = [
     icon: Building2, 
     title: "Tỷ lệ Lấp đầy", 
     desc: "Lịch sử lấp đầy phòng theo tháng/quý/năm, trend chart", 
-    route: "/reports/occupancy",
+    route: "/admin/reports/occupancy",
     color: "text-blue-600",
     bg: "bg-blue-50"
   },
@@ -26,7 +26,7 @@ const reportCards = [
     icon: TrendingUp, 
     title: "Tài chính", 
     desc: "Doanh thu, chi phí, lợi nhuận, cashflow", 
-    route: "/reports/financial",
+    route: "/admin/reports/financial",
     color: "text-emerald-600",
     bg: "bg-emerald-50"
   },
@@ -34,7 +34,7 @@ const reportCards = [
     icon: AlertCircle, 
     title: "Công nợ", 
     desc: "Danh sách công nợ, phân tích tuổi nợ", 
-    route: "/reports/debt",
+    route: "/admin/reports/debt",
     color: "text-rose-600",
     bg: "bg-rose-50"
   },
@@ -42,7 +42,7 @@ const reportCards = [
     icon: Zap, 
     title: "Tiêu thụ Điện/Nước", 
     desc: "Tiêu thụ theo tòa nhà, phòng, so sánh kỳ", 
-    route: "/reports/consumption",
+    route: "/admin/reports/consumption",
     color: "text-amber-600",
     bg: "bg-amber-50"
   },
@@ -50,15 +50,15 @@ const reportCards = [
     icon: RefreshCw, 
     title: "Vòng đời Phòng", 
     desc: "Thời gian trống, bảo trì, cho thuê, vacancy rate", 
-    route: "/reports/room-lifecycle",
+    route: "/admin/reports/room-lifecycle",
     color: "text-purple-600",
     bg: "bg-purple-50"
   },
   { 
     icon: Star, 
     title: "NPS & Hài lòng", 
-    desc: "Điểm NPS trung bình, trend, phân bổ", 
-    route: "/reports/nps",
+    desc: "Điểm NPS trung bình, trend, phân bỏ", 
+    route: "/admin/reports/nps",
     color: "text-indigo-600",
     bg: "bg-indigo-50"
   },
@@ -66,7 +66,7 @@ const reportCards = [
     icon: Users, 
     title: "Hiệu suất Nhân viên", 
     desc: "Rating NV, số ticket xử lý, thời gian xử lý TB", 
-    route: "/reports/staff",
+    route: "/admin/reports/staff",
     color: "text-cyan-600",
     bg: "bg-cyan-50"
   },
@@ -74,7 +74,7 @@ const reportCards = [
     icon: Bell, 
     title: "Cảnh báo Hệ thống", 
     desc: "AnalyticsAlerts theo severity, trend", 
-    route: "/reports/alerts",
+    route: "/admin/reports/alerts",
     color: "text-orange-600",
     bg: "bg-orange-50"
   },

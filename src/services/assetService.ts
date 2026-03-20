@@ -19,5 +19,21 @@ export const assetService = {
     await new Promise(resolve => setTimeout(resolve, 300));
     const asset = MOCK_ASSETS.find(a => a.id.toString() === id.toString());
     return asset || null;
+  },
+
+  createAsset: async (data: any): Promise<Asset> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const newAsset = { ...data, id: Math.random().toString(36).substr(2, 9) };
+    return newAsset;
+  },
+
+  updateAsset: async (id: string | number, data: any): Promise<Asset> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return { ...data, id };
+  },
+
+  deleteAsset: async (id: string | number): Promise<boolean> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return true;
   }
 };

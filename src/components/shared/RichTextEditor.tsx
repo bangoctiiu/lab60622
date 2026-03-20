@@ -86,14 +86,14 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       {!readOnly && (
         <div className="flex flex-wrap items-center gap-1 p-2 border-b bg-gray-50">
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleHeading({ level: 1 }).run()} 
-            active={editor.isActive('heading', { level: 1 })}
+            onClick={() => (editor?.chain()?.focus() as any).toggleHeading({ level: 1 })?.run()} 
+            active={editor?.isActive('heading', { level: 1 })}
           >
             <Heading1 className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleHeading({ level: 2 }).run()} 
-            active={editor.isActive('heading', { level: 2 })}
+            onClick={() => (editor?.chain()?.focus() as any).toggleHeading({ level: 2 })?.run()} 
+            active={editor?.isActive('heading', { level: 2 })}
           >
             <Heading2 className="w-4 h-4" />
           </ToolbarButton>
@@ -101,20 +101,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <div className="w-px h-4 bg-gray-300 mx-1" />
           
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleBold().run()} 
-            active={editor.isActive('bold')}
+            onClick={() => (editor?.chain()?.focus() as any).toggleBold()?.run()} 
+            active={editor?.isActive('bold')}
           >
             <Bold className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleItalic().run()} 
-            active={editor.isActive('italic')}
+            onClick={() => (editor?.chain()?.focus() as any).toggleItalic()?.run()} 
+            active={editor?.isActive('italic')}
           >
             <Italic className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleUnderline().run()} 
-            active={editor.isActive('underline')}
+            onClick={() => (editor?.chain()?.focus() as any).toggleUnderline()?.run()} 
+            active={editor?.isActive('underline')}
           >
             <UnderlineIcon className="w-4 h-4" />
           </ToolbarButton>
@@ -122,20 +122,20 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <div className="w-px h-4 bg-gray-300 mx-1" />
           
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleBulletList().run()} 
-            active={editor.isActive('bulletList')}
+            onClick={() => (editor?.chain()?.focus() as any).toggleBulletList()?.run()} 
+            active={editor?.isActive('bulletList')}
           >
             <List className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleOrderedList().run()} 
-            active={editor.isActive('orderedList')}
+            onClick={() => (editor?.chain()?.focus() as any).toggleOrderedList()?.run()} 
+            active={editor?.isActive('orderedList')}
           >
             <ListOrdered className="w-4 h-4" />
           </ToolbarButton>
           <ToolbarButton 
-            onClick={() => (editor as any).chain().focus().toggleBlockquote().run()} 
-            active={editor.isActive('blockquote')}
+            onClick={() => (editor?.chain()?.focus() as any).toggleBlockquote()?.run()} 
+            active={editor?.isActive('blockquote')}
           >
             <Quote className="w-4 h-4" />
           </ToolbarButton>
@@ -144,24 +144,24 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           
           <ToolbarButton onClick={() => {
             const url = window.prompt('Nhập URL liên kết');
-            if (url) (editor as any).chain().focus().setLink({ href: url }).run();
-          }} active={editor.isActive('link')}>
+            if (url) (editor?.chain()?.focus() as any).setLink({ href: url })?.run();
+          }} active={editor?.isActive('link')}>
             <LinkIcon className="w-4 h-4" />
           </ToolbarButton>
           
           <ToolbarButton onClick={() => {
             const url = window.prompt('Nhập URL hình ảnh');
-            if (url) (editor as any).chain().focus().setImage({ src: url }).run();
+            if (url) (editor?.chain()?.focus() as any).setImage({ src: url })?.run();
           }}>
             <ImageIcon className="w-4 h-4" />
           </ToolbarButton>
           
           <div className="flex-1" />
           
-          <ToolbarButton onClick={() => (editor as any).chain().focus().undo().run()} disabled={!(editor as any).can().undo()}>
+          <ToolbarButton onClick={() => (editor?.chain()?.focus() as any).undo()?.run()} disabled={!(editor?.can() as any).undo()}>
             <Undo className="w-4 h-4" />
           </ToolbarButton>
-          <ToolbarButton onClick={() => (editor as any).chain().focus().redo().run()} disabled={!(editor as any).can().redo()}>
+          <ToolbarButton onClick={() => (editor?.chain()?.focus() as any).redo()?.run()} disabled={!(editor?.can() as any).redo()}>
             <Redo className="w-4 h-4" />
           </ToolbarButton>
         </div>
@@ -176,7 +176,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
       {!readOnly && maxLength && (
         <div className="px-4 py-2 border-t bg-gray-50 text-[10px] text-gray-500 text-right">
-          {editor.getText().length} / {maxLength} ký tự
+          {editor?.getText()?.length || 0} / {maxLength} ký tự
         </div>
       )}
     </div>

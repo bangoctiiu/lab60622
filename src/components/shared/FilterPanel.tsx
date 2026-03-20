@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, Search, X, ChevronDown, ChevronUp, RotateCcw, Loader2 } from 'lucide-react';
 import { cn } from '@/utils';
 
+
 export type FilterType = 'text' | 'select' | 'multiSelect' | 'dateRange' | 'date' | 'numberRange' | 'toggle' | 'selectAsync';
 
 export interface FilterConfig {
@@ -99,7 +100,8 @@ const AsyncSelect = ({
     <div className="relative">
       <div className="relative">
         <select
-          value={value || ''}
+          value={Array.isArray(value) ? (value[0] || '') : (value || '')}
+
           onChange={(e) => onChange(e.target.value)}
           className="w-full h-10 px-3 py-2 text-sm bg-gray-50 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none"
         >

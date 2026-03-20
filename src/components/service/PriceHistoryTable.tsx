@@ -67,7 +67,7 @@ const PriceHistoryTable: React.FC<PriceHistoryTableProps> = ({
         </button>
       </div>
 
-      <div className="overflow-hidden rounded-[32px] border border-slate-100 bg-white shadow-2xl shadow-slate-200/40">
+      <div className="overflow-x-auto rounded-[32px] border border-slate-100 bg-white shadow-2xl shadow-slate-200/40 custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-100">

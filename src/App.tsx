@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AppProviders } from './components/layout/AppProviders';
 import ProtectedRoute from './routes/ProtectedRoute';
 import PortalAuthGuard from './components/auth/PortalAuthGuard';
@@ -45,6 +45,11 @@ const AuthRedirect = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const LegacyRedirect = ({ to }: { to: string }) => {
+  const { "*": path } = useParams();
+  return <Navigate to={`${to}/${path || ''}`} replace />;
+};
+
 
 
 // Error Pages
@@ -54,19 +59,17 @@ import { OfflineBanner, PageSkeleton } from './components/ui/StatusStates';
 import { RouteObject } from 'react-router-dom';
 
 // Recursive Route Mapper for RouteObject arrays
-const MapRoutes = ({ routes }: { routes: RouteObject[] }) => (
-  <>
-    {routes.map((route, i) => {
-      if (route.index) {
-        return <Route key={i} index element={route.element} />;
-      }
-      return (
-        <Route key={i} path={route.path} element={route.element}>
-          {route.children && <MapRoutes routes={route.children} />}
-        </Route>
-      );
-    })}
-  </>
+const mapRoutes = (routes: RouteObject[]) => (
+  routes.map((route, i) => {
+    if (route.index) {
+      return <Route key={i} index element={route.element} />;
+    }
+    return (
+      <Route key={i} path={route.path} element={route.element}>
+        {route.children && mapRoutes(route.children)}
+      </Route>
+    );
+  })
 );
 
 const App = () => {
@@ -105,10 +108,9 @@ const App = () => {
 
               {/* 1. Admin & Staff Namespace (Protected) */}
               <Route element={<ProtectedRoute />}>
-                  <Route element={<AdminLayout />}>
-                    <MapRoutes routes={adminRoutes} />
-                    
-                    {/* Architectural Clarity: Crucial Admin Routes */}
+                  <Route path="admin" element={<AdminLayout />}>
+                    {mapRoutes(adminRoutes)}
+                    {/* Explicit routes for architectural visibility [H1] */}
                     <Route path="payments/:id" element={<PaymentDetail />} />
                     <Route path="owners/:id" element={<OwnerDetail />} />
                     <Route path="meters/confirm" element={<MeterReadingConfirm />} />
@@ -118,7 +120,16 @@ const App = () => {
                     <Route path="notifications" element={<NotificationPage />} />
                   </Route>
 
-                   <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                   <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+                   <Route path="/dashboard" element={<Navigate to="/admin/dashboard" replace />} />
+                   <Route path="/rooms/*" element={<LegacyRedirect to="/admin/rooms" />} />
+                   <Route path="/contracts/*" element={<LegacyRedirect to="/admin/contracts" />} />
+                   <Route path="/tenants/*" element={<LegacyRedirect to="/admin/tenants" />} />
+                   <Route path="/invoices/*" element={<LegacyRedirect to="/admin/invoices" />} />
+                   <Route path="/payments/*" element={<LegacyRedirect to="/admin/payments" />} />
+                   <Route path="/meters/*" element={<LegacyRedirect to="/admin/meters" />} />
+                   <Route path="/tickets/*" element={<LegacyRedirect to="/admin/tickets" />} />
+                   <Route path="/buildings/*" element={<LegacyRedirect to="/admin/buildings" />} />
                  </Route>
 
               <Route path="/portal">
@@ -134,7 +145,7 @@ const App = () => {
                 {/* Protected Portal Area */}
                 <Route element={<PortalAuthGuard />}>
                   <Route element={<PortalLayout />}>
-                    <MapRoutes routes={portalRoutes} />
+                    {mapRoutes(portalRoutes)}
                     {/* Explicitly adding Documents route for visibility */}
                     <Route path="documents" element={<Documents />} />
                   </Route>

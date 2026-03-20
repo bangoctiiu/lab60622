@@ -188,10 +188,10 @@ const PaymentList = () => {
                    </td>
                    <td className="px-6 py-4">
                       <div className="flex flex-col gap-1">
-                        <span onClick={() => navigate(`/admin/invoices/${p.invoiceId}`)} className="text-small font-bold text-text hover:text-primary cursor-pointer flex items-center gap-1">
+                        <span onClick={() => navigate(`/invoices/${p.invoiceId}`)} className="text-small font-bold text-text hover:text-primary cursor-pointer flex items-center gap-1">
                           <FileText size={12} /> {p.invoiceCode}
                         </span>
-                        <span onClick={() => navigate(`/admin/tenants/${p.tenantId}`)} className="text-[10px] text-muted hover:text-primary cursor-pointer flex items-center gap-1">
+                        <span onClick={() => navigate(`/tenants/${p.tenantId}`)} className="text-[10px] text-muted hover:text-primary cursor-pointer flex items-center gap-1">
                           <User size={10} /> {p.tenantName}
                         </span>
                       </div>

@@ -4,43 +4,79 @@
 
 @layer base {
   :root {
-    /* 2.1 Color Tokens */
-    --color-primary: #1B3A6B;
-    --color-secondary: #0D8A8A;
-    --color-accent: #F26419;
-    --color-success: #10B981;
-    --color-warning: #F59E0B;
-    --color-danger: #EF4444;
-    --color-bg: #F8FAFC;
-    --color-card: #FFFFFF;
-    --color-text: #1E293B;
-    --color-muted: #64748B;
-    --color-border: #E2E8F0;
+    /* Semantic Colors */
+    --primary: #1B3A6B;
+    --primary-foreground: #FFFFFF;
+    --secondary: #0D8A8A;
+    --secondary-foreground: #FFFFFF;
+    --accent: #F26419;
+    --accent-foreground: #FFFFFF;
+    
+    --background: #F8FAFC;
+    --foreground: #1E293B;
+    
+    --card: #FFFFFF;
+    --card-foreground: #1E293B;
+    
+    --muted: #64748B;
+    --muted-foreground: #94A3B8;
+    
+    --border: #E2E8F0;
+    --input: #E2E8F0;
+    
+    --success: #10B981;
+    --warning: #F59E0B;
+    --destructive: #EF4444;
+    --danger: var(--destructive);
 
-    /* Portal Color Overrides */
+    /* Backward Compatibility Aliases [L1] */
+    --color-primary: var(--primary);
+    --color-secondary: var(--secondary);
+    --color-accent: var(--accent);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-muted: var(--muted);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-danger: var(--destructive);
+
+    --bg: var(--background);
+    --muted-text: var(--muted);
+
+    /* Portal Overrides */
     --portal-primary: #0D8A8A;
-    --portal-primary-foreground: #FFFFFF;
     --portal-radius: 24px;
     
-    /* Advanced Shadows */
+    /* Premium Shadows */
     --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-    --shadow-inner-premium: inset 0 2px 4px 0 rgb(0 0 0 / 0.03);
     --shadow-glow: 0 0 20px rgba(13, 138, 138, 0.15);
   }
 
-  /* 2.1 Dark Mode Tokens */
   .dark {
-    --color-bg: #0F172A;
-    --color-card: #1E293B;
-    --color-text: #F8FAFC;
-    --color-muted: #94A3B8;
-    --color-border: #334155;
+    --primary: #38BDF8;
+    --primary-foreground: #0F172A;
+    --secondary: #0D8A8A;
+    --secondary-foreground: #F8FAFC;
     
-    --portal-radius: 24px;
-    --portal-primary: #0D8A8A;
+    --background: #020617;
+    --foreground: #F8FAFC;
     
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    --card: #1E293B;
+    --card-foreground: #F8FAFC;
+    
+    --muted: #94A3B8;
+    --muted-foreground: #64748B;
+    
+    --border: #334155;
+    --input: #334155;
+    
+    --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+
+    background-color: var(--background);
+    color: var(--foreground);
   }
 
   body {

@@ -20,8 +20,15 @@ export const formatVND = (amount: number): string => {
 /**
  * Format date to standard SmartStay format
  */
-export const formatDate = (date: Date | string | number, formatStr: string = 'dd/MM/yyyy'): string => {
-  return format(new Date(date), formatStr, { locale: vi });
+export const formatDate = (date: Date | string | number | null | undefined, formatStr: string = 'dd/MM/yyyy'): string => {
+  if (!date || date === '--') return '--';
+  try {
+     const d = new Date(date);
+     if (isNaN(d.getTime())) return '--';
+     return format(d, formatStr, { locale: vi });
+  } catch (e) {
+     return '--';
+  }
 };
 
 /**
@@ -41,17 +48,30 @@ export const maskPhone = (phone: string): string => {
 };
 
 import { differenceInYears, formatDistanceToNow } from 'date-fns';
-export const calculateAge = (dob: string | Date): string => {
-  if (!dob) return '--';
-  const age = differenceInYears(new Date(), new Date(dob));
-  return `${age} tuổi`;
+export const calculateAge = (dob: string | Date | null | undefined): string => {
+  if (!dob || dob === '--') return '--';
+  try {
+     const d = new Date(dob);
+     if (isNaN(d.getTime())) return '--';
+     const age = differenceInYears(new Date(), d);
+     return `${age} tuổi`;
+  } catch (e) {
+     return '--';
+  }
 };
 
 /**
  * Format relative time (e.g. "2 mins ago")
  */
-export const formatRelativeTime = (date: string | Date): string => {
-  return formatDistanceToNow(new Date(date), { addSuffix: true, locale: vi });
+export const formatRelativeTime = (date: string | Date | null | undefined): string => {
+  if (!date || date === '--') return '--';
+  try {
+     const d = new Date(date);
+     if (isNaN(d.getTime())) return '--';
+     return formatDistanceToNow(d, { addSuffix: true, locale: vi });
+  } catch (e) {
+     return '--';
+  }
 };
 
 /**

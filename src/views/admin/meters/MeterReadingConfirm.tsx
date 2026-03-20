@@ -22,7 +22,7 @@ const MeterReadingConfirm = () => {
       success: 'Đã lưu tất cả chỉ số thành công!',
       error: 'Lỗi khi lưu dữ liệu.'
     });
-    setTimeout(() => navigate('/meters'), 2200);
+    setTimeout(() => navigate('/admin/meters'), 2200);
   };
 
   return (

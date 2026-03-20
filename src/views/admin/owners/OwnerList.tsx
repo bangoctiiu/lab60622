@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Users, Search, Plus, Filter, 
   MoreVertical, Phone, Mail, 
@@ -9,23 +9,55 @@ import {
   Info
 } from 'lucide-react';
 import { buildingService } from '@/services/buildingService';
-import { OwnerSummary } from '@/models/Owner';
+import { OwnerSummary, Owner } from '@/models/Owner';
 import { cn } from '@/utils';
 import { Spinner } from '@/components/ui/Feedback';
 import { usePermission } from '@/hooks/usePermission';
+import { OwnerModal } from './OwnerModal';
+import { toast } from 'sonner';
 
 const OwnerList = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { hasPermission } = usePermission();
   const [search, setSearch] = useState('');
   const [showSensitive, setShowSensitive] = useState<string[]>([]);
   
+  // Modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingOwner, setEditingOwner] = useState<Owner | null>(null);
+
   const canViewPII = hasPermission('owner.view_pii');
 
   const { data: owners, isLoading } = useQuery<OwnerSummary[]>({
     queryKey: ['owners', search],
     queryFn: () => buildingService.getOwners(search)
   });
+
+  // Mutations
+  const createMutation = useMutation({
+    mutationFn: (data: any) => buildingService.createOwner(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['owners'] });
+      toast.success('Thêm chủ sở hữu thành công');
+      setIsModalOpen(false);
+    },
+    onError: () => toast.error('Có lỗi xảy ra khi thêm chủ sở hữu')
+  });
+
+  const handleOpenCreate = () => {
+    setEditingOwner(null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingOwner(null);
+  };
+
+  const handleSubmit = (data: any) => {
+    createMutation.mutate(data);
+  };
 
   const toggleMask = (id: string) => {
     if (!canViewPII) return;
@@ -49,7 +81,12 @@ const OwnerList = () => {
         </div>
         <div className="flex items-center gap-3">
           <button className="btn-outline flex items-center gap-2 h-11"><Download size={18} /> Export</button>
-          <button className="btn-primary flex items-center gap-2 px-8 h-11 shadow-xl shadow-primary/20"><Plus size={18} /> Thêm chủ sở hữu</button>
+          <button 
+            onClick={handleOpenCreate}
+            className="btn-primary flex items-center gap-2 px-8 h-11 shadow-xl shadow-primary/20"
+          >
+            <Plus size={18} /> Thêm chủ sở hữu
+          </button>
         </div>
       </div>
 
@@ -171,6 +208,15 @@ const OwnerList = () => {
            </p>
         </div>
       )}
+
+      {/* Owner Modal */}
+      <OwnerModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        initialData={editingOwner}
+        onSubmit={handleSubmit}
+        isSubmitting={createMutation.isPending}
+      />
     </div>
   );
 };

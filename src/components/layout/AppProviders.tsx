@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { queryClient } from '@/lib/queryClient';
 import { Toaster } from 'sonner';
 import { OfflineBanner, SessionExpiredOverlay } from '../ui/StatusStates';
+import { ConfirmDialog } from '../shared/ConfirmDialog';
 import useAuthStore from '@/stores/authStore';
 import useUIStore from '@/stores/uiStore';
 
@@ -33,6 +34,8 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
       {sessionExpired && <SessionExpiredOverlay onLogin={handleLoginRedirect} />}
       
       {children}
+      
+      <ConfirmDialog />
       
       <Toaster 
         position="bottom-right" 
