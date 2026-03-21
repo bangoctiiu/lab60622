@@ -96,7 +96,11 @@ export const getNormalizedHttpUrl = (url?: unknown): string | null => {
     // 1. Protocol check
     if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
       
-      // 2. Domain Whitelist check
+      // 2. Strip credentials to prevent user:pass@host obfuscation
+      parsed.username = '';
+      parsed.password = '';
+      
+      // 3. Domain Whitelist check
       const hostname = parsed.hostname.toLowerCase();
       const isTrusted = TRUSTED_DOMAINS.some(domain => 
         hostname === domain || hostname.endsWith('.' + domain)

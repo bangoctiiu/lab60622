@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation, useOutlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { ChevronLeft, Bell } from 'lucide-react';
 import BottomNavigation from './BottomNavigation';
 
@@ -22,13 +22,6 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  let outlet = null;
-  try {
-    outlet = useOutlet();
-  } catch (e) {
-    // Ignore if not in a valid router context
-  }
 
   // Determine title based on route if not provided
   const getTitleFromRoute = () => {
@@ -96,7 +89,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({
 
         {/* Dynamic Content Area with Mesh Background */}
         <main className="flex-1 overflow-y-auto portal-content custom-scrollbar">
-          {outlet || children}
+          {children !== undefined ? children : <Outlet />}
         </main>
 
         {/* Sticky Bottom Navigation Framework */}

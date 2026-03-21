@@ -27,22 +27,17 @@ export const NOTIFICATION_STYLE_MAP: Record<string, NotificationStyle> = {
  * Historical/variant type mapping to canonical keys
  */
 const TYPE_MAPPING: Record<string, string> = {
-  'invoice_due': 'invoice_due',
   'invoicedue': 'invoice_due',
-  'invoice_new': 'invoice_new',
   'invoicenew': 'invoice_new',
-  'bill_new': 'invoice_new',
-  'bill_due': 'invoice_due',
-  'payment_confirmed': 'payment_confirmed',
+  'billnew': 'invoice_new',
+  'billdue': 'invoice_due',
   'paymentconfirmed': 'payment_confirmed',
-  'payment_success': 'payment_confirmed',
-  'payment_paid': 'payment_confirmed',
+  'paymentsuccess': 'payment_confirmed',
+  'paymentpaid': 'payment_confirmed',
   'ticket': 'ticket',
-  'ticket_assigned': 'ticket',
   'ticketassigned': 'ticket',
-  'ticket_update': 'ticket',
-  'contract_renew': 'contract_renew',
-  'contract_expiring': 'contract_renew',
+  'ticketupdate': 'ticket',
+  'contractrenew': 'contract_renew',
   'contractexpiring': 'contract_renew',
   'announcement': 'announcement'
 };

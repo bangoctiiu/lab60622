@@ -4,7 +4,7 @@ import {
   Check, X, AlertCircle, User, Wind, Droplets, Refrigerator, Disc, Monitor, Layout
 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { roomService } from '@/services/roomService';
@@ -35,7 +35,7 @@ const mapRoomToFormData = (room: Room | RoomDetail | null, defaults: RoomFormDat
   if (!room) return defaults;
   return {
     roomCode: room.roomCode ?? defaults.roomCode,
-    buildingId: room.buildingId ?? defaults.buildingId,
+    buildingId: room.buildingId != null ? String(room.buildingId) : defaults.buildingId,
     floorNumber: room.floorNumber ?? defaults.floorNumber,
     roomType: room.roomType ?? defaults.roomType,
     areaSqm: room.areaSqm ?? defaults.areaSqm,
@@ -71,7 +71,7 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
     reset,
     formState: { errors, isSubmitting }
   } = useForm<RoomFormData>({
-    resolver: zodResolver(roomSchema) as any,
+    resolver: zodResolver(roomSchema) as unknown as Resolver<RoomFormData>,
     defaultValues: mapRoomToFormData(room || null, defaultValues)
   });
 
@@ -136,7 +136,7 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-all"><X size={24} /></button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit as any)} className="flex-1 overflow-y-auto p-10 space-y-10">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex-1 overflow-y-auto p-10 space-y-10">
            <div className="space-y-6">
               <div className="flex items-center gap-3 text-primary">
                  <Building2 size={18} /><h3 className="text-body font-black uppercase tracking-widest">Thông tin cơ bản</h3>
@@ -151,7 +151,7 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
                  <div className="space-y-2 relative">
                     <label className="text-[10px] font-black text-muted uppercase">Mã phòng *</label>
                     <input {...register('roomCode')} placeholder="VD: A-101" className={cn("input-base w-full", errors.roomCode && "border-danger")} />
-                    {errors.roomCode?.message && <p className="text-[10px] text-danger font-bold absolute -bottom-5">{(errors.roomCode.message as any)}</p>}
+                    {errors.roomCode?.message && <p className="text-[10px] text-danger font-bold absolute -bottom-5">{String(errors.roomCode.message)}</p>}
                  </div>
                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-muted uppercase">Tầng số</label>
@@ -255,7 +255,7 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
 
         <div className="p-8 border-t bg-bg/20 flex justify-end gap-3">
            <button onClick={onClose} className="px-8 py-3 bg-white border border-border/50 text-muted font-black uppercase tracking-widest rounded-2xl hover:bg-white/80 transition-all">Huỷ bỏ</button>
-           <button onClick={handleSubmit(onSubmit as any)} disabled={createMutation.isPending || updateMutation.isPending} className="px-10 py-3 bg-primary text-white font-black uppercase tracking-[3px] rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50">
+           <button onClick={handleSubmit(onSubmit)} disabled={createMutation.isPending || updateMutation.isPending} className="px-10 py-3 bg-primary text-white font-black uppercase tracking-[3px] rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50">
               {(createMutation.isPending || updateMutation.isPending) ? <Spinner className="w-4 h-4 text-white" /> : (isEditing ? 'Lưu thay đổi' : 'Tạo phòng')}
            </button>
         </div>

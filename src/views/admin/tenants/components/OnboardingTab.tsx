@@ -3,14 +3,16 @@ import { LayoutList, CheckCircle2, ArrowRight } from 'lucide-react';
 import { OnboardingProgress } from '@/models/Tenant';
 import { cn } from '@/utils';
 
+import { TabType } from '../TenantDetail';
+
 interface OnboardingTabProps {
   onboarding: OnboardingProgress | undefined;
   onAction: (key: string) => void;
-  onTabChange: (tab: any) => void;
+  onTabChange: (tab: TabType) => void;
 }
 
 export const OnboardingTab: React.FC<OnboardingTabProps> = ({ onboarding, onAction, onTabChange }) => {
-  const steps = [
+  const steps: { key: string; label: string; target: TabType | null }[] = [
     { key: 'isPersonalInfoConfirmed', label: 'Xác nhận thông tin cá nhân', target: 'Ho so' },
     { key: 'isCCCDUploaded', label: 'Upload CCCD/Hộ chiếu', target: 'Ho so' },
     { key: 'isEmergencyContactAdded', label: 'Thêm liên hệ khẩn cấp', target: 'Lien he' },
@@ -72,7 +74,7 @@ export const OnboardingTab: React.FC<OnboardingTabProps> = ({ onboarding, onActi
             <div className="flex items-center gap-4">
               {step.target && !onboarding?.[step.key as keyof OnboardingProgress] && (
                 <button 
-                  onClick={() => onTabChange(step.target)}
+                  onClick={() => onTabChange(step.target!)}
                   className="text-[10px] font-black uppercase text-primary hover:underline"
                 >
                   Thực hiện ngay

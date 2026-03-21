@@ -35,7 +35,7 @@ import {
   OnboardingTab
 } from './components/index';
 
-type TabType = 'Ho so' | 'Lien he' | 'Hop dong' | 'Hoa don' | 'Vi' | 'Phan hoi' | 'Onboarding';
+export type TabType = 'Ho so' | 'Lien he' | 'Hop dong' | 'Hoa don' | 'Vi' | 'Phan hoi' | 'Onboarding';
 
 /**
  * Helper to determine if a tab is in a loading state.

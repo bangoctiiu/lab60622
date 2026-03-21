@@ -16,7 +16,8 @@ import {
   Droplets,
   Wifi,
   Shield,
-  FilePlus
+  FilePlus,
+  AlertCircle
 } from 'lucide-react';
 import PortalLayout from '@/components/layout/PortalLayout';
 import api from '@/services/apiClient';
@@ -37,7 +38,7 @@ const getServiceIcon = (name: string) => {
 };
 
 const ContractView = () => {
-  const { data: contract, isLoading } = useQuery<ContractDetail>({
+  const { data: contract, isLoading, isError, refetch } = useQuery<ContractDetail>({
     queryKey: ['portal-active-contract'],
     queryFn: () => portalService.getActiveContract()
   });
@@ -57,6 +58,15 @@ const ContractView = () => {
           <div className="py-20 flex flex-col items-center justify-center gap-4">
              <Spinner />
              <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest italic">Đang tải dữ liệu pháp lý...</p>
+          </div>
+        ) : isError || !contract ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-4 text-center px-6">
+             <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-2 shadow-inner border border-red-100">
+               <AlertCircle size={32} />
+             </div>
+             <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Không thể tải hợp đồng</h3>
+             <p className="text-[12px] text-slate-500 max-w-[250px] leading-relaxed">Đã xảy ra lỗi khi kết nối với máy chủ hoặc dữ liệu hợp đồng không hợp pháp.</p>
+             <button onClick={() => refetch()} className="mt-4 px-6 py-2 bg-slate-900 text-white hover:bg-slate-800 transition-colors text-[11px] font-bold uppercase tracking-widest rounded-xl">Thử lại</button>
           </div>
         ) : (
           <>
@@ -175,20 +185,29 @@ const ContractView = () => {
                           <p className="text-[11px] text-slate-500 italic line-clamp-2 mt-1">{addendum.content}</p>
                           
                           {(() => {
-                             if (typeof addendum.fileUrl !== 'string') return null;
-                             const safeUrl = getNormalizedHttpUrl(addendum.fileUrl);
-                             if (!safeUrl) return null;
-                             
-                             return (
-                               <a 
-                                 href={safeUrl}
-                                 target="_blank"
-                                 rel="noopener noreferrer"
-                                 className="mt-3 inline-flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
-                               >
-                                  <Download size={12} /> Tải bản scan PDF
-                               </a>
-                             );
+                             try {
+                               if (typeof addendum.fileUrl !== 'string') return null;
+                               const safeUrl = getNormalizedHttpUrl(addendum.fileUrl);
+                               if (!safeUrl) return null;
+                               
+                               return (
+                                 <a 
+                                   href={safeUrl}
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="mt-3 inline-flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline"
+                                 >
+                                    <Download size={12} /> Tải bản scan PDF
+                                 </a>
+                               );
+                             } catch (err) {
+                               console.warn('[ContractView] Render failed for fileUrl', { addendumCode: addendum.addendumCode, fileUrl: addendum.fileUrl, err });
+                               return (
+                                 <span className="mt-3 inline-flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-widest">
+                                   <AlertCircle size={12} /> Lỗi định dạng tệp
+                                 </span>
+                               );
+                             }
                           })()}
 
                        </div>
