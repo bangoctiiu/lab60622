@@ -1,0 +1,2 @@
+src/services/tenantDashboardService.ts(102,7): error TS2741: Property 'addendums' is missing in type '{ id: string; contractCode: string; tenantName: string; roomId: string; roomCode: string; buildingName: string; type: "Residential"; startDate: string; endDate: string; rentPriceSnapshot: number; ... 8 more ...; services: never[]; }' but required in type 'ContractDetail'.
+src/views/admin/contracts/AddendumListPage.tsx(6,29): error TS2307: Cannot find module '@/components/shared/StatusBadge' or its corresponding type declarations.

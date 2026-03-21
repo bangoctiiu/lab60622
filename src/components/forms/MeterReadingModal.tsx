@@ -84,7 +84,7 @@ export const MeterReadingModal = ({ isOpen, onClose, meter, onSuccess }: Reading
        toast.warning("Bạn đang ghi chồng chỉ số đã tồn tại.");
     }
     if (isError) {
-       toast.error(`Chỉ số hiện tại (${currentIndex}) không được nhỏ hơn chỉ số trước (${previousIndex})`);
+       toast.error(`Chỉ số hiện tại (${currentIndex}) không được nhỏ hơn chỉ số kỳ trước (${previousIndex})`);
        return;
     }
 
@@ -164,7 +164,7 @@ export const MeterReadingModal = ({ isOpen, onClose, meter, onSuccess }: Reading
 
                   <div className="space-y-6">
                      <div className="space-y-2">
-                        <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Số cũ (RULE-01)</label>
+                        <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Chỉ số kỳ trước (RULE-01)</label>
                         <div className="h-14 bg-slate-900/5 rounded-[20px] flex items-center px-6 border border-slate-100">
                            <span className="text-[20px] font-black font-mono text-slate-400">
                               {isLoadingLatest ? '...' : previousIndex.toLocaleString()}
@@ -174,7 +174,7 @@ export const MeterReadingModal = ({ isOpen, onClose, meter, onSuccess }: Reading
                      </div>
 
                      <div className="space-y-2">
-                        <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Số mới hiện tại</label>
+                        <label className="text-[11px] text-muted font-black uppercase tracking-[2px] ml-1">Chỉ số hiện tại</label>
                         <div className="relative group">
                            <input 
                              type="number" 

@@ -25,34 +25,15 @@ import { format } from 'date-fns';
 import api from '@/services/apiClient';
 import notificationService from '@/services/notificationService';
 import { cn } from '@/utils';
+import { getNotificationStyle, normalizeNotificationType } from '@/utils/notificationUtils';
 
 const SwipeableNotificationItem = ({ item, onRead, onDelete }: { item: any; onRead: () => void; onDelete: () => void }) => {
   const [offset, setOffset] = useState(0);
   const [startX, setStartX] = useState(0);
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'invoice_new': return <CreditCard size={20} />;
-      case 'invoice_due': return <Bell size={20} />;
-      case 'payment_success': return <Check size={20} />;
-      case 'ticket_update': return <Wrench size={20} />;
-      case 'contract_expiring': return <Calendar size={20} />;
-      case 'announcement': return <Megaphone size={20} />;
-      default: return <Bell size={20} />;
-    }
-  };
+  const style = getNotificationStyle(item.type);
+  const Icon = style?.icon || Bell;
 
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'invoice_new': return 'bg-blue-50 text-blue-600 border-blue-100';
-      case 'invoice_due': return 'bg-amber-50 text-amber-600 border-amber-100';
-      case 'payment_success': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-      case 'ticket_update': return 'bg-teal-50 text-[#0D8A8A] border-teal-100';
-      case 'contract_expiring': return 'bg-rose-50 text-rose-600 border-rose-100';
-      case 'announcement': return 'bg-indigo-50 text-indigo-600 border-indigo-100';
-      default: return 'bg-slate-50 text-slate-500 border-slate-100';
-    }
-  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setStartX(e.touches[0].clientX);
@@ -99,9 +80,10 @@ const SwipeableNotificationItem = ({ item, onRead, onDelete }: { item: any; onRe
         <div className="flex gap-4">
           <div className={cn(
             "w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border shadow-inner transition-transform group-hover:scale-105",
-            getIconColor(item.type)
+            style?.color || 'bg-slate-50 text-slate-500 border-slate-100'
           )}>
-            {getIcon(item.type)}
+            <Icon size={20} />
+
           </div>
           
           <div className="flex-1 space-y-1.5 min-w-0">
@@ -167,33 +149,15 @@ const NotificationCenter = () => {
     }
   });
 
-  const getIcon = (type: string) => {
-    const t = (type || '').toLowerCase();
-    if (t.includes('invoice')) return <CreditCard size={20} />;
-    if (t.includes('payment')) return <Check size={20} />;
-    if (t.includes('ticket')) return <Wrench size={20} />;
-    if (t.includes('contract')) return <Calendar size={20} />;
-    if (t.includes('announcement')) return <Megaphone size={20} />;
-    return <Bell size={20} />;
-  };
 
-  const getIconColor = (type: string) => {
-    const t = (type || '').toLowerCase();
-    if (t.includes('invoice')) return 'bg-amber-50 text-amber-600 border-amber-100';
-    if (t.includes('payment')) return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-    if (t.includes('ticket')) return 'bg-teal-50 text-[#0D8A8A] border-teal-100';
-    if (t.includes('contract')) return 'bg-rose-50 text-rose-600 border-rose-100';
-    if (t.includes('announcement')) return 'bg-indigo-50 text-indigo-600 border-indigo-100';
-    return 'bg-slate-50 text-slate-500 border-slate-100';
-  };
 
   const handleNotificationClick = (item: any) => {
     if (!item.isRead) markAsReadMutation.mutate(item.id);
-    const t = (item.type || '').toLowerCase();
-    if (t.includes('invoice') || t.includes('payment')) navigate('/portal/invoices');
-    else if (t.includes('ticket')) navigate('/portal/tickets');
-    else if (t.includes('announcement')) navigate('/portal/announcements');
-    else if (t.includes('contract')) navigate('/portal/profile');
+    const t = normalizeNotificationType(item.type);
+    if (t === 'invoice_new' || t === 'invoice_due' || t === 'payment_confirmed') navigate('/portal/invoices');
+    else if (t === 'ticket') navigate('/portal/tickets');
+    else if (t === 'announcement') navigate('/portal/announcements');
+    else if (t === 'contract_renew') navigate('/portal/profile');
   };
 
   const filteredNotifications = notifications?.filter((n: any) => 

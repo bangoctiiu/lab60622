@@ -3,7 +3,7 @@ import { FileText, ShieldCheck, Clock, Download, Plus } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { contractService } from '@/services/contractService';
 import { formatDate, cn } from '@/utils';
-import { StatusBadge } from '@/components/shared/StatusBadge';
+import { StatusBadge } from '@/components/ui';
 import { Spinner } from '@/components/ui/Feedback';
 import { toast } from 'sonner';
 

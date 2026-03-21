@@ -118,7 +118,8 @@ export const tenantDashboardService = {
         paymentDueDay: 5,
         status: 'Active',
         tenants: [],
-        services: []
+        services: [],
+        addendums: []
       },
       onboarding: {
         completionPercent: 50,

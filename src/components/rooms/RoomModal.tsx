@@ -9,22 +9,59 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { roomService } from '@/services/roomService';
 import { roomSchema, RoomFormData } from '@/schemas/roomSchema';
-import { RoomDetail, RoomType, Furnishing, DirectionFacing } from '@/models/Room';
+import { Room, RoomDetail, RoomType, Furnishing, DirectionFacing } from '@/models/Room';
 import { cn } from '@/utils';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/Feedback';
 import useUIStore from '@/stores/uiStore';
 
+const getDefaults = (activeBuildingId?: string | number | null): RoomFormData => ({
+  roomCode: '',
+  buildingId: activeBuildingId ? activeBuildingId.toString() : '',
+  floorNumber: 1,
+  roomType: 'Studio',
+  areaSqm: 25,
+  baseRentPrice: 5000000,
+  maxOccupancy: 2,
+  furnishing: 'Unfurnished',
+  directionFacing: 'S',
+  hasBalcony: false,
+  conditionScore: 8,
+  amenities: [],
+  description: ''
+});
+
+const mapRoomToFormData = (room: Room | RoomDetail | null, defaults: RoomFormData): RoomFormData => {
+  if (!room) return defaults;
+  return {
+    roomCode: room.roomCode ?? defaults.roomCode,
+    buildingId: room.buildingId ?? defaults.buildingId,
+    floorNumber: room.floorNumber ?? defaults.floorNumber,
+    roomType: room.roomType ?? defaults.roomType,
+    areaSqm: room.areaSqm ?? defaults.areaSqm,
+    baseRentPrice: room.baseRentPrice ?? defaults.baseRentPrice,
+    maxOccupancy: (room as RoomDetail).maxOccupancy ?? defaults.maxOccupancy,
+    furnishing: ('furnishing' in room && room.furnishing) ? room.furnishing : defaults.furnishing,
+    directionFacing: ('directionFacing' in room && room.directionFacing) ? room.directionFacing : defaults.directionFacing,
+    hasBalcony: 'hasBalcony' in room ? room.hasBalcony : defaults.hasBalcony,
+    conditionScore: 'conditionScore' in room ? room.conditionScore : defaults.conditionScore,
+    amenities: 'amenities' in room ? room.amenities : defaults.amenities,
+    description: 'description' in room ? (room.description || '') : defaults.description,
+  };
+};
+
 interface RoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  room?: RoomDetail;
+  room?: RoomDetail | Room | null;
 }
 
 export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
   const isEditing = !!room;
   const queryClient = useQueryClient();
   const { activeBuildingId } = useUIStore();
+  
+  const defaultValues = useMemo(() => getDefaults(activeBuildingId), [activeBuildingId]);
   
   const {
     register,
@@ -35,21 +72,7 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
     formState: { errors, isSubmitting }
   } = useForm<RoomFormData>({
     resolver: zodResolver(roomSchema) as any,
-    defaultValues: room || {
-      roomCode: '',
-      buildingId: activeBuildingId ? activeBuildingId.toString() : '1',
-      floorNumber: 1,
-      roomType: 'Studio',
-      areaSqm: 25,
-      baseRentPrice: 5000000,
-      maxOccupancy: 2,
-      furnishing: 'Unfurnished',
-      directionFacing: 'S',
-      hasBalcony: false,
-      conditionScore: 8,
-      amenities: [],
-      description: ''
-    }
+    defaultValues: mapRoomToFormData(room || null, defaultValues)
   });
 
   const selectedAmenities = useWatch({ control, name: 'amenities' }) || [];
@@ -57,23 +80,10 @@ export const RoomModal = ({ isOpen, onClose, room }: RoomModalProps) => {
   const hasBalcony = useWatch({ control, name: 'hasBalcony' }) || false;
 
   useEffect(() => {
-    if (room && isOpen) reset(room);
-    else if (!room && isOpen) reset({
-        roomCode: '',
-        buildingId: activeBuildingId ? activeBuildingId.toString() : '1',
-        floorNumber: 1,
-        roomType: 'Studio',
-        areaSqm: 25,
-        baseRentPrice: 5000000,
-        maxOccupancy: 2,
-        furnishing: 'Unfurnished',
-        directionFacing: 'S',
-        hasBalcony: false,
-        conditionScore: 8,
-        amenities: [],
-        description: ''
-    });
-  }, [room, isOpen, reset, activeBuildingId]);
+    if (isOpen) {
+      reset(mapRoomToFormData(room || null, defaultValues));
+    }
+  }, [room, isOpen, reset, defaultValues]);
 
   const createMutation = useMutation({
     mutationFn: (data: RoomFormData) => roomService.createRoom(data),

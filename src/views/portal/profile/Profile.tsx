@@ -574,8 +574,8 @@ const Switch = ({ active, onClick }: { active: boolean, onClick: () => void }) =
     )}
   >
     <div className={cn(
-      "absolute top-1.5 w-7 h-7 bg-white rounded-full transition-all duration-700 shadow-xl",
-      active ? "left-7.5 translate-x-1" : "left-1.5"
+      "absolute top-1.5 left-1.5 w-7 h-7 bg-white rounded-full transition-transform duration-700 shadow-xl",
+      active ? "translate-x-[1.5rem]" : "translate-x-0"
     )} />
   </button>
 );

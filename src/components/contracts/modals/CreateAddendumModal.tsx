@@ -52,10 +52,11 @@ export const CreateAddendumModal = ({ isOpen, onClose, contract }: CreateAddendu
             <div className="bg-danger/5 p-4 rounded-2xl border border-danger/20 flex gap-3 animate-bounce">
               <AlertCircle className="text-danger shrink-0" size={20} />
               <p className="text-small text-danger font-bold uppercase">
-                Cảnh báo RULE-06: Vui lòng upload file scan bản ký tay trước khi chuyển trạng thái sang "Đã ký".
+                (RULE-06) Vui lòng upload file scan bản ký tay trước khi chuyển sang trạng thái "Đã ký" (Signed)
               </p>
             </div>
           )}
+
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">

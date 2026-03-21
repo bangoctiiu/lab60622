@@ -57,6 +57,18 @@ export const MOCK_CONTRACTS: any[] = [
         signedAt: '2024-02-28'
       }
     ],
-    extensions: []
+    extensions: [],
+    addendums: [
+      {
+        id: 'A1',
+        addendumCode: 'PL-2403-001',
+        type: 'PriceChange',
+        title: 'Điều chỉnh giá dịch vụ 2024',
+        effectiveDate: '2024-03-05',
+        status: 'Signed',
+        fileUrl: 'https://example.com/addendum-1.pdf',
+        content: 'Thay đổi đơn giá nước sinh hoạt từ 23.000đ lên 25.000đ/m3.'
+      }
+    ]
   }
 ];

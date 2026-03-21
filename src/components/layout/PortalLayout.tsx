@@ -1,21 +1,34 @@
 import React from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, useOutlet } from 'react-router-dom';
 import { ChevronLeft, Bell } from 'lucide-react';
 import BottomNavigation from './BottomNavigation';
 
 interface PortalLayoutProps {
+  /** The title to display in the header. If omitted, it will be inferred from the current route. */
   title?: string;
+  /** Whether to show the back button. Default is true. */
   showBack?: boolean;
+  /** Custom element to show in the top-right corner of the header. */
   rightAction?: React.ReactNode;
+  /** Alternative to route-based rendering. If provided, these children will render if no nested route matches. */
+  children?: React.ReactNode;
 }
 
 const PortalLayout: React.FC<PortalLayoutProps> = ({ 
   title, 
   showBack = true,
-  rightAction
+  rightAction,
+  children
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  let outlet = null;
+  try {
+    outlet = useOutlet();
+  } catch (e) {
+    // Ignore if not in a valid router context
+  }
 
   // Determine title based on route if not provided
   const getTitleFromRoute = () => {
@@ -83,7 +96,7 @@ const PortalLayout: React.FC<PortalLayoutProps> = ({
 
         {/* Dynamic Content Area with Mesh Background */}
         <main className="flex-1 overflow-y-auto portal-content custom-scrollbar">
-          <Outlet />
+          {outlet || children}
         </main>
 
         {/* Sticky Bottom Navigation Framework */}

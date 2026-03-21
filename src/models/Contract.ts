@@ -29,6 +29,8 @@ export interface ContractDetail extends Contract {
   note?: string;
   tenants: ContractTenant[];
   services: ContractService[];
+  addendums?: ContractAddendum[];
+
 }
 
 export interface ContractTenant {

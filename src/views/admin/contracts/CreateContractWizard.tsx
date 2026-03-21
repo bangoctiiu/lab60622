@@ -179,7 +179,7 @@ const Step1 = () => {
   });
 
   const representativeId = watch('representativeId');
-  const selectedRoom = rooms?.find(r => r.id === selectedRoomId);
+  const selectedRoom = selectedRoomId ? (rooms?.find(r => r.id === selectedRoomId) || null) : null;
 
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4">
@@ -215,7 +215,12 @@ const Step1 = () => {
             </select>
             {errors.roomId && (
               <div className="flex items-center gap-1.5 text-destructive text-[10px] font-bold">
-                <AlertCircle size={12} /> {errors.roomId.message}
+                <AlertCircle size={12} /> {errors.roomId.message === 'Required' ? 'Vui lòng chọn phòng' : errors.roomId.message}
+              </div>
+            )}
+            {selectedRoom?.status === 'Occupied' && (
+              <div className="flex items-center gap-1.5 text-destructive text-[10px] font-black uppercase">
+                <AlertCircle size={12} /> Phong dang co hop dong Active
               </div>
             )}
           </div>

@@ -3,7 +3,7 @@
  * Prevents XSS and loading content from untrusted remote sources
  */
 
-const TRUSTED_DOMAINS = [
+export const TRUSTED_DOMAINS = [
   'cdn.smartstay.vn',
   'localhost',
   '127.0.0.1',
@@ -79,4 +79,39 @@ export const checkImageIntegrity = async (file: Blob): Promise<boolean> => {
     };
     reader.readAsArrayBuffer(file.slice(0, 16));
   });
+};
+
+/**
+ * Strictly validates and normalizes a URL string. 
+ * Only allows http: and https: protocols AND requires the host
+ * to be on the TRUSTED_DOMAINS whitelist.
+ * Returns the normalized href string or null if invalid.
+ */
+export const getNormalizedHttpUrl = (url?: unknown): string | null => {
+  if (typeof url !== 'string' || !url.trim()) return null;
+
+  try {
+    const parsed = new URL(url.trim());
+    
+    // 1. Protocol check
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      
+      // 2. Domain Whitelist check
+      const hostname = parsed.hostname.toLowerCase();
+      const isTrusted = TRUSTED_DOMAINS.some(domain => 
+        hostname === domain || hostname.endsWith('.' + domain)
+      );
+      
+      if (isTrusted) {
+        return parsed.href;
+      } else {
+        console.warn(`[Security] Untrusted URL domain blocked: ${hostname}`);
+        return null;
+      }
+    }
+    console.warn(`[Security] Invalid URL protocol blocked: ${parsed.protocol}`);
+  } catch (e) {
+    console.warn(`[Security] Malformed URL encountered and blocked.`);
+  }
+  return null;
 };

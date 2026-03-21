@@ -77,6 +77,18 @@ export default {
         'xl': '1280px',
         '2xl': '1536px',
       },
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+        'spin-fast': 'spin 0.5s linear infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'bounce-gentle': 'bounce-gentle 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'bounce-gentle': {
+          '0%, 100%': { transform: 'translateY(0) translateZ(0)' },
+          '50%': { transform: 'translateY(-5px) translateZ(0)' },
+        }
+      }
     },
   },
   plugins: [tailwindAnimate],
